@@ -1,9 +1,5 @@
 import { domainSuffixList } from './domain-suffix-list.js';
 
-const ROUTE = '/abcd1234'; // todo use Worker KV maybe?
-const PATH_FOR_SCRIPT_DOWNLOAD = '/ghjklmno56789';  // todo use Worker KV maybe?
-const PATH_FOR_GET_ENDPOINT = '/qwerty13579';  // todo use Worker KV maybe?
-
 function getVisitorIdEndpoint(region) {
   const prefix = region === 'us' ? '' : `${region}.`;
   return `https://${prefix}api.fpjs.io`;
@@ -136,12 +132,12 @@ async function handleIngressAPI(event){
   return handleIngressAPIRaw(event, newURL)
 }
 
-async function handleRequest(event) {  
+async function handleRequest(event) {
   const url = new URL(event.request.url);
-  const pathname = url.pathname;
-  if (pathname === `${ROUTE}${PATH_FOR_SCRIPT_DOWNLOAD}`) {
+  const pathname = url.pathname;  
+  if (pathname === `${api_route}${api_for_script_download}`) {
     return handleDownloadScript(event);
-  } else if (pathname === `${ROUTE}${PATH_FOR_GET_ENDPOINT}`) {
+  } else if (pathname === `${api_route}${api_for_get_endpoint}`) {
     return handleIngressAPI(event)
   } else {
     throw new Error(`unmatched path ${pathname}`);
