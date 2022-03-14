@@ -1,0 +1,11 @@
+name = "fpjs-metrics-beta"
+type = "javascript"
+account_id = ""
+zone_id = ""
+route = ""
+
+[build]
+command = "npm install && npm run build"
+
+[build.upload]
+format = "service-worker"

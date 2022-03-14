@@ -1,0 +1,13 @@
+{
+    "name": "fp-cf-worker",
+    "version": "0.0.1",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "esbuild --bundle --format=iife --platform=node --minify --outdir=dist ./src/index.js",
+        "deploy": "wrangler publish"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "esbuild": "^0.14.25"
+    }
+}
