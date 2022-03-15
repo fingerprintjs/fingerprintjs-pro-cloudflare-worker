@@ -1,7 +1,8 @@
+import { API_VERSION, LOADER_VERSION, getCdnEndpoint, getCdnEndpoint0 } from './env.js';
 import { domainSuffixList } from './domain-suffix-list.js';
 
 function getVisitorIdEndpoint(region) {
-  const prefix = region === 'us' ? '' : `${region}.`;
+  const prefix = region === 'us' ? '' : `${region}.`;  
   return `https://${prefix}api.fpjs.io`;
 }
 
@@ -11,16 +12,6 @@ function createCookieStringFromObject(name, value) {
   const rest = flags.map(([k,v]) => v ? `${k}=${v}` : k);
   return [nameValue, ...rest].join('; ');
 }
-
-const rules = domainSuffixList.map(rule => {
-  return {
-    rule: rule,
-    suffix: rule.replace(/^(\*\.|\!)/, ''),
-    punySuffix: -1,
-    wildcard: rule.charAt(0) === '*',
-    exception: rule.charAt(0) === '!'
-  }
-});
 
 function createResponseWithMaxAge(oldResponse, maxMaxAge) {
   const response = new Response(oldResponse.body, oldResponse)
@@ -37,12 +28,32 @@ function createResponseWithMaxAge(oldResponse, maxMaxAge) {
   return response
 }
 
+function identifyDomain(hostname) {
+  const l1 = hostname.length;
+  for (let i = 0; i < domainSuffixList.length; i++) {
+    const domain = domainSuffixList[i];
+    const l2 = domain.length;
+    const sp = l1 - l2;
+    if (sp < 0) continue;
+
+    if (domain.toLowerCase() === hostname.substring(l1 - l2, l1)) {
+      const fp = hostname.substring(0, sp - 1);
+      const dot = fp.lastIndexOf('.');
+      if (dot == -1) {
+        return hostname;
+      } else {
+        return hostname.substring(dot + 1);
+      }
+    }
+  }
+
+  return hostname;
+}
+
 function createResponseWithFirstPartyCookies(request, response) {
   const origin = request.headers.get('origin');
-  const domainURL = (new URL(origin)).hostname;
-  // TODO psl 
-  const domain = domainURL;
-  console.log(`domain = ${domain}`);
+  const hostname = (new URL(origin)).hostname;
+  const domain = identifyDomain(hostname);
   const newHeaders = new Headers(response.headers)
   const cookiesArray = newHeaders.getAll('set-cookie');
   newHeaders.delete('set-cookie')
@@ -111,7 +122,9 @@ async function handleDownloadScript(event){
   if (!browserToken) {
     throw new Error('browserToken is expected in query parameters.');
   }
-  const cdnEndpoint = `https://fpcdn.io/v3/${browserToken}`; // todo get version, loader version from js client and set in the endpoint
+  
+  //const cdnEndpoint = getCdnEndpoint(browserToken, API_VERSION, LOADER_VERSION)
+  const cdnEndpoint = getCdnEndpoint0(browserToken, API_VERSION)
   const newRequest = new Request(cdnEndpoint, new Request(event.request, {
     headers: new Headers(event.request.headers)
   }));
@@ -125,7 +138,7 @@ async function handleDownloadScript(event){
 
 async function handleIngressAPI(event){
   const url = new URL(event.request.url);
-  const region = url.searchParams.get('region') || 'us';
+  const region = url.searchParams.get('region') || 'us';  
   const endpoint = getVisitorIdEndpoint(region)
   const newURL = new URL(endpoint)
   newURL.search = new URLSearchParams(url.search)
