@@ -8,9 +8,6 @@ const DEFAULT_GET_ENDPOINT_SUBPATH = '/qwerty13579';
 const scriptDownloadSubpath = (typeof script_download_subpath !== 'undefined') ? script_download_subpath : DEFAULT_SCRIPT_DOWNLOAD_SUBPATH;
 const getEndpointSubpath = (typeof get_endpoint_subpath !== 'undefined') ? get_endpoint_subpath : DEFAULT_GET_ENDPOINT_SUBPATH;
 
-// values presented in wrangers.toml [vars] section
-// and comes as env vars
-
 function getVisitorIdEndpoint(region) {
   const prefix = region === 'us' ? '' : `${region}.`;  
   return `https://${prefix}api.fpjs.io`;
@@ -138,6 +135,7 @@ async function handleRequest(event) {
   const url = new URL(event.request.url);
   const pathname = url.pathname;
   
+  // API_BASE_ROUTE comes from secrets
   const SCRIPT_DOWNLOAD_PATH = `${API_BASE_ROUTE}${scriptDownloadSubpath}`;
   const GET_ENDPOINT_PATH = `${API_BASE_ROUTE}${getEndpointSubpath}`;
 
