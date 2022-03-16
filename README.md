@@ -65,4 +65,4 @@ API_BASE_ROUTE = <route to worker>
  * `CF_API_TOKEN` -- Cloudflare API token with `Edit workers` permission. [Link](https://dash.cloudflare.com/profile/api-tokens) to create.
  * `CF_ROUTE` -- Worker's HTTP route, e.g. `domain.com/<route to worker>`
  * `CF_API_BASE_ROUTE` -- `<route to worker>`.
-
+2. Use [workflow file](.github/workflows/deploy.yml) to deploy worker.
