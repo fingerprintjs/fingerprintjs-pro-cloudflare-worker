@@ -10,8 +10,6 @@ const getEndpointSubpath = (typeof get_endpoint_subpath !== 'undefined') ? get_e
 
 // values presented in wrangers.toml [vars] section
 // and comes as env vars
-const SCRIPT_DOWNLOAD_PATH = `${API_BASE_ROUTE}${scriptDownloadSubpath}`;
-const GET_ENDPOINT_PATH = `${API_BASE_ROUTE}${getEndpointSubpath}`;
 
 function getVisitorIdEndpoint(region) {
   const prefix = region === 'us' ? '' : `${region}.`;  
@@ -140,6 +138,9 @@ async function handleRequest(event) {
   const url = new URL(event.request.url);
   const pathname = url.pathname;
   
+  const SCRIPT_DOWNLOAD_PATH = `${API_BASE_ROUTE}${scriptDownloadSubpath}`;
+  const GET_ENDPOINT_PATH = `${API_BASE_ROUTE}${getEndpointSubpath}`;
+
   if (pathname === SCRIPT_DOWNLOAD_PATH) {
     return handleDownloadScript(event);
   } else if (pathname === GET_ENDPOINT_PATH) {
