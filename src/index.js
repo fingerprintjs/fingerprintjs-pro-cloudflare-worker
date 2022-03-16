@@ -1,4 +1,4 @@
-import { API_VERSION, LOADER_VERSION, getCdnEndpoint } from './env.js';
+import { API_VERSION, LOADER_VERSION, getCdnEndpoint, getVisitorIdEndpoint } from './env.js';
 
 import { identifyDomain } from './utils/utils.js';
 
@@ -7,11 +7,6 @@ const DEFAULT_GET_ENDPOINT_SUBPATH = '/qwerty13579';
 
 const scriptDownloadSubpath = (typeof script_download_subpath !== 'undefined') ? script_download_subpath : DEFAULT_SCRIPT_DOWNLOAD_SUBPATH;
 const getEndpointSubpath = (typeof get_endpoint_subpath !== 'undefined') ? get_endpoint_subpath : DEFAULT_GET_ENDPOINT_SUBPATH;
-
-function getVisitorIdEndpoint(region) {
-  const prefix = region === 'us' ? '' : `${region}.`;  
-  return `https://${prefix}api.fpjs.io`;
-}
 
 function createCookieStringFromObject(name, value) {
   const flags = Object.entries(value).filter(([k]) => k !== name && k !== 'value');
