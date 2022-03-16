@@ -51,8 +51,18 @@ FingerprintJS.load({
   * `account_id` -- your Cloudflare Account ID from [Workers Dashboard](https://dash.cloudflare.com/?to=/:account/workers).
   * `zone_id` -- Zone ID from [CF Dashboard](https://dash.cloudflare.com/?to=/:account/) of the website.
   * `route` -- Worker's HTTP route, e.g. `domain.com/<route to worker>`
-  * `api_base_route` -- <route to worker>`
-3. In order to change default values of `<script_download_subpath>` and `<get_endpoint_subpath>` you may add them info `wrangler.toml` file under `[vars]` section.
+3. Add `[vars]` section in the `wrangler.toml` file:
+```
+[vars]
+API_BASE_ROUTE = <route to worker>
+```
+4. In order to change default values of `<script_download_subpath>` and `<get_endpoint_subpath>` you may add them info `wrangler.toml` file under `[vars]` section.
 
 ### How to deploy worker via Github Actions
-// TODO
+1. Add following values to the repository secrets:
+ * `CF_ACCOUNT_ID` -- your Cloudflare Account ID from [Workers Dashboard](https://dash.cloudflare.com/?to=/:account/workers).
+ * `CF_ZONE_ID` -- Zone ID from [CF Dashboard](https://dash.cloudflare.com/?to=/:account/) of the website.
+ * `CF_API_TOKEN` -- Cloudflare API token with `Edit workers` permission. [Link](https://dash.cloudflare.com/profile/api-tokens) to create.
+ * `CF_ROUTE` -- Worker's HTTP route, e.g. `domain.com/<route to worker>`
+ * `CF_API_BASE_ROUTE` -- `<route to worker>`.
+
