@@ -4,12 +4,15 @@
 
 Let's define the variables for an integration.
 Let we have a domain `domain.com`.
-* `route := domain.com/<route to worker>` -- the root route that's processed by worker.
-* `script_download_subpath` -- a path to the agent script.
-* `get_endpoint_subpath` -- a path to the endpoint to call the agent.
+| Variable  | Description | Default value | Example | 
+| ------------- | ------------- | ------- | ----- |
+| `route`  | The route route that's processed by worker  | No | `https://domain.com/cf-integration` |
+| `script_download_endpoint`  | An endpoint under `route` to download agent | `agent` | `https://domain.com/cf-integration/agent` |
+| `script_npm_download_endpoint` | An endpoint under `route` to download agent for NPM version | `agent-npm` | `domain.com/cf-integration/agent-npm` |
+| `get_visitor_endpoint` | An endpoint to get visitorId | `visitor` | `https://domain.com/cf-integration/visitorId` |
 
-So that, a full endpoint to download script looks like this: `domain.com/<route>/<script_download_subpath>?apiKey=${PUBLIC_API_KEY}`. \
-A full endpoint to get visitor ID looks like: `domain.com/<route>/<get_endpoint_subpath>?region=${REGION}`.
+So that, a full endpoint to download script looks like this: `domain.com/<route>/<script_download_endpoint>?apiKey=${PUBLIC_API_KEY}`. \
+A full endpoint to get visitor ID looks like: `domain.com/<route>/<get_endpoint_endpoint>?region=${REGION}`.
 
 ### CDN
 Add the following code to an entry point of your website.
