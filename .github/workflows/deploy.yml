@@ -27,5 +27,4 @@ jobs:
           CF_ACCOUNT_ID: ${{secrets.CF_ACCOUNT_ID}}
           CF_ZONE_ID: ${{secrets.CF_ZONE_ID}}
           CF_ROUTE: ${{secrets.CF_ROUTE}}
-          API_BASE_ROUTE: ${{secrets.CF_BASE_ROUTE}}
-          CF_API_BASE_ROUTE2: ${{secrets.CF_BASE_ROUTE}}
+          API_BASE_ROUTE: ${{secrets.CF_API_BASE_ROUTE}}
