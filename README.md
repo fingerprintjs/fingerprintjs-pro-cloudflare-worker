@@ -50,7 +50,8 @@ FingerprintJS.load({
 2. Put the following values to the `wrangler.toml` file:
   * `account_id` -- your Cloudflare Account ID from [Workers Dashboard](https://dash.cloudflare.com/?to=/:account/workers).
   * `zone_id` -- Zone ID from [CF Dashboard](https://dash.cloudflare.com/?to=/:account/) of the website.
-  * `route` -- Worker's HTTP route.
+  * `route` -- Worker's HTTP route, e.g. `domain.com/<route to worker>`
+  * `api_base_route` -- <route to worker>`
 
 
 ### How to deploy worker via Github Actions
