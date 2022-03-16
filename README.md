@@ -8,7 +8,7 @@ Let we have a domain `domain.com`.
 * `script_download_subpath` -- a path to the agent script.
 * `get_endpoint_subpath` -- a path to the endpoint to call the agent.
 
-So that, a full endpoint to download script looks like this: `domain.com/<route>/<script_download_subpath>?apiKey=${PUBLIC_API_KEY}`.
+So that, a full endpoint to download script looks like this: `domain.com/<route>/<script_download_subpath>?apiKey=${PUBLIC_API_KEY}`. \
 A full endpoint to get visitor ID looks like: `domain.com/<route>/<get_endpoint_subpath>?region=${REGION}`.
 
 ### CDN
