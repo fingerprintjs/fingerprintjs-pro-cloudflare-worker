@@ -1,5 +1,6 @@
 export function getCdnEndpoint(apiKey, apiVersion, loaderVersion) {
-    return `https://fpcdn.io/${apiVersion}/${apiKey}/loader_${loaderVersion}.js?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`
+    return `https://fpcdn.io/${apiVersion}/${apiKey}`;
+    //return `https://fpcdn.io/${apiVersion}/${apiKey}/loader_${loaderVersion}.js?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`
 }
 
 export function getVisitorIdEndpoint(region) {
