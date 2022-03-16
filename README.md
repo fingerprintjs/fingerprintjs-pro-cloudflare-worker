@@ -7,8 +7,8 @@ Let we have a domain `domain.com`.
 | Variable  | Description | Default value | Example | 
 | ------------- | ------------- | ------- | ----- |
 | `route`  | The route route that's processed by worker  | No | `https://domain.com/cf-integration` |
-| `script_download_endpoint`  | An endpoint under `route` to download agent | `agent` | `https://domain.com/cf-integration/agent` |
-| `script_npm_download_endpoint` | An endpoint under `route` to download agent for NPM version | `agent-npm` | `domain.com/cf-integration/agent-npm` |
+| `script_download_endpoint`  | An endpoint under `route` to download agent for CDN | `agent` | `https://domain.com/cf-integration/agent` |
+| `script_npm_download_endpoint` | An endpoint under `route` to download agent for NPM | `agent-npm` | `domain.com/cf-integration/agent-npm` |
 | `get_visitor_endpoint` | An endpoint to get visitorId | `visitor` | `https://domain.com/cf-integration/visitorId` |
 
 So that, a full endpoint to download script looks like this: `domain.com/<route>/<script_download_endpoint>?apiKey=${PUBLIC_API_KEY}`. \
