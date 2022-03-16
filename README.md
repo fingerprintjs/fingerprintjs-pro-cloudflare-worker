@@ -52,7 +52,7 @@ FingerprintJS.load({
   * `zone_id` -- Zone ID from [CF Dashboard](https://dash.cloudflare.com/?to=/:account/) of the website.
   * `route` -- Worker's HTTP route, e.g. `domain.com/<route to worker>`
   * `api_base_route` -- <route to worker>`
-
+3. In order to change default values of `<script_download_subpath>` and `<get_endpoint_subpath>` you may add them info `wrangler.toml` file under `[vars]` section.
 
 ### How to deploy worker via Github Actions
 // TODO
