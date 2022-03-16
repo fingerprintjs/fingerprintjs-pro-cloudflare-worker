@@ -1,13 +1,15 @@
 name = "fpjs-metrics-beta"
 type = "javascript"
+
 account_id = ""
 zone_id = ""
 route = ""
+workers_dev = true
 
 [vars]
-api_route = "/abcd1234"
-api_for_script_download = "/ghjklmno56789"
-api_for_get_endpoint = "/qwerty13579"
+api_route = "<BASE ENDPOINT FOR FPJS>"
+api_for_script_download = "<SCRIPT DOWNLOADING SUB PATH>"
+api_for_get_endpoint = "<GET ENDPOINT SUB PATH>"
 
 [build]
 command = "npm install && npm run build"
