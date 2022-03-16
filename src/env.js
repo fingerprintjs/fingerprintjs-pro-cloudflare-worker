@@ -1,7 +1,3 @@
-export function getCdnEndpoint0(apiKey, apiVersion) {
-    return `https://fpcdn.io/${apiVersion}/${apiKey}`;
-}
-
 export function getCdnEndpoint(apiKey, apiVersion, loaderVersion) {
     return `https://fpcdn.io/${apiVersion}/${apiKey}/loader_${loaderVersion}.js`
 }

@@ -1,5 +1,11 @@
 import { API_VERSION, LOADER_VERSION, getCdnEndpoint, getCdnEndpoint0 } from './env.js';
-import { domainSuffixList } from './domain-suffix-list.js';
+
+import { identifyDomain } from './utils/utils.js';
+
+// values presented in wrangers.toml [vars] section
+// and comes as env vars
+const SCRIPT_DOWNLOAD_PATH = `${api_base_route}${script_download_subpath}`;
+const GET_ENDPOINT_PATH = `${api_base_route}${get_endpoint_subpath}`;
 
 function getVisitorIdEndpoint(region) {
   const prefix = region === 'us' ? '' : `${region}.`;  
@@ -28,35 +34,13 @@ function createResponseWithMaxAge(oldResponse, maxMaxAge) {
   return response
 }
 
-function identifyDomain(hostname) {
-  const l1 = hostname.length;
-  for (let i = 0; i < domainSuffixList.length; i++) {
-    const domain = domainSuffixList[i];
-    const l2 = domain.length;
-    const sp = l1 - l2;
-    if (sp < 0) continue;
-
-    if (domain.toLowerCase() === hostname.substring(l1 - l2, l1)) {
-      const fp = hostname.substring(0, sp - 1);
-      const dot = fp.lastIndexOf('.');
-      if (dot == -1) {
-        return hostname;
-      } else {
-        return hostname.substring(dot + 1);
-      }
-    }
-  }
-
-  return hostname;
-}
-
 function createResponseWithFirstPartyCookies(request, response) {
   const origin = request.headers.get('origin');
   const hostname = (new URL(origin)).hostname;
   const domain = identifyDomain(hostname);
   const newHeaders = new Headers(response.headers)
   const cookiesArray = newHeaders.getAll('set-cookie');
-  newHeaders.delete('set-cookie')
+  newHeaders.delete('set-cookie') 
   for (const cookieValue of cookiesArray) {
       let cookieName;
       const cookieObject = cookieValue.split('; ').reduce((prev, flag, index) => {
@@ -92,7 +76,7 @@ async function handleIngressAPIRaw(event, url) {
   if (event == null) {
     throw new Error('event is null');
   }
-
+ 
   if (event.request == null) {
     throw new Error('request is null');
   }
@@ -118,13 +102,18 @@ async function fetchCacheable(event, request, ttl) {
 
 async function handleDownloadScript(event){
   const url = new URL(event.request.url);
-  const browserToken = url.searchParams.get('browserToken');
-  if (!browserToken) {
+  const apiKey = url.searchParams.get('apiKey');
+  if (!apiKey) {
     throw new Error('browserToken is expected in query parameters.');
   }
+  const apiVersion = url.searchParams.get('apiVersion') ?? API_VERSION;
+  const loaderVersion = url.searchParams.get('loaderVersion') ?? LOADER_VERSION;
   
-  //const cdnEndpoint = getCdnEndpoint(browserToken, API_VERSION, LOADER_VERSION)
-  const cdnEndpoint = getCdnEndpoint0(browserToken, API_VERSION)
+  console.log(`apiKey = ${apiKey}`);
+  console.log(`apiVersion = ${apiVersion}`);
+  console.log(`loaderVersion = ${loaderVersion}`);
+
+  const cdnEndpoint = getCdnEndpoint(browserToken, apiVersion, loaderVersion);
   const newRequest = new Request(cdnEndpoint, new Request(event.request, {
     headers: new Headers(event.request.headers)
   }));
@@ -139,18 +128,19 @@ async function handleDownloadScript(event){
 async function handleIngressAPI(event){
   const url = new URL(event.request.url);
   const region = url.searchParams.get('region') || 'us';  
-  const endpoint = getVisitorIdEndpoint(region)
-  const newURL = new URL(endpoint)
-  newURL.search = new URLSearchParams(url.search)
-  return handleIngressAPIRaw(event, newURL)
+  const endpoint = getVisitorIdEndpoint(region);
+  const newURL = new URL(endpoint);
+  newURL.search = new URLSearchParams(url.search);
+  return handleIngressAPIRaw(event, newURL);
 }
 
 async function handleRequest(event) {
   const url = new URL(event.request.url);
   const pathname = url.pathname;  
-  if (pathname === `${api_route}${api_for_script_download}`) {
+  
+  if (pathname === SCRIPT_DOWNLOAD_PATH) {
     return handleDownloadScript(event);
-  } else if (pathname === `${api_route}${api_for_get_endpoint}`) {
+  } else if (pathname === GET_ENDPOINT_PATH) {
     return handleIngressAPI(event)
   } else {
     throw new Error(`unmatched path ${pathname}`);
