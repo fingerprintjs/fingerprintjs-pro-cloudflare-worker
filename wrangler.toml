@@ -6,9 +6,6 @@ zone_id = ""
 route = ""
 workers_dev = true
 
-[vars]
-api_route = "<BASE ENDPOINT FOR FPJS>"
-
 [build]
 command = "npm install && npm run build"
 
