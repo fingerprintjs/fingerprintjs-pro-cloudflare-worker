@@ -11,4 +11,7 @@
   * `account_id` -- your Cloudflare Account ID from [Workers Dashboard](https://dash.cloudflare.com/?to=/:account/workers).
   * `zone_id` -- Zone ID from [CF Dashboard](https://dash.cloudflare.com/?to=/:account/) of the website.
   * `route` -- Worker's HTTP route.
-3. 
+
+
+## How to deploy worker via Github Actions
+// TODO
