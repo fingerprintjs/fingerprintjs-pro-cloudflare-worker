@@ -18,7 +18,7 @@ const url = `domain.com/<route>/<script_download_subpath>?apiKey=${PUBLIC_API_KE
 const fpPromise = import(url)
  .then(FingerprintJS => FingerprintJS.load({
    apiKey: 'PUBLIC_API_KEY',
-   endpoint: 'domain.com/<route>/<get_endpoint_subpath>?region=${REGION}',
+   endpoint: 'domain.com/<route>/agent?region=${REGION}',
  }));
  fpPromise
   .then(fp => fp.get())
@@ -30,14 +30,16 @@ const fpPromise = import(url)
 //TODO link to npm package.
 Add the following code to an entry point of your website.
 ```
-const url = `domain.com/<route>/<script_download_subpath>?apiKey=${PUBLIC_API_KEY}`
 FingerprintJS.load({
     apiKey: 'PUBLIC_API_KEY',
-    scriptUrl: '<route>'/<PUBLIC_API_KEY>_<version>.js?lv=<loaderVersion>',
+    scriptUrl: 'domain.com/<route>/agent-for-npm?apiKey=cDmIWy1OwbKEf7a2izsZ&apiVersion=<api_version>&loaderVersion=<loader_version>',
+    endpoint: 'domain.com/<route>/visitorId?region=<region>'
   })
   .then(fp => fp.get())
   .then(result => console.log(result))
 ```
+`<api_version>` and `<loader_version>` are optional parameters.
+
 
 ## Deployment
 ### How to deploy worker via Cloudflare CLI
