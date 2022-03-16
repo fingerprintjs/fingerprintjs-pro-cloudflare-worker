@@ -14,11 +14,11 @@ A full endpoint to get visitor ID looks like: `domain.com/<route>/<get_endpoint_
 ### CDN
 Add the following code to an entry point of your website.
 ```
-const url = `domain.com/<route>/<script_download_subpath>?apiKey=${PUBLIC_API_KEY}`
+const url = `domain.com/<route>/<script_download_subpath>?apiKey=<public api_key>`
 const fpPromise = import(url)
  .then(FingerprintJS => FingerprintJS.load({
-   apiKey: 'PUBLIC_API_KEY',
-   endpoint: 'domain.com/<route>/agent?region=${REGION}',
+   apiKey: '<public api_key>',
+   endpoint: 'domain.com/<route>/agent?region=<region>',
  }));
  fpPromise
   .then(fp => fp.get())
@@ -31,7 +31,7 @@ const fpPromise = import(url)
 Add the following code to an entry point of your website.
 ```
 FingerprintJS.load({
-    apiKey: 'PUBLIC_API_KEY',
+    apiKey: '<public api_key>',
     scriptUrl: 'domain.com/<route>/agent-for-npm?apiKey=cDmIWy1OwbKEf7a2izsZ&apiVersion=<api_version>&loaderVersion=<loader_version>',
     endpoint: 'domain.com/<route>/visitorId?region=<region>'
   })
