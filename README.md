@@ -32,7 +32,7 @@ Add the following code to an entry point of your website.
 ```
 FingerprintJS.load({
     apiKey: '<public api_key>',
-    scriptUrl: 'domain.com/<route>/agent-for-npm?apiKey=cDmIWy1OwbKEf7a2izsZ&apiVersion=<api_version>&loaderVersion=<loader_version>',
+    scriptUrl: 'domain.com/<route>/agent-for-npm?apiKey=<public api key>&apiVersion=<api_version>&loaderVersion=<loader_version>',
     endpoint: 'domain.com/<route>/visitorId?region=<region>'
   })
   .then(fp => fp.get())
