@@ -12,7 +12,7 @@ So that, a full endpoint to download script looks like this: `domain.com/<route>
 A full endpoint to get visitor ID looks like: `domain.com/<route>/<get_endpoint_subpath>?region=${REGION}`.
 
 ### CDN
-Add the following code to an entry point of your website,
+Add the following code to an entry point of your website.
 ```
 const url = `domain.com/<route>/<script_download_subpath>?apiKey=${PUBLIC_API_KEY}`
 const fpPromise = import(url)
@@ -27,7 +27,17 @@ const fpPromise = import(url)
 
 
 ### NPM package
-
+//TODO link to npm package.
+Add the following code to an entry point of your website.
+```
+const url = `domain.com/<route>/<script_download_subpath>?apiKey=${PUBLIC_API_KEY}`
+FingerprintJS.load({
+    apiKey: 'PUBLIC_API_KEY',
+    scriptUrl: '<route>'/<PUBLIC_API_KEY>_<version>.js?lv=<loaderVersion>',
+  })
+  .then(fp => fp.get())
+  .then(result => console.log(result))
+```
 
 ## Deployment
 ### How to deploy worker via Cloudflare CLI
