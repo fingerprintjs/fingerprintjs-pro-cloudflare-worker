@@ -1,9 +1,3 @@
-//export function getCdnEndpoint(apiKey, apiVersion, loaderVersion) {
-//    const base = 'https://fpcdn.io/'
-//    return `https://fpcdn.io/${apiVersion}/${apiKey}/loader_${loaderVersion}.js`
-    //return `https://fpcdn.io/${apiVersion}/${apiKey}/loader_${loaderVersion}.js?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`
-//}
-
 export function getCdnEndpoint(path) {
     const url = new URL(path);
     const apiKey = url.searchParams.get('apiKey');
@@ -11,7 +5,7 @@ export function getCdnEndpoint(path) {
         throw new Error('apiKey is expected in query parameters.');
     }
     const apiVersion = url.searchParams.get('apiVersion') ?? API_VERSION;
-    return `https://fpcdn.io/${apiVersion}/${apiKey}`;
+    return `https://fpcdn.io/${apiVersion}/${apiKey}?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`;
 }
 
 export function getCdnForNpmEndpoint(path) {
@@ -24,7 +18,7 @@ export function getCdnForNpmEndpoint(path) {
     const base = `https://fpcdn.io/${apiVersion}/${apiKey}`;
 
     const loaderVersion = url.searchParams.get('loaderVersion') ?? LOADER_VERSION;
-    return `${base}/loader_${loaderVersion}.js`;    
+    return `${base}/loader_${loaderVersion}.js?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`;    
 }
 
 export function getVisitorIdEndpoint(region) {
