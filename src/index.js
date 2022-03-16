@@ -1,11 +1,17 @@
-import { API_VERSION, LOADER_VERSION, getCdnEndpoint, getCdnEndpoint0 } from './env.js';
+import { API_VERSION, LOADER_VERSION, getCdnEndpoint } from './env.js';
 
 import { identifyDomain } from './utils/utils.js';
 
+const DEFAULT_SCRIPT_DOWNLOAD_SUBPATH = '/ghjklmno56789';
+const DEFAULT_GET_ENDPOINT_SUBPATH = '/qwerty13579';
+
+const scriptDownloadSubpath = (typeof script_download_subpath !== 'undefined') ? script_download_subpath : DEFAULT_SCRIPT_DOWNLOAD_SUBPATH;
+const getEndpointSubpath = (typeof get_endpoint_subpath !== 'undefined') ? get_endpoint_subpath : DEFAULT_GET_ENDPOINT_SUBPATH;
+
 // values presented in wrangers.toml [vars] section
 // and comes as env vars
-const SCRIPT_DOWNLOAD_PATH = `${api_base_route}${script_download_subpath}`;
-const GET_ENDPOINT_PATH = `${api_base_route}${get_endpoint_subpath}`;
+const SCRIPT_DOWNLOAD_PATH = `${api_base_route}${scriptDownloadSubpath}`;
+const GET_ENDPOINT_PATH = `${api_base_route}${getEndpointSubpath}`;
 
 function getVisitorIdEndpoint(region) {
   const prefix = region === 'us' ? '' : `${region}.`;  
@@ -104,16 +110,12 @@ async function handleDownloadScript(event){
   const url = new URL(event.request.url);
   const apiKey = url.searchParams.get('apiKey');
   if (!apiKey) {
-    throw new Error('browserToken is expected in query parameters.');
+    throw new Error('apiKey is expected in query parameters.');
   }
   const apiVersion = url.searchParams.get('apiVersion') ?? API_VERSION;
-  const loaderVersion = url.searchParams.get('loaderVersion') ?? LOADER_VERSION;
-  
-  console.log(`apiKey = ${apiKey}`);
-  console.log(`apiVersion = ${apiVersion}`);
-  console.log(`loaderVersion = ${loaderVersion}`);
+  const loaderVersion = url.searchParams.get('loaderVersion') ?? LOADER_VERSION;  
 
-  const cdnEndpoint = getCdnEndpoint(browserToken, apiVersion, loaderVersion);
+  const cdnEndpoint = getCdnEndpoint(apiKey, apiVersion, loaderVersion);
   const newRequest = new Request(cdnEndpoint, new Request(event.request, {
     headers: new Headers(event.request.headers)
   }));
@@ -136,7 +138,7 @@ async function handleIngressAPI(event){
 
 async function handleRequest(event) {
   const url = new URL(event.request.url);
-  const pathname = url.pathname;  
+  const pathname = url.pathname;
   
   if (pathname === SCRIPT_DOWNLOAD_PATH) {
     return handleDownloadScript(event);

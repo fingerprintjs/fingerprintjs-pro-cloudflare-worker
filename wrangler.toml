@@ -8,8 +8,6 @@ workers_dev = true
 
 [vars]
 api_route = "<BASE ENDPOINT FOR FPJS>"
-api_for_script_download = "<SCRIPT DOWNLOADING SUB PATH>"
-api_for_get_endpoint = "<GET ENDPOINT SUB PATH>"
 
 [build]
 command = "npm install && npm run build"
