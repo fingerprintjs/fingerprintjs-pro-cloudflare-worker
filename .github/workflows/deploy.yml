@@ -3,7 +3,7 @@ name: Deploy to Cloudflare Workers
 on:
   push:
     branches:
-      - main
+      - master
   repository_dispatch:
 
 jobs:
