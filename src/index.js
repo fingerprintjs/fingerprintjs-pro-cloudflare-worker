@@ -1,17 +1,19 @@
-import { API_VERSION, LOADER_VERSION, getCdnEndpoint, getVisitorIdEndpoint } from './env.js';
+import { getCdnEndpoint, getCdnForNpmEndpoint, getVisitorIdEndpoint } from './env.js';
 
 import { identifyDomain } from './utils/utils.js';
 
-const DEFAULT_SCRIPT_DOWNLOAD_SUBPATH = '/ghjklmno56789';
-const DEFAULT_GET_ENDPOINT_SUBPATH = '/qwerty13579';
+const DEFAULT_SCRIPT_DOWNLOAD_SUBPATH = '/agent';
+const DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH = '/agent-for-npm';
+const DEFAULT_GET_ENDPOINT_SUBPATH = '/visitorId';
 
 const scriptDownloadSubpath = (typeof script_download_subpath !== 'undefined') ? script_download_subpath : DEFAULT_SCRIPT_DOWNLOAD_SUBPATH;
+const scriptNpmDownloadSubpath = (typeof script_npm_download_subpath !== 'undefined') ? script_npm_download_subpath : DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH;
 const getEndpointSubpath = (typeof get_endpoint_subpath !== 'undefined') ? get_endpoint_subpath : DEFAULT_GET_ENDPOINT_SUBPATH;
 
 function createCookieStringFromObject(name, value) {
   const flags = Object.entries(value).filter(([k]) => k !== name && k !== 'value');
   const nameValue = `${name}=${value.value}`;
-  const rest = flags.map(([k,v]) => v ? `${k}=${v}` : k);
+  const rest = flags.map(([k, v]) => v ? `${k}=${v}` : k);
   return [nameValue, ...rest].join('; ');
 }
 
@@ -36,20 +38,20 @@ function createResponseWithFirstPartyCookies(request, response) {
   const domain = identifyDomain(hostname);
   const newHeaders = new Headers(response.headers)
   const cookiesArray = newHeaders.getAll('set-cookie');
-  newHeaders.delete('set-cookie') 
+  newHeaders.delete('set-cookie')
   for (const cookieValue of cookiesArray) {
-      let cookieName;
-      const cookieObject = cookieValue.split('; ').reduce((prev, flag, index) => {
-          let [key, value] = flag.split('=');
-          if (index === 0) {
-              cookieName = key;
-              key = 'value';
-          }
-          return {...prev, [key]: value}
-      }, {})
-      cookieObject.Domain = domain; // first party cookie instead of third party cookie
-      const newCookie = createCookieStringFromObject(cookieName, cookieObject);
-      newHeaders.append('set-cookie', newCookie);
+    let cookieName;
+    const cookieObject = cookieValue.split('; ').reduce((prev, flag, index) => {
+      let [key, value] = flag.split('=');
+      if (index === 0) {
+        cookieName = key;
+        key = 'value';
+      }
+      return { ...prev, [key]: value }
+    }, {})
+    cookieObject.Domain = domain; // first party cookie instead of third party cookie
+    const newCookie = createCookieStringFromObject(cookieName, cookieObject);
+    newHeaders.append('set-cookie', newCookie);
   }
   const newResponse = new Response(response.body, {
     status: response.status,
@@ -72,7 +74,7 @@ async function handleIngressAPIRaw(event, url) {
   if (event == null) {
     throw new Error('event is null');
   }
- 
+
   if (event.request == null) {
     throw new Error('request is null');
   }
@@ -93,33 +95,24 @@ async function handleIngressAPIRaw(event, url) {
 }
 
 async function fetchCacheable(event, request, ttl) {
-  return fetch(request, {cf: {cacheTtl: ttl}});
+  return fetch(request, { cf: { cacheTtl: ttl } });
 }
 
-async function handleDownloadScript(event){
-  const url = new URL(event.request.url);
-  const apiKey = url.searchParams.get('apiKey');
-  if (!apiKey) {
-    throw new Error('apiKey is expected in query parameters.');
-  }
-  const apiVersion = url.searchParams.get('apiVersion') ?? API_VERSION;
-  const loaderVersion = url.searchParams.get('loaderVersion') ?? LOADER_VERSION;  
-
-  const cdnEndpoint = getCdnEndpoint(apiKey, apiVersion, loaderVersion);
-  const newRequest = new Request(cdnEndpoint, new Request(event.request, {
+async function handleDownloadScript(event, url) {
+  const newRequest = new Request(url, new Request(event.request, {
     headers: new Headers(event.request.headers)
   }));
 
-  console.log(`Downloading script from cdnEndpoint ${cdnEndpoint}...`);
+  console.log(`Downloading script from cdnEndpoint ${url}`);
   const downloadScriptCacheTtl = 5 * 60;
 
   return fetchCacheable(event, newRequest, downloadScriptCacheTtl)
     .then(res => createResponseWithMaxAge(res, 60 * 60))
 }
 
-async function handleIngressAPI(event){
+async function handleIngressAPI(event) {
   const url = new URL(event.request.url);
-  const region = url.searchParams.get('region') || 'us';  
+  const region = url.searchParams.get('region') || 'us';
   const endpoint = getVisitorIdEndpoint(region);
   const newURL = new URL(endpoint);
   newURL.search = new URLSearchParams(url.search);
@@ -129,13 +122,15 @@ async function handleIngressAPI(event){
 async function handleRequest(event) {
   const url = new URL(event.request.url);
   const pathname = url.pathname;
-  
-  // API_BASE_ROUTE comes from secrets
+
   const SCRIPT_DOWNLOAD_PATH = `${API_BASE_ROUTE}${scriptDownloadSubpath}`;
+  const SCRIPT_NPM_DOWNLOAD_PATH = `${API_BASE_ROUTE}${scriptNpmDownloadSubpath}`;
   const GET_ENDPOINT_PATH = `${API_BASE_ROUTE}${getEndpointSubpath}`;
 
-  if (pathname === SCRIPT_DOWNLOAD_PATH) {
-    return handleDownloadScript(event);
+  if (pathname === SCRIPT_DOWNLOAD_PATH ) {
+    return handleDownloadScript(event, getCdnEndpoint(event.request.url));
+  } else if (pathname === SCRIPT_NPM_DOWNLOAD_PATH) {
+    return handleDownloadScript(event, getCdnForNpmEndpoint(event.request.url));
   } else if (pathname === GET_ENDPOINT_PATH) {
     return handleIngressAPI(event)
   } else {
@@ -145,15 +140,15 @@ async function handleRequest(event) {
 
 addEventListener('fetch', event => {
   const request = event.request;
-  event.respondWith(handleRequest({request}));
+  event.respondWith(handleRequest({ request }));
 });
 
-export default {  
-  async fetch(request){
+export default {
+  async fetch(request) {
     try {
-      return handleRequest({request})
+      return handleRequest({ request })
     } catch (e) {
       return createErrorResponse(`unmatched path ${pathname}`)
     }
-  } 
+  }
 }
