@@ -14,11 +14,16 @@ export function getCdnForNpmEndpoint(path) {
     if (!apiKey) {
         throw new Error('apiKey is expected in query parameters.');
     }
-    const apiVersion = url.searchParams.get('apiVersion') ?? API_VERSION;
-    const base = `https://fpcdn.io/${apiVersion}/${apiKey}`;
+    const apiVersion = url.searchParams.get('v');
+    if (!apiVersion) {
+        throw new Error('v is expected in query parameters.')
+    }    
 
-    const loaderVersion = url.searchParams.get('loaderVersion') ?? LOADER_VERSION;
-    return `${base}/loader_${loaderVersion}.js?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`;    
+    const loaderVersion = url.searchParams.get('lv');
+    if (!loaderVersion) {
+        throw new Error('lv is expected in query parameters.')
+    }
+    return `https://fpcdn.io/v${apiVersion}/${apiKey}/loader_v${loaderVersion}.js?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`;    
 }
 
 export function getVisitorIdEndpoint(region) {

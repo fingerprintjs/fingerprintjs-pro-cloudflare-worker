@@ -123,15 +123,11 @@ async function handleRequest(event) {
   const url = new URL(event.request.url);
   const pathname = url.pathname;
 
-  const SCRIPT_DOWNLOAD_PATH = `${API_BASE_ROUTE}${scriptDownloadSubpath}`;
-  const SCRIPT_NPM_DOWNLOAD_PATH = `${API_BASE_ROUTE}${scriptNpmDownloadSubpath}`;
-  const GET_ENDPOINT_PATH = `${API_BASE_ROUTE}${getEndpointSubpath}`;
-
-  if (pathname === SCRIPT_DOWNLOAD_PATH ) {
+  if (pathname === `${API_BASE_ROUTE}${scriptDownloadSubpath}`) {
     return handleDownloadScript(event, getCdnEndpoint(event.request.url));
-  } else if (pathname === SCRIPT_NPM_DOWNLOAD_PATH) {
+  } else if (pathname === `${API_BASE_ROUTE}${scriptNpmDownloadSubpath}`) {
     return handleDownloadScript(event, getCdnForNpmEndpoint(event.request.url));
-  } else if (pathname === GET_ENDPOINT_PATH) {
+  } else if (pathname === `${API_BASE_ROUTE}${getEndpointSubpath}`) {
     return handleIngressAPI(event)
   } else {
     throw new Error(`unmatched path ${pathname}`);
