@@ -32,16 +32,16 @@ const fpPromise = import(url)
 ### NPM package
 //TODO link to npm package.
 Add the following code to an entry point of your website.
+Set <public api_key> and replace `<domain.com>/<route>` by your route to Cloudflare integration.
 ```
 FingerprintJS.load({
     apiKey: '<public api_key>',
-    scriptUrl: 'domain.com/<route>/agent-for-npm?apiKey=<public api key>&apiVersion=<api_version>&loaderVersion=<loader_version>',
-    endpoint: 'domain.com/<route>/visitorId?region=<region>'
+    scriptUrl: '<domain.com>/<route>/agent-for-npm?apiKey=<apiKey>&v=<version>&lv=<loaderVersion>',
+    endpoint: '<domain.com>/<route>/visitorId?region=<region>'
   })
   .then(fp => fp.get())
   .then(result => console.log(result))
 ```
-`<api_version>` and `<loader_version>` are optional parameters.
 
 
 ## Deployment
