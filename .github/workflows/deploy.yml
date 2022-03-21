@@ -31,3 +31,6 @@ jobs:
           CF_ZONE_ID: ${{secrets.CF_ZONE_ID}}
           CF_ROUTE: ${{secrets.CF_ROUTE}}
           API_BASE_ROUTE: ${{secrets.CF_API_BASE_ROUTE}}
+          SCRIPT_DOWNLOAD_ENDPOINT: ${{secrets.CF_SCRIPT_DOWNLOAD_ENDPOINT}}
+          SCRIPT_NPM_DOWNLOAD_ENDPOINT: ${{secrets.CF_SCRIPT_NPM_DOWNLOAD_ENDPOINT}}
+          GET_VISITOR_ID_ENDPOINT: ${{secrets.CF_GET_VISITOR_ID_ENDPOINT}}
