@@ -6,9 +6,9 @@ const DEFAULT_SCRIPT_DOWNLOAD_SUBPATH = '/agent';
 const DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH = '/agent-for-npm';
 const DEFAULT_GET_ENDPOINT_SUBPATH = '/visitorId';
 
-const scriptDownloadSubpath = (typeof script_download_endpoint !== 'undefined') ? script_download_endpoint : DEFAULT_SCRIPT_DOWNLOAD_SUBPATH;
-const scriptNpmDownloadSubpath = (typeof script_npm_download_endpoint !== 'undefined') ? script_npm_download_endpoint : DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH;
-const getEndpointSubpath = (typeof get_visitor_endpoint !== 'undefined') ? get_visitor_endpoint : DEFAULT_GET_ENDPOINT_SUBPATH;
+const scriptDownloadSubpath = (typeof SCRIPT_DOWNLOAD_ENDPOINT !== 'undefined') ? SCRIPT_DOWNLOAD_ENDPOINT : DEFAULT_SCRIPT_DOWNLOAD_SUBPATH;
+const scriptNpmDownloadSubpath = (typeof SCRIPT_NPM_DOWNLOAD_ENDPOINT !== 'undefined') ? SCRIPT_NPM_DOWNLOAD_ENDPOINT : DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH;
+const getEndpointSubpath = (typeof GET_VISITOR_ID_ENDPOINT !== 'undefined') ? GET_VISITOR_ID_ENDPOINT : DEFAULT_GET_ENDPOINT_SUBPATH;
 
 function createCookieStringFromObject(name, value) {
   const flags = Object.entries(value).filter(([k]) => k !== name && k !== 'value');
