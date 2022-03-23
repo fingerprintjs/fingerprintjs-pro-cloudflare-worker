@@ -1,4 +1,4 @@
-name: Update
+name: Update worker's repository from the public template
 
 on:
   schedule:
@@ -12,9 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: Update main branch of the repository from the another one
-        uses: sshelomentsev/github-action-update-repository@v0.1.0
+      - name: Get updates from the public template and merge into the repository branch
+        uses: sshelomentsev/github-action-update-repository@v0.1.1
         with:
           source: https://github.com/fingerprintjs/cf-worker.git
           branch: master
-          
