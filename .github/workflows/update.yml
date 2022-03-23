@@ -16,3 +16,5 @@ jobs:
         uses: sshelomentsev/github-action-update-repository@v0.1.0
         with:
           source: https://github.com/fingerprintjs/cf-worker.git
+          branch: master
+          
