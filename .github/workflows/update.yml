@@ -1,0 +1,18 @@
+name: Update
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Update main branch of the repository from the another one
+        uses: sshelomentsev/github-action-update-repository@v0.1.0
+        with:
+          source: https://github.com/fingerprintjs/cf-worker.git
