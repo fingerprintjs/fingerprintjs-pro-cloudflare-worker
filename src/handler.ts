@@ -1,21 +1,21 @@
-import { getCdnEndpoint, getCdnForNpmEndpoint, getVisitorIdEndpoint } from './env';
+import { getCdnEndpoint, getCdnForNpmEndpoint, getVisitorIdEndpoint } from './env'
 
-import { identifyDomain } from './domains/domain-utils';
-import { Cookie } from 'cookies';
+import { identifyDomain } from './domains/domain-utils'
+import { Cookie } from 'cookies'
 
-const DEFAULT_SCRIPT_DOWNLOAD_SUBPATH = '/agent';
-const DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH = '/agent-for-npm';
-const DEFAULT_GET_ENDPOINT_SUBPATH = '/visitorId';
+const DEFAULT_SCRIPT_DOWNLOAD_SUBPATH = '/agent'
+const DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH = '/agent-for-npm'
+const DEFAULT_GET_ENDPOINT_SUBPATH = '/visitorId'
 
-const scriptDownloadSubpath = (typeof SCRIPT_DOWNLOAD_ENDPOINT !== 'undefined') ? SCRIPT_DOWNLOAD_ENDPOINT : DEFAULT_SCRIPT_DOWNLOAD_SUBPATH;
-const scriptNpmDownloadSubpath = (typeof SCRIPT_NPM_DOWNLOAD_ENDPOINT !== 'undefined') ? SCRIPT_NPM_DOWNLOAD_ENDPOINT : DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH;
-const getEndpointSubpath = (typeof GET_VISITOR_ID_ENDPOINT !== 'undefined') ? GET_VISITOR_ID_ENDPOINT : DEFAULT_GET_ENDPOINT_SUBPATH;
+const scriptDownloadSubpath = typeof SCRIPT_DOWNLOAD_ENDPOINT !== 'undefined' ?SCRIPT_DOWNLOAD_ENDPOINT : DEFAULT_SCRIPT_DOWNLOAD_SUBPATH
+const scriptNpmDownloadSubpath = typeof SCRIPT_NPM_DOWNLOAD_ENDPOINT !== 'undefined' ? SCRIPT_NPM_DOWNLOAD_ENDPOINT : DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH
+const getEndpointSubpath = typeof GET_VISITOR_ID_ENDPOINT !== 'undefined' ? GET_VISITOR_ID_ENDPOINT : DEFAULT_GET_ENDPOINT_SUBPATH
 
 function createCookieStringFromObject(name: string, value: Cookie) {
-  const flags = Object.entries(value).filter(([k]) => k !== name && k !== 'value');
-  const nameValue = `${name}=${value.value}`;
-  const rest = flags.map(([k, v]) => v ? `${k}=${v}` : k);
-  return [nameValue, ...rest].join('; ');
+  const flags = Object.entries(value).filter(([k]) => k !== name && k !== 'value')
+  const nameValue = `${name}=${value.value}`
+  const rest = flags.map(([k, v]) => (v ? `${k}=${v}` : k))
+  return [nameValue, ...rest].join('; ')
 }
 
 function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number) {
@@ -34,25 +34,25 @@ function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number) {
 }
 
 function createResponseWithFirstPartyCookies(request: Request, response: Response) {
-  const origin = request.headers.get('origin');
-  const hostname = (new URL(origin)).hostname;
-  const domain = identifyDomain(hostname);
+  const origin = request.headers.get('origin')
+  const hostname = new URL(origin).hostname
+  const domain = identifyDomain(hostname)
   const newHeaders = new Headers(response.headers)
-  const cookiesArray = newHeaders.getAll('set-cookie');
+  const cookiesArray = newHeaders.getAll('set-cookie')
   newHeaders.delete('set-cookie')
   for (const cookieValue of cookiesArray) {
-    let cookieName: string = '';
+    let cookieName: string = ''
     const cookieObject = cookieValue.split('; ').reduce((prev, flag, index) => {
-      let [key, value] = flag.split('=');
+      let [key, value] = flag.split('=')
       if (index === 0) {
-        cookieName = key;
-        key = 'value';
+        cookieName = key
+        key = 'value'
       }
       return { ...prev, [key]: value }
     }, {})
-    cookieObject.Domain = domain; // first party cookie instead of third party cookie
-    const newCookie = createCookieStringFromObject(cookieName, cookieObject);
-    newHeaders.append('set-cookie', newCookie);
+    cookieObject.Domain = domain // first party cookie instead of third party cookie
+    const newCookie = createCookieStringFromObject(cookieName, cookieObject)
+    newHeaders.append('set-cookie', newCookie)
   }
   const newResponse = new Response(response.body, {
     status: response.status,
@@ -74,61 +74,55 @@ function createErrorResponse(reason: string) {
 
 async function handleIngressAPIRaw(request: Request, url: URL) {  
   if (request == null) {
-    throw new Error('request is null');
+    throw new Error('request is null')
   }
 
   if (url == null) {
-    throw new Error('url is null');
+    throw new Error('url is null')
   }
 
   console.log(`sending ingress api to ${url}...`)
   const requestHeaders = new Headers(request.headers)
 
-  const newRequest = new Request(url.toString(), new Request(request, {
-    headers: requestHeaders
-  }));
+  const newRequest = new Request(url.toString(), new Request(request, { headers: requestHeaders }))
 
   const response = await fetch(newRequest)
   return createResponseWithFirstPartyCookies(request, response)
 }
 
 async function fetchCacheable(request: Request, ttl: number) {
-  return fetch(request, { cf: { cacheTtl: ttl } });
+  return fetch(request, { cf: { cacheTtl: ttl } })
 }
 
 async function handleDownloadScript(request: Request, url: string) {
-  const newRequest = new Request(url, new Request(request, {
-    headers: new Headers(request.headers)
-  }));
+  const newRequest = new Request(url, new Request(request, { headers: new Headers(request.headers) }))
 
-  console.log(`Downloading script from cdnEndpoint ${url}`);
-  const downloadScriptCacheTtl = 5 * 60;
+  console.log(`Downloading script from cdnEndpoint ${url}`)
+  const downloadScriptCacheTtl = 5 * 60
 
-  return fetchCacheable(newRequest, downloadScriptCacheTtl)
-    .then(res => createResponseWithMaxAge(res, 60 * 60))
+  return fetchCacheable(newRequest, downloadScriptCacheTtl).then((res) => createResponseWithMaxAge(res, 60 * 60))
 }
 
 async function handleIngressAPI(request: Request) {
-  const url = new URL(request.url);
-  const region = url.searchParams.get('region') || 'us';
-  const endpoint = getVisitorIdEndpoint(region);
-  const newURL: URL = new URL(endpoint);
-  newURL.search = new URLSearchParams(url.search).toString();
-  return handleIngressAPIRaw(request, newURL);
+  const url = new URL(request.url)
+  const region = url.searchParams.get('region') || 'us'
+  const endpoint = getVisitorIdEndpoint(region)
+  const newURL: URL = new URL(endpoint)
+  newURL.search = new URLSearchParams(url.search).toString()
+  return handleIngressAPIRaw(request, newURL)
 }
 
 export async function handleRequest(request: Request): Promise<Response> {
-  const url = new URL(request.url);
-  const pathname = url.pathname;
+  const url = new URL(request.url)
+  const pathname = url.pathname
 
   if (pathname === `${API_BASE_ROUTE}${scriptDownloadSubpath}`) {
-    return handleDownloadScript(event, getCdnEndpoint(url));
+    return handleDownloadScript(event, getCdnEndpoint(url))
   } else if (pathname === `${API_BASE_ROUTE}${scriptNpmDownloadSubpath}`) {
-    return handleDownloadScript(event, getCdnForNpmEndpoint(url));
+    return handleDownloadScript(event, getCdnForNpmEndpoint(url))
   } else if (pathname === `${API_BASE_ROUTE}${getEndpointSubpath}`) {
     return handleIngressAPI(request)
   } else {
-    throw new Error(`unmatched path ${pathname}`);
+    throw new Error(`unmatched path ${pathname}`)
   }
 }
-  
