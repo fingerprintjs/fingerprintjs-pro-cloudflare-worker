@@ -9,7 +9,7 @@ const { dependencies = {} } = require('./package.json')
 
 const inputFile = 'src/index.ts'
 const outputDirectory = 'dist'
-const artifactName = 'template-ts'
+const artifactName = 'fingerprintjs-pro-cloudflare-worker'
 
 const commonBanner = licensePlugin({
   banner: {
@@ -25,6 +25,7 @@ const commonInput = {
 }
 
 const commonOutput = {
+  name: 'FingerprintJsPro-cloudflare-worker',
   // name: 'MyFpJsLibrary', // Need for IIFE and UMD build. Name of global variable
   exports: 'named',
 }
