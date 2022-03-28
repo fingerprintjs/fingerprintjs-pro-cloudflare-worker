@@ -16,7 +16,7 @@ A full endpoint to get visitor ID looks like: `domain.com/<route>/<get_endpoint_
 
 ### CDN
 Add the following code to an entry point of your website.
-```
+```js
 const url = `domain.com/<route>/<script_download_subpath>?apiKey=<public api_key>`
 const fpPromise = import(url)
  .then(FingerprintJS => FingerprintJS.load({
@@ -33,7 +33,7 @@ const fpPromise = import(url)
 //TODO link to npm package.
 Add the following code to an entry point of your website.
 Set <public api_key> and replace `<domain.com>/<route>` by your route to Cloudflare integration.
-```
+```js
 FingerprintJS.load({
     apiKey: '<public api_key>',
     scriptUrl: '<domain.com>/<route>/agent-for-npm?apiKey=<apiKey>&v=<version>&lv=<loaderVersion>',
