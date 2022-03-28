@@ -7,9 +7,16 @@ const DEFAULT_SCRIPT_DOWNLOAD_SUBPATH = '/agent'
 const DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH = '/agent-for-npm'
 const DEFAULT_GET_ENDPOINT_SUBPATH = '/visitorId'
 
-const scriptDownloadSubpath = typeof SCRIPT_DOWNLOAD_ENDPOINT !== 'undefined' ?SCRIPT_DOWNLOAD_ENDPOINT : DEFAULT_SCRIPT_DOWNLOAD_SUBPATH
-const scriptNpmDownloadSubpath = typeof SCRIPT_NPM_DOWNLOAD_ENDPOINT !== 'undefined' ? SCRIPT_NPM_DOWNLOAD_ENDPOINT : DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH
-const getEndpointSubpath = typeof GET_VISITOR_ID_ENDPOINT !== 'undefined' ? GET_VISITOR_ID_ENDPOINT : DEFAULT_GET_ENDPOINT_SUBPATH
+const scriptDownloadSubpath =
+  typeof SCRIPT_DOWNLOAD_ENDPOINT !== 'undefined' ? SCRIPT_DOWNLOAD_ENDPOINT : DEFAULT_SCRIPT_DOWNLOAD_SUBPATH
+
+const scriptNpmDownloadSubpath =
+  typeof SCRIPT_NPM_DOWNLOAD_ENDPOINT !== 'undefined'
+    ? SCRIPT_NPM_DOWNLOAD_ENDPOINT
+    : DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH
+
+const getEndpointSubpath =
+  typeof GET_VISITOR_ID_ENDPOINT !== 'undefined' ? GET_VISITOR_ID_ENDPOINT : DEFAULT_GET_ENDPOINT_SUBPATH
 
 function createCookieStringFromObject(name: string, value: Cookie) {
   const flags = Object.entries(value).filter(([k]) => k !== name && k !== 'value')
@@ -21,7 +28,9 @@ function createCookieStringFromObject(name: string, value: Cookie) {
 function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number) {
   const response = new Response(oldResponse.body, oldResponse)
   const cacheControlDirectives = oldResponse.headers.get('cache-control').split(', ')
-  const maxAgeIndex = cacheControlDirectives.findIndex(directive => directive.split('=')[0].trim().toLowerCase() === 'max-age')
+  const maxAgeIndex = cacheControlDirectives.findIndex(
+    (directive) => directive.split('=')[0].trim().toLowerCase() === 'max-age'
+  )
   if (maxAgeIndex === -1) {
     cacheControlDirectives.push(`max-age=${maxMaxAge}`)
   } else {
@@ -43,11 +52,12 @@ function createResponseWithFirstPartyCookies(request: Request, response: Respons
   for (const cookieValue of cookiesArray) {
     let cookieName: string = ''
     const cookieObject = cookieValue.split('; ').reduce((prev, flag, index) => {
-      let [key, value] = flag.split('=')
+      const kv = flag.split('=')
+      const key = index === 0 ? 'value' : kv[0]
       if (index === 0) {
-        cookieName = key
-        key = 'value'
+        cookieName = kv[0]
       }
+      const value = kv[1]
       return { ...prev, [key]: value }
     }, {})
     cookieObject.Domain = domain // first party cookie instead of third party cookie
@@ -71,8 +81,7 @@ function createErrorResponse(reason: string) {
   return new Response(JSON.stringify(responseBody), { status: 500 }) // todo standard error for js client
 }
 
-
-async function handleIngressAPIRaw(request: Request, url: URL) {  
+async function handleIngressAPIRaw(request: Request, url: URL) {
   if (request == null) {
     throw new Error('request is null')
   }
@@ -123,6 +132,6 @@ export async function handleRequest(request: Request): Promise<Response> {
   } else if (pathname === `${API_BASE_ROUTE}${getEndpointSubpath}`) {
     return handleIngressAPI(request)
   } else {
-    throw new Error(`unmatched path ${pathname}`)
+    return createErrorResponse(`unmatched path ${pathname}`)
   }
 }
