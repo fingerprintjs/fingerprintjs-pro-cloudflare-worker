@@ -15,5 +15,5 @@ jobs:
       - name: Get updates from the public template and merge into the repository branch
         uses: sshelomentsev/github-action-update-repository@v0.1.1
         with:
-          source: https://github.com/fingerprintjs/cf-worker.git
+          source: https://github.com/fingerprintjs/cloudflare-worker-typescript.git
           branch: master
