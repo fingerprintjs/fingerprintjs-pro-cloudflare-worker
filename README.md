@@ -71,3 +71,4 @@ API_BASE_ROUTE = <route to worker>
  * `CF_ROUTE` -- Worker's HTTP route, e.g. `domain.com/<route to worker>`
  * `CF_API_BASE_ROUTE` -- `<route to worker>`.
 2. Use [workflow file](.github/workflows/deploy.yml) to deploy worker.
+

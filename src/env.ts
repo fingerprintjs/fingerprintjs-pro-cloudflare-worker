@@ -1,4 +1,4 @@
-export function getCdnEndpoint(path) {
+export function getCdnEndpoint(path: string) {
     const url = new URL(path);
     const apiKey = url.searchParams.get('apiKey');
     if (!apiKey) {
@@ -8,7 +8,7 @@ export function getCdnEndpoint(path) {
     return `https://fpcdn.io/${apiVersion}/${apiKey}?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`;
 }
 
-export function getCdnForNpmEndpoint(path) {
+export function getCdnForNpmEndpoint(path: string) {
     const url = new URL(path);
     const apiKey = url.searchParams.get('apiKey');
     if (!apiKey) {

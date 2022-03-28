@@ -1,4 +1,4 @@
-export const domainSuffixList = [
+[
     "ac",
     "com.ac",
     "edu.ac",

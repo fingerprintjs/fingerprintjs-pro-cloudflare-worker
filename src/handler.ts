@@ -1,6 +1,7 @@
-import { getCdnEndpoint, getCdnForNpmEndpoint, getVisitorIdEndpoint } from './env.js';
+import { getCdnEndpoint, getCdnForNpmEndpoint, getVisitorIdEndpoint } from './env';
 
-import { identifyDomain } from './utils/utils.js';
+import { identifyDomain } from './domains/domain-utils';
+import { Cookie } from 'cookies';
 
 const DEFAULT_SCRIPT_DOWNLOAD_SUBPATH = '/agent';
 const DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH = '/agent-for-npm';
@@ -10,14 +11,14 @@ const scriptDownloadSubpath = (typeof SCRIPT_DOWNLOAD_ENDPOINT !== 'undefined') 
 const scriptNpmDownloadSubpath = (typeof SCRIPT_NPM_DOWNLOAD_ENDPOINT !== 'undefined') ? SCRIPT_NPM_DOWNLOAD_ENDPOINT : DEFAULT_NPM_SCRIPT_DOWNLOAD_SUBPATH;
 const getEndpointSubpath = (typeof GET_VISITOR_ID_ENDPOINT !== 'undefined') ? GET_VISITOR_ID_ENDPOINT : DEFAULT_GET_ENDPOINT_SUBPATH;
 
-function createCookieStringFromObject(name, value) {
+function createCookieStringFromObject(name: string, value: Cookie) {
   const flags = Object.entries(value).filter(([k]) => k !== name && k !== 'value');
   const nameValue = `${name}=${value.value}`;
   const rest = flags.map(([k, v]) => v ? `${k}=${v}` : k);
   return [nameValue, ...rest].join('; ');
 }
 
-function createResponseWithMaxAge(oldResponse, maxMaxAge) {
+function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number) {
   const response = new Response(oldResponse.body, oldResponse)
   const cacheControlDirectives = oldResponse.headers.get('cache-control').split(', ')
   const maxAgeIndex = cacheControlDirectives.findIndex(directive => directive.split('=')[0].trim().toLowerCase() === 'max-age')
@@ -32,7 +33,7 @@ function createResponseWithMaxAge(oldResponse, maxMaxAge) {
   return response
 }
 
-function createResponseWithFirstPartyCookies(request, response) {
+function createResponseWithFirstPartyCookies(request: Request, response: Response) {
   const origin = request.headers.get('origin');
   const hostname = (new URL(origin)).hostname;
   const domain = identifyDomain(hostname);
@@ -40,7 +41,7 @@ function createResponseWithFirstPartyCookies(request, response) {
   const cookiesArray = newHeaders.getAll('set-cookie');
   newHeaders.delete('set-cookie')
   for (const cookieValue of cookiesArray) {
-    let cookieName;
+    let cookieName: string = '';
     const cookieObject = cookieValue.split('; ').reduce((prev, flag, index) => {
       let [key, value] = flag.split('=');
       if (index === 0) {
@@ -62,7 +63,7 @@ function createResponseWithFirstPartyCookies(request, response) {
   return newResponse
 }
 
-function createErrorResponse(reason) {
+function createErrorResponse(reason: string) {
   const responseBody = {
     message: 'An error occurred with Cloudflare worker.',
     reason,
@@ -70,12 +71,9 @@ function createErrorResponse(reason) {
   return new Response(JSON.stringify(responseBody), { status: 500 }) // todo standard error for js client
 }
 
-async function handleIngressAPIRaw(event, url) {
-  if (event == null) {
-    throw new Error('event is null');
-  }
 
-  if (event.request == null) {
+async function handleIngressAPIRaw(request: Request, url: URL) {  
+  if (request == null) {
     throw new Error('request is null');
   }
 
@@ -84,67 +82,53 @@ async function handleIngressAPIRaw(event, url) {
   }
 
   console.log(`sending ingress api to ${url}...`)
-  const requestHeaders = new Headers(event.request.headers)
+  const requestHeaders = new Headers(request.headers)
 
-  const newRequest = new Request(url, new Request(event.request, {
+  const newRequest = new Request(url.toString(), new Request(request, {
     headers: requestHeaders
   }));
 
   const response = await fetch(newRequest)
-  return createResponseWithFirstPartyCookies(event.request, response)
+  return createResponseWithFirstPartyCookies(request, response)
 }
 
-async function fetchCacheable(event, request, ttl) {
+async function fetchCacheable(request: Request, ttl: number) {
   return fetch(request, { cf: { cacheTtl: ttl } });
 }
 
-async function handleDownloadScript(event, url) {
-  const newRequest = new Request(url, new Request(event.request, {
-    headers: new Headers(event.request.headers)
+async function handleDownloadScript(request: Request, url: string) {
+  const newRequest = new Request(url, new Request(request, {
+    headers: new Headers(request.headers)
   }));
 
   console.log(`Downloading script from cdnEndpoint ${url}`);
   const downloadScriptCacheTtl = 5 * 60;
 
-  return fetchCacheable(event, newRequest, downloadScriptCacheTtl)
+  return fetchCacheable(newRequest, downloadScriptCacheTtl)
     .then(res => createResponseWithMaxAge(res, 60 * 60))
 }
 
-async function handleIngressAPI(event) {
-  const url = new URL(event.request.url);
+async function handleIngressAPI(request: Request) {
+  const url = new URL(request.url);
   const region = url.searchParams.get('region') || 'us';
   const endpoint = getVisitorIdEndpoint(region);
-  const newURL = new URL(endpoint);
-  newURL.search = new URLSearchParams(url.search);
-  return handleIngressAPIRaw(event, newURL);
+  const newURL: URL = new URL(endpoint);
+  newURL.search = new URLSearchParams(url.search).toString();
+  return handleIngressAPIRaw(request, newURL);
 }
 
-async function handleRequest(event) {
-  const url = new URL(event.request.url);
+export async function handleRequest(request: Request): Promise<Response> {
+  const url = new URL(request.url);
   const pathname = url.pathname;
 
   if (pathname === `${API_BASE_ROUTE}${scriptDownloadSubpath}`) {
-    return handleDownloadScript(event, getCdnEndpoint(event.request.url));
+    return handleDownloadScript(event, getCdnEndpoint(url));
   } else if (pathname === `${API_BASE_ROUTE}${scriptNpmDownloadSubpath}`) {
-    return handleDownloadScript(event, getCdnForNpmEndpoint(event.request.url));
+    return handleDownloadScript(event, getCdnForNpmEndpoint(url));
   } else if (pathname === `${API_BASE_ROUTE}${getEndpointSubpath}`) {
-    return handleIngressAPI(event)
+    return handleIngressAPI(request)
   } else {
     throw new Error(`unmatched path ${pathname}`);
   }
 }
-
-addEventListener('fetch', event => {
-  const request = event.request;
-  event.respondWith(handleRequest({ request }));
-});
-
-export default {
-  async fetch(request) {
-    try {
-      return handleRequest({ request })
-    } catch (e) {
-      return createErrorResponse(`unmatched path ${pathname}`)
-    }
-  }
-}
+  

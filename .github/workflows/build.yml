@@ -1,0 +1,33 @@
+# Reference on this file: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+name: Lint, build and test
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  build:
+    name: Lint, build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/node_modules
+            !**/dist/node_modules
+          key: nodemodules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: nodemodules-
+      - name: Install Node packages
+        run: yarn install
+      - name: Lint
+        run: yarn lint
+      - name: Tests
+        run: yarn test
+      - name: Build
+        run: yarn build
+      - name: Typecheck
+        run: yarn test:dts

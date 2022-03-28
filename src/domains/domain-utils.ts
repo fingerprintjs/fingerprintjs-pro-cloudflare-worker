@@ -1,6 +1,6 @@
-import { domainSuffixList } from "./domain-suffix-list";
+import domainSuffixList from './domain-suffix-list.json';
 
-export function identifyDomain(hostname) {
+export function identifyDomain(hostname: string) {
   const l1 = hostname.length;
   for (let i = 0; i < domainSuffixList.length; i++) {
     const domain = domainSuffixList[i];
