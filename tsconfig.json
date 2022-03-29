@@ -16,7 +16,8 @@
     "types": [
       "@cloudflare/workers-types",
       "@types/service-worker-mock",
-      "@types/cookies"
+      "@types/cookies",
+      "@types/jest"
     ]
   },
   "files": ["src/index.ts"],
