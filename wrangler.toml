@@ -7,7 +7,7 @@ route = ""
 workers_dev = true
 
 [build]
-command = "npm install && npm run build"
+command = "yarn install && yarn build"
 
 [build.upload]
 format = "service-worker"
