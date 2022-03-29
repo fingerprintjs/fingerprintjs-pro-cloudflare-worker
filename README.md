@@ -1,4 +1,7 @@
-# Cloudflare worker for Fingerprint.js PRO agent
+# DISCLAIMER
+This project is a work-in-progress and **should not** be used in production.
+
+# 👷 Cloudflare worker for Fingerprint.js PRO agent
 
 ## Installing to a website
 
