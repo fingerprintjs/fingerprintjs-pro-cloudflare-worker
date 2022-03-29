@@ -1,5 +1,20 @@
-export function getCdnEndpoint(path: string) {
-  const url = new URL(path)
+export function getScriptDownloadPath() {
+  const scriptDownloadSubpath = typeof SCRIPT_DOWNLOAD_ENDPOINT !== 'undefined' ? SCRIPT_DOWNLOAD_ENDPOINT : '/agent'
+  return `${API_BASE_ROUTE}${scriptDownloadSubpath}`
+}
+
+export function getScriptNpmDownloadPath() {
+  const scriptNpmDownloadSubpath =
+    typeof SCRIPT_NPM_DOWNLOAD_ENDPOINT !== 'undefined' ? SCRIPT_NPM_DOWNLOAD_ENDPOINT : '/agent-for-npm'
+  return `${API_BASE_ROUTE}${scriptNpmDownloadSubpath}`
+}
+
+export function getVisitorIdPath() {
+  const getEndpointSubpath = typeof GET_VISITOR_ID_ENDPOINT !== 'undefined' ? GET_VISITOR_ID_ENDPOINT : '/agent'
+  return `${API_BASE_ROUTE}${getEndpointSubpath}`
+}
+
+export function getCdnEndpoint(url: URL) {
   const apiKey = url.searchParams.get('apiKey')
   if (!apiKey) {
     throw new Error('apiKey is expected in query parameters.')
@@ -8,8 +23,7 @@ export function getCdnEndpoint(path: string) {
   return `https://fpcdn.io/${apiVersion}/${apiKey}?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`
 }
 
-export function getCdnForNpmEndpoint(path: string) {
-  const url = new URL(path)
+export function getCdnForNpmEndpoint(url: URL) {
   const apiKey = url.searchParams.get('apiKey')
   if (!apiKey) {
     throw new Error('apiKey is expected in query parameters.')
