@@ -1,11 +1,4 @@
-import {
-  getCdnEndpoint,
-  getCdnForNpmEndpoint,
-  getVisitorIdEndpoint,
-  getScriptDownloadPath,
-  getScriptNpmDownloadPath,
-  getVisitorIdPath,
-} from './env'
+import { getAgentScriptEndpoint, getVisitorIdEndpoint, getScriptDownloadPath, getVisitorIdPath } from './env'
 
 import { identifyDomain } from './domains/domain-utils'
 import { Cookie } from 'cookies'
@@ -117,10 +110,8 @@ export async function handleRequest(request: Request): Promise<Response> {
   const url = new URL(request.url)
   const pathname = url.pathname
 
-  if (pathname === getScriptDownloadPath()) {
-    return handleDownloadScript(request, getCdnEndpoint(url))
-  } else if (pathname === getScriptNpmDownloadPath()) {
-    return handleDownloadScript(request, getCdnForNpmEndpoint(url))
+  if (pathname == getScriptDownloadPath()) {
+    return handleDownloadScript(request, getAgentScriptEndpoint(url))
   } else if (pathname === getVisitorIdPath()) {
     return handleIngressAPI(request)
   } else {
