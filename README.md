@@ -33,7 +33,8 @@ const fpPromise = import(url)
 
 
 ### NPM package
-//TODO link to npm package.
+Install npm package:
+`npm i @fingerprintjs/fingerprintjs-pro` \
 Add the following code to an entry point of your website.
 Set <public api_key> and replace `<domain.com>/<route>` by your route to Cloudflare integration.
 ```js
