@@ -1,13 +1,12 @@
 export function getScriptDownloadPath() {
   const scriptDownloadSubpath =
-    typeof SCRIPT_DOWNLOAD_ENDPOINT !== 'undefined' ? SCRIPT_DOWNLOAD_ENDPOINT : Defaults.AGENT_SCRIPT_DOWNLOAD_PATH
-  return `${API_BASE_ROUTE}${scriptDownloadSubpath}`
+    typeof AGENT_SCRIPT_DOWNLOAD_PATH !== 'undefined' ? AGENT_SCRIPT_DOWNLOAD_PATH : Defaults.AGENT_SCRIPT_DOWNLOAD_PATH
+  return `/${ROUTE}/${scriptDownloadSubpath}`
 }
 
 export function getVisitorIdPath() {
-  const getEndpointSubpath =
-    typeof GET_VISITOR_ID_ENDPOINT !== 'undefined' ? GET_VISITOR_ID_ENDPOINT : Defaults.VISITOR_ID_PATH
-  return `${API_BASE_ROUTE}${getEndpointSubpath}`
+  const getEndpointSubpath = typeof VISITOR_ID_PATH !== 'undefined' ? VISITOR_ID_PATH : Defaults.VISITOR_ID_PATH
+  return `/${ROUTE}/${getEndpointSubpath}`
 }
 
 export function getAgentScriptEndpoint(url: URL) {
@@ -29,9 +28,9 @@ export function getVisitorIdEndpoint(region: string) {
 export const INT_VERSION = '1.0.0-beta'
 
 const Defaults = {
-  API_BASE_ROUTE: '/cf-worker',
-  AGENT_SCRIPT_DOWNLOAD_PATH: '/agent',
-  VISITOR_ID_PATH: '/visitorId',
+  API_BASE_ROUTE: 'cf-worker',
+  AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
+  VISITOR_ID_PATH: 'visitorId',
   REGION: 'us',
   API_KEY: '',
   AGENT_VERSION: '3',
