@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       
       - name: Get updates from the public template and merge into the repository branch
-        uses: sshelomentsev/github-action-update-repository@v0.1.1
+        uses: sshelomentsev/update-repository@v1.2.0        
         with:
           source: https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker.git
           branch: master
