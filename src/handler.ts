@@ -12,18 +12,21 @@ function createCookieStringFromObject(name: string, value: Cookie) {
 
 function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number) {
   const response = new Response(oldResponse.body, oldResponse)
-  const cacheControlDirectives = oldResponse.headers.get('cache-control').split(', ')
-  const maxAgeIndex = cacheControlDirectives.findIndex(
-    (directive) => directive.split('=')[0].trim().toLowerCase() === 'max-age'
-  )
-  if (maxAgeIndex === -1) {
-    cacheControlDirectives.push(`max-age=${maxMaxAge}`)
-  } else {
-    const oldMaxAge = Number(cacheControlDirectives[maxAgeIndex].split('=')[1])
-    cacheControlDirectives[maxAgeIndex] = `max-age=${Math.min(maxMaxAge, oldMaxAge)}`
+  const oldHeders = oldResponse.headers.get('cache-control')
+  if (oldHeders) {
+    const cacheControlDirectives = oldHeders.split(', ')
+    const maxAgeIndex = cacheControlDirectives.findIndex(
+      (directive) => directive.split('=')[0].trim().toLowerCase() === 'max-age'
+    )
+    if (maxAgeIndex === -1) {
+      cacheControlDirectives.push(`max-age=${maxMaxAge}`)
+    } else {
+      const oldMaxAge = Number(cacheControlDirectives[maxAgeIndex].split('=')[1])
+      cacheControlDirectives[maxAgeIndex] = `max-age=${Math.min(maxMaxAge, oldMaxAge)}`
+    }
+    const cacheControlValue = cacheControlDirectives.join(', ')
+    response.headers.set('cache-control', cacheControlValue)
   }
-  const cacheControlValue = cacheControlDirectives.join(', ')
-  response.headers.set('cache-control', cacheControlValue)
   return response
 }
 
@@ -36,7 +39,7 @@ function createResponseWithFirstPartyCookies(request: Request, response: Respons
   newHeaders.delete('set-cookie')
   for (const cookieValue of cookiesArray) {
     let cookieName: string = ''
-    const cookieObject = cookieValue.split('; ').reduce((prev, flag, index) => {
+    const cookieObject = cookieValue.split('; ').reduce((prev: Cookie, flag: string, index: number) => {
       const kv = flag.split('=')
       const key = index === 0 ? 'value' : kv[0]
       if (index === 0) {
