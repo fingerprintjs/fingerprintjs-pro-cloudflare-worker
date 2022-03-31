@@ -21,16 +21,7 @@ jobs:
         uses: cloudflare/wrangler-action@1.2.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
-          secrets: |
-            API_BASE_ROUTE
-            SCRIPT_DOWNLOAD_ENDPOINT
-            SCRIPT_NPM_DOWNLOAD_ENDPOINT
-            GET_VISITOR_ID_ENDPOINT
         env:
           CF_ACCOUNT_ID: ${{secrets.CF_ACCOUNT_ID}}
           CF_ZONE_ID: ${{secrets.CF_ZONE_ID}}
           CF_ROUTE: ${{secrets.CF_ROUTE}}
-          API_BASE_ROUTE: ${{secrets.CF_API_BASE_ROUTE}}
-          SCRIPT_DOWNLOAD_ENDPOINT: ${{secrets.CF_SCRIPT_DOWNLOAD_ENDPOINT}} || null
-          SCRIPT_NPM_DOWNLOAD_ENDPOINT: ${{secrets.CF_SCRIPT_NPM_DOWNLOAD_ENDPOINT}} || null
-          GET_VISITOR_ID_ENDPOINT: ${{secrets.CF_GET_VISITOR_ID_ENDPOINT}} || null
