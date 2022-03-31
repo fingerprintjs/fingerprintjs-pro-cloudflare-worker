@@ -1,17 +1,15 @@
-export function getScriptDownloadPath() {
-  const scriptDownloadSubpath =
-    typeof AGENT_SCRIPT_DOWNLOAD_PATH !== 'undefined' ? AGENT_SCRIPT_DOWNLOAD_PATH : Defaults.AGENT_SCRIPT_DOWNLOAD_PATH
-  return `/${getIntegrationUri()}/${scriptDownloadSubpath}`
+export function getScriptDownloadPath(env: any) {
+  const agentPath = env['AGENT_SCRIPT_DOWNLOAD_PATH'] || Defaults.AGENT_SCRIPT_DOWNLOAD_PATH
+  return `/${getWorkerPath(env)}/${agentPath}`
 }
 
-export function getVisitorIdPath() {
-  const getEndpointSubpath = typeof VISITOR_ID_PATH !== 'undefined' ? VISITOR_ID_PATH : Defaults.VISITOR_ID_PATH
-  return `/${getIntegrationUri()}/${getEndpointSubpath}`
+export function getVisitorIdPath(env: any) {
+  const visitorPath = env['VISITOR_ID_PATH'] || Defaults.VISITOR_ID_PATH
+  return `/${getWorkerPath(env)}/${visitorPath}`
 }
 
-function getIntegrationUri() {
-  const value = typeof WORKER_PATH !== 'undefined' ? WORKER_PATH : Defaults.WORKER_PATH
-  return value
+function getWorkerPath(env: any) {
+  return env['WORKER_PATH'] || Defaults.WORKER_PATH
 }
 
 export function getAgentScriptEndpoint(url: URL) {

@@ -106,13 +106,13 @@ async function handleIngressAPI(request: Request) {
   return handleIngressAPIRaw(request, newURL)
 }
 
-export async function handleRequest(request: Request): Promise<Response> {
+export async function handleRequest(request: Request, env: any): Promise<Response> {
   const url = new URL(request.url)
   const pathname = url.pathname
 
-  if (pathname == getScriptDownloadPath()) {
+  if (pathname == getScriptDownloadPath(env)) {
     return handleDownloadScript(request, getAgentScriptEndpoint(url))
-  } else if (pathname === getVisitorIdPath()) {
+  } else if (pathname === getVisitorIdPath(env)) {
     return handleIngressAPI(request)
   } else {
     return createErrorResponse(`unmatched path ${pathname}`)
