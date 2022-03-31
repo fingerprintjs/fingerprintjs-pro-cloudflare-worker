@@ -10,4 +10,11 @@ workers_dev = true
 command = "yarn install && yarn build"
 
 [build.upload]
-format = "service-worker"
+format = "modules"
+dir = "./dist"
+main = "./fingerprintjs-pro-cloudflare-worker.esm.js"
+
+[[build.upload.rules]]
+type = "ESModule"
+globs = ["**/*.js"]
+

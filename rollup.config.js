@@ -25,59 +25,15 @@ const commonInput = {
 }
 
 const commonOutput = {
-  name: 'FingerprintJsPro-cloudflare-worker',
-  // name: 'MyFpJsLibrary', // Need for IIFE and UMD build. Name of global variable
+  name: 'fingerprintjs-pro-cloudflare-worker',
   exports: 'named',
 }
 
-// Need for IIFE or UMD build
-// const commonTerser = terserPlugin(require('./terser.config.js'))
-
 export default [
-  // UMD and IIFE build config
-  // {
-  //   ...commonInput,
-  //   output: [
-  //     // IIFE build for browser with adding globals to window
-  //     {
-  //       ...commonOutput,
-  //       file: `${outputDirectory}/${artifactName}.js`,
-  //       format: 'iife',
-  //     },
-  //     {
-  //       ...commonOutput,
-  //       file: `${outputDirectory}/${artifactName}.min.js`,
-  //       format: 'iife',
-  //       plugins: [commonTerser],
-  //     },
-  //
-  //     // UMD for users who use Require.js or Electron and want to leverage them
-  //     {
-  //       ...commonOutput,
-  //       file: `${outputDirectory}/${artifactName}.umd.js`,
-  //       format: 'umd',
-  //     },
-  //     {
-  //       ...commonOutput,
-  //       file: `${outputDirectory}/${artifactName}.umd.min.js`,
-  //       format: 'umd',
-  //       plugins: [commonTerser],
-  //     },
-  //   ]
-  // },
-  // NPM bundles. They have all the dependencies excluded for end code size optimization.
   {
     ...commonInput,
     external: Object.keys(dependencies),
     output: [
-      // CJS for usage with `require()`
-      {
-        ...commonOutput,
-        file: `${outputDirectory}/${artifactName}.cjs.js`,
-        format: 'cjs',
-      },
-
-      // ESM for usage with `import`
       {
         ...commonOutput,
         file: `${outputDirectory}/${artifactName}.esm.js`,

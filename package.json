@@ -15,7 +15,7 @@
     "test": "jest",
     "test:dts": "tsc --noEmit --isolatedModules dist/fingerprintjs-pro-cloudflare-worker.d.ts"
   },
-  "main": "dist/fingerprintjs-pro-cloudflare-worker.cjs.js",
+  "main": "dist/fingerprintjs-pro-cloudflare-worker.esm.js",
   "module": "dist/fingerprintjs-pro-cloudflare-worker.esm.js",
   "types": "dist/fingerprintjs-pro-cloudflare-worker.d.ts",
   "sideEffects": false,
