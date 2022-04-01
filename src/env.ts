@@ -14,10 +14,10 @@ function getWorkerPath(env: any) {
 
 export function getAgentScriptEndpoint(url: URL) {
   const apiKey = url.searchParams.get('apiKey') || Defaults.API_KEY
-  const apiVersion = url.searchParams.get('v') || Defaults.AGENT_VERSION
+  const apiVersion = url.searchParams.get('version') || Defaults.AGENT_VERSION
 
   const base = `https://fpcdn.io/v${apiVersion}/${apiKey}`
-  const loaderVersion = url.searchParams.get('lv')
+  const loaderVersion = url.searchParams.get('loaderVersion')
   const lv = loaderVersion ? `/loader_v${loaderVersion}.js` : ''
 
   return `${base}${lv}?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`
