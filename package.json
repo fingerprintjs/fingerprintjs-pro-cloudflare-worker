@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker-typescript.git"
+    "url": "https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker.git"
   },
   "scripts": {
     "build": "rimraf dist && rollup -c rollup.config.js",
