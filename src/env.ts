@@ -1,15 +1,21 @@
-export function getScriptDownloadPath(env: any) {
-  const agentPath = env['AGENT_SCRIPT_DOWNLOAD_PATH'] || Defaults.AGENT_SCRIPT_DOWNLOAD_PATH
+export type WorkerEnv = {
+  AGENT_SCRIPT_DOWNLOAD_PATH: string | null
+  VISITOR_ID_PATH: string | null
+  WORKER_PATH: string | null
+}
+
+export function getScriptDownloadPath(env: WorkerEnv) {
+  const agentPath = env.AGENT_SCRIPT_DOWNLOAD_PATH || Defaults.AGENT_SCRIPT_DOWNLOAD_PATH
   return `/${getWorkerPath(env)}/${agentPath}`
 }
 
-export function getVisitorIdPath(env: any) {
-  const visitorPath = env['VISITOR_ID_PATH'] || Defaults.VISITOR_ID_PATH
+export function getVisitorIdPath(env: WorkerEnv) {
+  const visitorPath = env.VISITOR_ID_PATH || Defaults.VISITOR_ID_PATH
   return `/${getWorkerPath(env)}/${visitorPath}`
 }
 
-function getWorkerPath(env: any) {
-  return env['WORKER_PATH'] || Defaults.WORKER_PATH
+function getWorkerPath(env: WorkerEnv) {
+  return env.WORKER_PATH || Defaults.WORKER_PATH
 }
 
 export function getAgentScriptEndpoint(url: URL) {
