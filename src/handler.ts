@@ -1,4 +1,10 @@
-import { getAgentScriptEndpoint, getVisitorIdEndpoint, getScriptDownloadPath, getVisitorIdPath } from './env'
+import {
+  getAgentScriptEndpoint,
+  getVisitorIdEndpoint,
+  getScriptDownloadPath,
+  getVisitorIdPath,
+  getHealthCheckPath,
+} from './env'
 
 import { identifyDomain } from './domains/domain-utils'
 import { Cookie } from 'cookies'
@@ -109,6 +115,23 @@ async function handleIngressAPI(request: Request) {
   return handleIngressAPIRaw(request, newURL)
 }
 
+async function handleHealthCheck() {
+  const headers = new Headers()
+  headers.append('Content-Type', 'application/json')
+
+  const body = {
+    success: true,
+  }
+
+  const response = new Response(JSON.stringify(body), {
+    status: 200,
+    statusText: 'OK',
+    headers: headers,
+  })
+
+  return response
+}
+
 export async function handleRequest(request: Request, env: any): Promise<Response> {
   const url = new URL(request.url)
   const pathname = url.pathname
@@ -117,6 +140,8 @@ export async function handleRequest(request: Request, env: any): Promise<Respons
     return handleDownloadScript(request, getAgentScriptEndpoint(url))
   } else if (pathname === getVisitorIdPath(env)) {
     return handleIngressAPI(request)
+  } else if (pathname === getHealthCheckPath(env)) {
+    return handleHealthCheck()
   } else {
     return createErrorResponse(`unmatched path ${pathname}`)
   }
