@@ -14,6 +14,10 @@ export function getVisitorIdPath(env: WorkerEnv) {
   return `/${getWorkerPath(env)}/${visitorPath}`
 }
 
+export function getHealthCheckPath(env: WorkerEnv) {
+  return `/${getWorkerPath(env)}/health`
+}
+
 function getWorkerPath(env: WorkerEnv) {
   return env.WORKER_PATH || Defaults.WORKER_PATH
 }
