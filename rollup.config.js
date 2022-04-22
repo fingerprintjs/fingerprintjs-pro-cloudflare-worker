@@ -14,7 +14,7 @@ const artifactName = 'fingerprintjs-pro-cloudflare-worker'
 const commonBanner = licensePlugin({
   banner: {
     content: {
-      file: join(__dirname, 'resources', 'license_banner.txt'),
+      file: join(__dirname, 'assets', 'license_banner.txt'),
     },
   },
 })

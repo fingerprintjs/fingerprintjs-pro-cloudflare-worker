@@ -15,7 +15,6 @@
     "exactOptionalPropertyTypes": true,
     "types": [
       "@cloudflare/workers-types",
-      "@types/cookies",
       "@types/jest"
     ]
   },

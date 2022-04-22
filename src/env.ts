@@ -18,12 +18,12 @@ function getWorkerPath(env: WorkerEnv) {
   return env.WORKER_PATH || Defaults.WORKER_PATH
 }
 
-export function getAgentScriptEndpoint(url: URL) {
-  const apiKey = url.searchParams.get('apiKey') || Defaults.API_KEY
-  const apiVersion = url.searchParams.get('version') || Defaults.AGENT_VERSION
+export function getAgentScriptEndpoint(searchParams: URLSearchParams) {
+  const apiKey = searchParams.get('apiKey') || Defaults.API_KEY
+  const apiVersion = searchParams.get('version') || Defaults.AGENT_VERSION
 
   const base = `https://fpcdn.io/v${apiVersion}/${apiKey}`
-  const loaderVersion = url.searchParams.get('loaderVersion')
+  const loaderVersion = searchParams.get('loaderVersion')
   const lv = loaderVersion ? `/loader_v${loaderVersion}.js` : ''
 
   return `${base}${lv}?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`
@@ -31,7 +31,7 @@ export function getAgentScriptEndpoint(url: URL) {
 
 export function getVisitorIdEndpoint(region: string) {
   const prefix = region === Defaults.REGION ? '' : `${region}.`
-  return `https://${prefix}api.fpjs.io?ii=fingerprintjs-cloudflare/${INT_VERSION}/ingress`
+  return `https://${prefix}api.fpjs.io?ii=fingerprintjs-cloudflare/${INT_VERSION}/ingress` // todo use searchParams
 }
 
 export const INT_VERSION = '1.0.0-beta'
