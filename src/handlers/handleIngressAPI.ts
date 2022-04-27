@@ -1,5 +1,14 @@
 import { getVisitorIdEndpoint } from '../env'
-import { createCookieObjectFromHeaderValue, createCookieStringFromObject, getDomainFromHostname } from '../utils'
+import {
+  addMonitoringHeadersForVisitorIdRequest,
+  createCookieObjectFromHeaderValue,
+  createCookieStringFromObject,
+  getDomainFromHostname,
+} from '../utils'
+
+function copySearchParams(oldURL: URL, newURL: URL) {
+  newURL.search = new URLSearchParams(oldURL.search).toString()
+}
 
 function getCookieValueWithDomain(oldCookieValue: string, domain: string): string {
   const [cookieName, cookieObject] = createCookieObjectFromHeaderValue(oldCookieValue)
@@ -50,10 +59,11 @@ async function handleIngressAPIRaw(request: Request, url: URL) {
 }
 
 export async function handleIngressAPI(request: Request) {
-  const url = new URL(request.url)
-  const region = url.searchParams.get('region') || 'us'
+  const oldURL = new URL(request.url)
+  const region = oldURL.searchParams.get('region') || 'us'
   const endpoint = getVisitorIdEndpoint(region)
   const newURL = new URL(endpoint)
-  newURL.search = new URLSearchParams(url.search).toString()
+  copySearchParams(oldURL, newURL)
+  addMonitoringHeadersForVisitorIdRequest(newURL)
   return handleIngressAPIRaw(request, newURL)
 }

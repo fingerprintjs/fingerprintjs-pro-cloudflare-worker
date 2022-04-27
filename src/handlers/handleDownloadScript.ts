@@ -1,4 +1,4 @@
-import { fetchCacheable, getCacheControlHeaderWithMaxAgeIfLower } from '../utils'
+import { fetchCacheable, getCacheControlHeaderWithMaxAgeIfLower, addMonitoringHeadersForProCDN } from '../utils'
 
 function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number) {
   const response = new Response(oldResponse.body, oldResponse)
@@ -12,10 +12,12 @@ function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number) {
   return response
 }
 
-export async function handleDownloadScript(request: Request, url: string) {
-  const newRequest = new Request(url, new Request(request, { headers: new Headers(request.headers) }))
+export async function handleDownloadScript(request: Request, endpoint: string) {
+  const url = new URL(endpoint)
+  addMonitoringHeadersForProCDN(url)
+  const newRequest = new Request(url.toString(), new Request(request, { headers: new Headers(request.headers) }))
 
-  console.log(`Downloading script from cdnEndpoint ${url}`)
+  console.log(`Downloading script from cdnEndpoint ${url.toString()}...`)
   const workerCacheTtl = 5 * 60
   const maxMageAge = 60 * 60
 

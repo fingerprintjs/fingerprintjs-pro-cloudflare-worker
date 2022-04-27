@@ -26,15 +26,13 @@ export function getAgentScriptEndpoint(searchParams: URLSearchParams) {
   const loaderVersion = searchParams.get('loaderVersion')
   const lv = loaderVersion ? `/loader_v${loaderVersion}.js` : ''
 
-  return `${base}${lv}?ii=fingerprintjs-cloudflare/${INT_VERSION}/procdn`
+  return `${base}${lv}`
 }
 
 export function getVisitorIdEndpoint(region: string) {
   const prefix = region === Defaults.REGION ? '' : `${region}.`
-  return `https://${prefix}api.fpjs.io?ii=fingerprintjs-cloudflare/${INT_VERSION}/ingress` // todo use searchParams
+  return `https://${prefix}api.fpjs.io`
 }
-
-export const INT_VERSION = '1.0.0-beta'
 
 const Defaults = {
   WORKER_PATH: 'cf-worker',
