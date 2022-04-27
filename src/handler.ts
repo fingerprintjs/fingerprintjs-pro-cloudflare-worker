@@ -1,4 +1,4 @@
-import { getAgentScriptEndpoint, getScriptDownloadPath, getVisitorIdPath, getHealthCheckPath, WorkerEnv } from './env'
+import { getScriptDownloadPath, getVisitorIdPath, getHealthCheckPath, WorkerEnv } from './env'
 
 import { createErrorResponse } from './utils'
 import { handleDownloadScript, handleIngressAPI, handleHealthCheck } from './handlers'
@@ -8,8 +8,7 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
   const pathname = url.pathname
 
   if (pathname === getScriptDownloadPath(env)) {
-    const agentScriptEndpoint = getAgentScriptEndpoint(url.searchParams)
-    return handleDownloadScript(request, agentScriptEndpoint)
+    return handleDownloadScript(request)
   }
 
   if (pathname === getVisitorIdPath(env)) {
