@@ -1,4 +1,4 @@
-import domainSuffixList from '../../assets/domain-suffix-list.json'
+import domainSuffixList from './domain-suffix-list.json'
 
 export function getDomainFromHostname(hostname: string) {
   if (!hostname) {
