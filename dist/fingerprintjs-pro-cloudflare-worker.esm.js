@@ -1,5 +1,5 @@
 /**
- * FingerprintJS Pro React v0.0.2 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprintjs.com)
+ * FingerprintJS Pro Agent Cloudflare Worker v0.0.2 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprintjs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
