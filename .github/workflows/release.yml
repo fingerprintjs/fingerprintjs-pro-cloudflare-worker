@@ -17,7 +17,13 @@ jobs:
   release:
     name: Release new version
     runs-on: ubuntu-latest
-    steps:      
+
+    permissions:
+      contents: write
+
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
       - name: Checkout develop branch
         uses: actions/checkout@v2
         with:
@@ -26,11 +32,6 @@ jobs:
       # git config settings to have user name and email for commit messages
       - name: Set git settings
         uses: fregante/setup-git-user@v1          
-      
-      # steps.date.outputs.date will be used as a temporary branch name
-      - name: Get current date and time
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
 
       # Build and test
       - name: Install Node packages
@@ -47,15 +48,12 @@ jobs:
       - name: Typecheck
         run: yarn test:dts
 
-      - name: Create new branch for release process
-        run: git checkout -b ${{ steps.date.outputs.date }}
-
       # add end-user script that's built in dist/
-      - name: add release script
-        run: git add -f dist/*.js
-      - name: commit release script
-        run: git commit dist/ -m "Add script"        
-      
+      - name: add release scripts
+        run: git add -f dist/
+      - name: commit new version of script
+        run: git commit dist/ -m "Add script"
+
       - name: get version
         id: version
         uses: notiz-dev/github-action-json-property@release
@@ -76,11 +74,8 @@ jobs:
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
 
-      - name: Switch to develop branch
-        run: git checkout develop
-
       - name: Push changes
-        uses: ad-m/github-push-action@main
+        uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: develop
