@@ -16,7 +16,7 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
   }
 
   if (pathname === getHealthCheckPath(env)) {
-    return handleHealthCheck()
+    return handleHealthCheck(env)
   }
 
   return createErrorResponse(`unmatched path ${pathname}`)
