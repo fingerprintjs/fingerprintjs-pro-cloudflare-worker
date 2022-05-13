@@ -4,9 +4,9 @@
  */
 
 declare type WorkerEnv = {
+    WORKER_PATH: string | null;
     AGENT_SCRIPT_DOWNLOAD_PATH: string | null;
     VISITOR_ID_PATH: string | null;
-    WORKER_PATH: string | null;
 };
 
 declare const _default: {
