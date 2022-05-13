@@ -3,19 +3,42 @@
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
+const Defaults = {
+    WORKER_PATH: 'cf-worker',
+    AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
+    VISITOR_ID_PATH: 'visitorId',
+    REGION: 'us',
+    AGENT_VERSION: '3',
+};
+function getVarOrDefault(variable, defaults) {
+    return function (env) {
+        return (env[variable] || defaults[variable]);
+    };
+}
+function isVarSet(variable) {
+    return function (env) {
+        return env[variable] != null;
+    };
+}
+const workerPathVarName = 'WORKER_PATH';
+const getWorkerPath = getVarOrDefault(workerPathVarName, Defaults);
+const isWorkerPathSet = isVarSet(workerPathVarName);
+const agentScriptDownloadPathVarName = 'AGENT_SCRIPT_DOWNLOAD_PATH';
+const getAgentPath = getVarOrDefault(agentScriptDownloadPathVarName, Defaults);
+const isScriptDownloadPathSet = isVarSet(agentScriptDownloadPathVarName);
 function getScriptDownloadPath(env) {
-    const agentPath = env.AGENT_SCRIPT_DOWNLOAD_PATH || Defaults.AGENT_SCRIPT_DOWNLOAD_PATH;
+    const agentPath = getAgentPath(env);
     return `/${getWorkerPath(env)}/${agentPath}`;
 }
+const visitorIdPathVarName = 'VISITOR_ID_PATH';
+const getVisitorPath = getVarOrDefault(visitorIdPathVarName, Defaults);
+const isVisitorIdPathSet = isVarSet(visitorIdPathVarName);
 function getVisitorIdPath(env) {
-    const visitorPath = env.VISITOR_ID_PATH || Defaults.VISITOR_ID_PATH;
+    const visitorPath = getVisitorPath(env);
     return `/${getWorkerPath(env)}/${visitorPath}`;
 }
 function getHealthCheckPath(env) {
     return `/${getWorkerPath(env)}/health`;
-}
-function getWorkerPath(env) {
-    return env.WORKER_PATH || Defaults.WORKER_PATH;
 }
 function getAgentScriptEndpoint(searchParams) {
     const apiKey = searchParams.get('apiKey') || Defaults.API_KEY;
@@ -29,15 +52,6 @@ function getVisitorIdEndpoint(region) {
     const prefix = region === Defaults.REGION ? '' : `${region}.`;
     return `https://${prefix}api.fpjs.io`;
 }
-const Defaults = {
-    WORKER_PATH: 'cf-worker',
-    AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
-    VISITOR_ID_PATH: 'visitorId',
-    REGION: 'us',
-    API_KEY: '',
-    AGENT_VERSION: '3',
-    LOADER_VERSION: '',
-};
 
 var domainSuffixList = [
 	"ac",
@@ -9445,7 +9459,7 @@ async function fetchCacheable(request, ttl) {
     return fetch(request, { cf: { cacheTtl: ttl } });
 }
 
-const INT_VERSION = '1.0.0-beta'; // todo no hard coding of version
+const INT_VERSION = '0.0.2'; // todo no hard coding of version
 const HEADER_NAME = 'ii';
 function getHeaderValue(type) {
     return `fingerprintjs-cloudflare/${INT_VERSION}/${type}`;
@@ -9536,12 +9550,42 @@ async function handleIngressAPI(request) {
     return handleIngressAPIRaw(request, newURL);
 }
 
-function handleHealthCheck() {
+function buildEnvInfo(env) {
+    const workerPath = {
+        envVarName: workerPathVarName,
+        value: getWorkerPath(env),
+        isSet: isWorkerPathSet(env),
+    };
+    const scriptDownloadPath = {
+        envVarName: agentScriptDownloadPathVarName,
+        value: getScriptDownloadPath(env),
+        isSet: isScriptDownloadPathSet(env),
+    };
+    const visitorIdPath = {
+        envVarName: visitorIdPathVarName,
+        value: getVisitorIdPath(env),
+        isSet: isVisitorIdPathSet(env),
+    };
+    return {
+        workerPath,
+        scriptDownloadPath,
+        visitorIdPath,
+    };
+}
+function buildHeaders() {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
-    const body = {
+    return headers;
+}
+function buildBody(env) {
+    return {
         success: true,
+        envInfo: buildEnvInfo(env),
     };
+}
+function handleHealthCheck(env) {
+    const headers = buildHeaders();
+    const body = buildBody(env);
     return new Response(JSON.stringify(body), {
         status: 200,
         statusText: 'OK',
@@ -9559,7 +9603,7 @@ async function handleRequest(request, env) {
         return handleIngressAPI(request);
     }
     if (pathname === getHealthCheckPath(env)) {
-        return handleHealthCheck();
+        return handleHealthCheck(env);
     }
     return createErrorResponse(`unmatched path ${pathname}`);
 }
