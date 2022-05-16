@@ -23,9 +23,15 @@ const commonBanner = licensePlugin({
 
 const commonInput = {
   input: inputFile,
-  plugins: [replace({
-    '__current_worker_version__': packageJson.version
-  }), jsonPlugin(), typescript(), external(), commonBanner],
+  plugins: [
+    replace({
+      __current_worker_version__: packageJson.version,
+    }),
+    jsonPlugin(),
+    typescript(),
+    external(),
+    commonBanner,
+  ],
 }
 
 const commonOutput = {
