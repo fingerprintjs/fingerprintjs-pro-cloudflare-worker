@@ -1,4 +1,4 @@
-const INT_VERSION = '0.0.2' // todo no hard coding of version
+const INT_VERSION = '__current_worker_version__'
 const HEADER_NAME = 'ii'
 
 function getHeaderValue(type: 'procdn' | 'ingress'): string {

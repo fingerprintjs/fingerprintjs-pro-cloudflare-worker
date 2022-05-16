@@ -4,8 +4,10 @@ import external from 'rollup-plugin-peer-deps-external'
 import dtsPlugin from 'rollup-plugin-dts'
 import licensePlugin from 'rollup-plugin-license'
 import { join } from 'path'
+import replace from '@rollup/plugin-replace'
 
 const { dependencies = {} } = require('./package.json')
+const packageJson = require('./package.json')
 
 const inputFile = 'src/index.ts'
 const outputDirectory = 'dist'
@@ -21,7 +23,15 @@ const commonBanner = licensePlugin({
 
 const commonInput = {
   input: inputFile,
-  plugins: [jsonPlugin(), typescript(), external(), commonBanner],
+  plugins: [
+    replace({
+      __current_worker_version__: packageJson.version,
+    }),
+    jsonPlugin(),
+    typescript(),
+    external(),
+    commonBanner,
+  ],
 }
 
 const commonOutput = {
