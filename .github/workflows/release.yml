@@ -41,6 +41,10 @@ jobs:
       - name: Tests
         run: yarn test
 
+      - name: Disable version tags
+        run: |
+          yarn config set version-git-tag false
+
       - name: Bump version
         run: yarn version --${{ github.event.inputs.version_bump }}
       - name: Build
@@ -57,22 +61,16 @@ jobs:
 
       - name: Commit and push a new version of the scripts
         run: |
-          git commit dist/ -m "feat new scripts v${{steps.version.outputs.prop}}"
+          git commit package.json dist/ -m "feat new scripts v${{steps.version.outputs.prop}}"
           git push "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
-
-      - name: Create and push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{steps.version.outputs.prop}}
+          git tag -a "v${{steps.version.outputs.prop}}" -m "v${{steps.version.outputs.prop}}"
+          git push --tags "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
 
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          tag: v${{steps.version.outputs.prop}}
+          name: Release ${{steps.version.outputs.prop}}
 
       - name: Create Pull Request from develop to main
         id: create_pr
