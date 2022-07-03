@@ -4,7 +4,10 @@ import { getCacheControlHeaderWithMaxAgeIfLower } from './getCacheControlHeaderW
 import { createCookieObjectFromHeaderValue } from './createCookieObjectFromHeaderValue'
 import { createErrorResponse } from './createErrorResponse'
 import { fetchCacheable } from './fetchCacheable'
-import { addMonitoringHeadersForVisitorIdRequest, addMonitoringHeadersForProCDN } from './addMonitoringHeaders'
+import {
+  addTrafficMonitoringSearchParamsForVisitorIdRequest,
+  addTrafficMonitoringSearchParamsForProCDN,
+} from './addTrafficMonitoring'
 import { returnHttpResponse } from './returnHttpResponse'
 import { Cookie } from './cookie'
 
@@ -12,8 +15,8 @@ export {
   getDomainFromHostname,
   createCookieStringFromObject,
   getCacheControlHeaderWithMaxAgeIfLower,
-  addMonitoringHeadersForVisitorIdRequest,
-  addMonitoringHeadersForProCDN,
+  addTrafficMonitoringSearchParamsForVisitorIdRequest,
+  addTrafficMonitoringSearchParamsForProCDN,
   createCookieObjectFromHeaderValue,
   createErrorResponse,
   returnHttpResponse,

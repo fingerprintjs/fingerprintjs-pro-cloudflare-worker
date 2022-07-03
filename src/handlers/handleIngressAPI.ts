@@ -1,6 +1,6 @@
 import { getVisitorIdEndpoint } from '../env'
 import {
-  addMonitoringHeadersForVisitorIdRequest,
+  addTrafficMonitoringSearchParamsForVisitorIdRequest,
   createCookieObjectFromHeaderValue,
   createCookieStringFromObject,
   getDomainFromHostname,
@@ -64,6 +64,6 @@ export async function handleIngressAPI(request: Request) {
   const endpoint = getVisitorIdEndpoint(region)
   const newURL = new URL(endpoint)
   copySearchParams(oldURL, newURL)
-  addMonitoringHeadersForVisitorIdRequest(newURL)
+  addTrafficMonitoringSearchParamsForVisitorIdRequest(newURL)
   return handleIngressAPIRaw(request, newURL)
 }
