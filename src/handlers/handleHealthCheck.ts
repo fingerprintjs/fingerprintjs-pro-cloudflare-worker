@@ -53,6 +53,7 @@ function buildBody(env: WorkerEnv): object {
   return {
     success: true,
     envInfo: buildEnvInfo(env),
+    version: '__current_worker_version__',
   }
 }
 
