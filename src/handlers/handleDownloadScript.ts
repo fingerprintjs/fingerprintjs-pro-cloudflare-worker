@@ -1,4 +1,8 @@
-import { fetchCacheable, getCacheControlHeaderWithMaxAgeIfLower, addMonitoringHeadersForProCDN } from '../utils'
+import {
+  fetchCacheable,
+  getCacheControlHeaderWithMaxAgeIfLower,
+  addTrafficMonitoringSearchParamsForProCDN,
+} from '../utils'
 import { getAgentScriptEndpoint } from '../env'
 
 function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number) {
@@ -17,7 +21,7 @@ export async function handleDownloadScript(request: Request) {
   const requestSearchParams = new URL(request.url).searchParams
   const agentScriptEndpoint = getAgentScriptEndpoint(requestSearchParams)
   const url = new URL(agentScriptEndpoint)
-  addMonitoringHeadersForProCDN(url)
+  addTrafficMonitoringSearchParamsForProCDN(url)
   const newRequest = new Request(url.toString(), new Request(request, { headers: new Headers(request.headers) }))
 
   console.log(`Downloading script from cdnEndpoint ${url.toString()}...`)
