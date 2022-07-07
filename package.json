@@ -1,6 +1,6 @@
 {
   "name": "@fingerprintjs/cloudflare-worker-typescript",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "FingerprintJS Pro Cloudflare Worker",
   "author": "FingerprintJS, Inc (https://fingerprintjs.com)",
   "license": "MIT",
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^3.4.0",
     "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.1",
     "@types/jest": "^27.4.0",
     "@typescript-eslint/eslint-plugin": "^5.12.0",

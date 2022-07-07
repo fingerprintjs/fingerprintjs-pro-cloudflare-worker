@@ -1,4 +1,4 @@
 export function returnHttpResponse(oldResponse: Response): Response {
-  // todo CSP headers
+  oldResponse.headers.delete('Strict-Transport-Security')
   return oldResponse
 }

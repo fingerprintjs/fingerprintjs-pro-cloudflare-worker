@@ -1,5 +1,5 @@
 /**
- * FingerprintJS Pro Agent Cloudflare Worker v0.0.2 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprintjs.com)
+ * FingerprintJS Pro Cloudflare Worker v0.0.3 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
@@ -9440,39 +9440,63 @@ function createCookieObjectFromHeaderValue(cookieValue) {
     return [cookieName, cookieObject];
 }
 
-function createErrorResponse(error) {
-    let reason;
+function errorToString(error) {
     try {
-        reason = typeof error === 'string' ? error : error instanceof Error ? error.message : String(error);
+        return typeof error === 'string' ? error : error instanceof Error ? error.message : String(error);
     }
     catch (e) {
-        reason = 'unknown';
+        return 'unknown';
     }
-    const responseBody = {
-        message: 'An error occurred with Cloudflare worker.',
-        reason,
+}
+function generateRandomString(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+function generateRequestUniqueId() {
+    return generateRandomString(2);
+}
+function generateRequestId() {
+    const uniqueId = generateRequestUniqueId();
+    const now = new Date().getTime();
+    return `${now}.cfi-${uniqueId}`;
+}
+function createErrorResponse(error) {
+    const reason = errorToString(error);
+    const errorBody = {
+        code: 'Failed',
+        message: `An error occurred with Cloudflare worker. Reason: ${reason}`,
     };
-    return new Response(JSON.stringify(responseBody), { status: 500 }); // todo standard error for js client
+    const responseBody = {
+        v: '2',
+        error: errorBody,
+        requestId: generateRequestId(),
+        products: {},
+    };
+    return new Response(JSON.stringify(responseBody), { status: 500 });
 }
 
 async function fetchCacheable(request, ttl) {
     return fetch(request, { cf: { cacheTtl: ttl } });
 }
 
-const INT_VERSION = '0.0.2'; // todo no hard coding of version
+const INT_VERSION = '0.0.3';
 const HEADER_NAME = 'ii';
 function getHeaderValue(type) {
-    return `fingerprintjs-cloudflare/${INT_VERSION}/${type}`;
+    return `fingerprintjs-pro-cloudflare/${INT_VERSION}/${type}`;
 }
-function addMonitoringHeadersForProCDN(url) {
+function addTrafficMonitoringSearchParamsForProCDN(url) {
     url.searchParams.append(HEADER_NAME, getHeaderValue('procdn'));
 }
-function addMonitoringHeadersForVisitorIdRequest(url) {
+function addTrafficMonitoringSearchParamsForVisitorIdRequest(url) {
     url.searchParams.append(HEADER_NAME, getHeaderValue('ingress'));
 }
 
 function returnHttpResponse(oldResponse) {
-    // todo CSP headers
+    oldResponse.headers.delete('Strict-Transport-Security');
     return oldResponse;
 }
 
@@ -9490,7 +9514,7 @@ async function handleDownloadScript(request) {
     const requestSearchParams = new URL(request.url).searchParams;
     const agentScriptEndpoint = getAgentScriptEndpoint(requestSearchParams);
     const url = new URL(agentScriptEndpoint);
-    addMonitoringHeadersForProCDN(url);
+    addTrafficMonitoringSearchParamsForProCDN(url);
     const newRequest = new Request(url.toString(), new Request(request, { headers: new Headers(request.headers) }));
     console.log(`Downloading script from cdnEndpoint ${url.toString()}...`);
     const workerCacheTtl = 5 * 60;
@@ -9546,7 +9570,7 @@ async function handleIngressAPI(request) {
     const endpoint = getVisitorIdEndpoint(region);
     const newURL = new URL(endpoint);
     copySearchParams(oldURL, newURL);
-    addMonitoringHeadersForVisitorIdRequest(newURL);
+    addTrafficMonitoringSearchParamsForVisitorIdRequest(newURL);
     return handleIngressAPIRaw(request, newURL);
 }
 
@@ -9581,6 +9605,7 @@ function buildBody(env) {
     return {
         success: true,
         envInfo: buildEnvInfo(env),
+        version: '0.0.3',
     };
 }
 function handleHealthCheck(env) {

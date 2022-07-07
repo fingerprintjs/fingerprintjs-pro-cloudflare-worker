@@ -5,21 +5,22 @@ on:
     inputs:
       version_bump:
         description: 'A type of version bump'
-        default: 'major'
+        default: 'patch'
         required: true
         type: choice
         options:
-        - major
-        - minor
-        - patch
+          - major
+          - minor
+          - patch
 
 jobs:
   release:
     name: Release new version
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     permissions:
       contents: write
+      pull-requests: write
 
     if: github.ref == 'refs/heads/develop'
 
@@ -28,54 +29,58 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: develop
+          fetch-depth: 0
 
-      # git config settings to have user name and email for commit messages
       - name: Set git settings
-        uses: fregante/setup-git-user@v1          
+        uses: fregante/setup-git-user@v1
 
-      # Build and test
       - name: Install Node packages
         run: yarn install
       - name: Lint
         run: yarn lint
       - name: Tests
         run: yarn test
-      
+
+      - name: Disable version tags
+        run: yarn config set version-git-tag false
+
       - name: Bump version
-        run: yarn version --${{ github.event.inputs.version_bump }}  
+        run: yarn version --${{ github.event.inputs.version_bump }}
       - name: Build
         run: yarn build
-      - name: Typecheck
+      - name: Type check
         run: yarn test:dts
 
-      # add end-user script that's built in dist/
-      - name: add release scripts
-        run: git add -f dist/
-      - name: commit new version of script
-        run: git commit dist/ -m "Add script"
-
-      - name: get version
+      - name: Get version
         id: version
-        uses: notiz-dev/github-action-json-property@release
-        with: 
+        uses: notiz-dev/github-action-json-property@v0.1.0
+        with:
           path: 'package.json'
           prop_path: 'version'
 
-      - name: Push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{steps.version.outputs.prop}}
+      - name: Commit and push a new version of the scripts
+        run: |
+          git commit package.json dist/ -m "feat new scripts v${{steps.version.outputs.prop}}"
+          git push "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+          git tag -a "v${{steps.version.outputs.prop}}" -m "v${{steps.version.outputs.prop}}"
+          git push --tags "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          tag: v${{steps.version.outputs.prop}}
+          name: Release ${{steps.version.outputs.prop}}
 
-      - name: Push changes
-        uses: ad-m/github-push-action@master
+      - name: Create Pull Request from develop to main
+        id: create_pr
+        uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: develop
+          source_branch: develop
+          target_branch: main
+          title: New version of scripts v${{ steps.version.outputs.prop }}
+          body: New version of scripts v${{ steps.version.outputs.prop }}
+
+      - name: Check PR outputs
+        if: ${{ steps.create_pr.outputs.url }}
+        run: echo "Pull Request URL - ${{ steps.create_pr.outputs.url }}"
