@@ -1,7 +1,7 @@
 import {
   getScriptDownloadPath,
   getGetResultPath,
-  getWorkerPath,
+  getWorkerPathVar,
   WorkerEnv,
   isScriptDownloadPathSet,
   isWorkerPathSet,
@@ -20,7 +20,7 @@ type EnvVarInfo = {
 function buildEnvInfo(env: WorkerEnv): { [key: string]: EnvVarInfo } {
   const workerPath: EnvVarInfo = {
     envVarName: workerPathVarName,
-    value: getWorkerPath(env),
+    value: getWorkerPathVar(env),
     isSet: isWorkerPathSet(env),
   }
 

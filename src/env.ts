@@ -25,16 +25,16 @@ function isVarSet(variable: keyof WorkerEnv): (env: WorkerEnv) => boolean {
 }
 
 export const workerPathVarName = 'WORKER_PATH'
-export const getWorkerPath = getVarOrDefault(workerPathVarName, Defaults)
+export const getWorkerPathVar = getVarOrDefault(workerPathVarName, Defaults)
 export const isWorkerPathSet = isVarSet(workerPathVarName)
 
 export const agentScriptDownloadPathVarName = 'AGENT_SCRIPT_DOWNLOAD_PATH'
-const getAgentPath = getVarOrDefault(agentScriptDownloadPathVarName, Defaults)
+const getAgentPathVar = getVarOrDefault(agentScriptDownloadPathVarName, Defaults)
 export const isScriptDownloadPathSet = isVarSet(agentScriptDownloadPathVarName)
 
 export function getScriptDownloadPath(env: WorkerEnv) {
-  const agentPath = getAgentPath(env)
-  return `/${getWorkerPath(env)}/${agentPath}`
+  const agentPathVar = getAgentPathVar(env)
+  return `/${getWorkerPathVar(env)}/${agentPathVar}`
 }
 
 export const getResultPathVarName = 'GET_RESULT_PATH'
@@ -43,11 +43,11 @@ export const isGetResultPathSet = isVarSet(getResultPathVarName)
 
 export function getGetResultPath(env: WorkerEnv) {
   const getResultPathVar = getGetResultPathVar(env)
-  return `/${getWorkerPath(env)}/${getResultPathVar}`
+  return `/${getWorkerPathVar(env)}/${getResultPathVar}`
 }
 
 export function getHealthCheckPath(env: WorkerEnv) {
-  return `/${getWorkerPath(env)}/health`
+  return `/${getWorkerPathVar(env)}/health`
 }
 
 export function getAgentScriptEndpoint(searchParams: URLSearchParams) {
