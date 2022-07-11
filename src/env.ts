@@ -1,13 +1,13 @@
 export type WorkerEnv = {
   WORKER_PATH: string | null
   AGENT_SCRIPT_DOWNLOAD_PATH: string | null
-  VISITOR_ID_PATH: string | null
+  GET_RESULT_PATH: string | null
 }
 
 const Defaults: WorkerEnv & Record<string, string> = {
   WORKER_PATH: 'cf-worker',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
-  VISITOR_ID_PATH: 'visitorId',
+  GET_RESULT_PATH: 'getResult',
   REGION: 'us',
   AGENT_VERSION: '3',
 }
@@ -37,13 +37,13 @@ export function getScriptDownloadPath(env: WorkerEnv) {
   return `/${getWorkerPath(env)}/${agentPath}`
 }
 
-export const visitorIdPathVarName = 'VISITOR_ID_PATH'
-const getVisitorPath = getVarOrDefault(visitorIdPathVarName, Defaults)
-export const isVisitorIdPathSet = isVarSet(visitorIdPathVarName)
+export const getResultPathVarName = 'GET_RESULT_PATH'
+const getGetResultPathVar = getVarOrDefault(getResultPathVarName, Defaults)
+export const isGetResultPathSet = isVarSet(getResultPathVarName)
 
-export function getVisitorIdPath(env: WorkerEnv) {
-  const visitorPath = getVisitorPath(env)
-  return `/${getWorkerPath(env)}/${visitorPath}`
+export function getGetResultPath(env: WorkerEnv) {
+  const getResultPathVar = getGetResultPathVar(env)
+  return `/${getWorkerPath(env)}/${getResultPathVar}`
 }
 
 export function getHealthCheckPath(env: WorkerEnv) {

@@ -1,14 +1,14 @@
 import {
   getScriptDownloadPath,
-  getVisitorIdPath,
+  getGetResultPath,
   getWorkerPath,
   WorkerEnv,
   isScriptDownloadPathSet,
   isWorkerPathSet,
-  isVisitorIdPathSet,
+  isGetResultPathSet,
   workerPathVarName,
   agentScriptDownloadPathVarName,
-  visitorIdPathVarName,
+  getResultPathVarName,
 } from '../env'
 
 type EnvVarInfo = {
@@ -30,16 +30,16 @@ function buildEnvInfo(env: WorkerEnv): { [key: string]: EnvVarInfo } {
     isSet: isScriptDownloadPathSet(env),
   }
 
-  const visitorIdPath: EnvVarInfo = {
-    envVarName: visitorIdPathVarName,
-    value: getVisitorIdPath(env),
-    isSet: isVisitorIdPathSet(env),
+  const getResultPath: EnvVarInfo = {
+    envVarName: getResultPathVarName,
+    value: getGetResultPath(env),
+    isSet: isGetResultPathSet(env),
   }
 
   return {
     workerPath,
     scriptDownloadPath,
-    visitorIdPath,
+    getResultPath,
   }
 }
 
