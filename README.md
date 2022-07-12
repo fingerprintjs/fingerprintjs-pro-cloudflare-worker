@@ -17,18 +17,14 @@
   <img src="https://img.shields.io/discord/852099967190433792?style=logo&label=Discord&logo=Discord&logoColor=white" alt="Discord server">
 </a>
 
-# DISCLAIMER
-This project is currently in Private Beta.  If you would like to join our Private Beta Cloudflare Integration please contact us at [support@fingerprint.com](mailto:support@fingerprint.com).
+# Fingerprint Pro Cloudflare worker
+The Cloudflare worker is responsible for delivering the latest fingerprinting client-side logic and proxying identification requests and responses between your site and Fingerprint Pro's APIs.
 
-# 👷 Cloudflare worker for FingerprintJS PRO agent
-FingerprintJS Inc offers a Cloudflare Integration for the customers. The integration makes use of Cloudflare Workers, 
-and this repository contains the source code of the worker. For more information about Cloudflare Workers, 
-please read [here](https://workers.cloudflare.com/).
+## Setup process
+The process consists of two steps. One needs to set up worker creation together with our support at [support@fingerprint.com](mailto:support@fingerprint.com). Afterwards, the Fingerprint Pro JS agent on the site needs to be configured to communicate with the worker.
 
-The aim of this project is proxying FingerprintJS Inc services using the same origin as the website.
+You can find the full documentation at [https://dev.fingerprint.com/docs/cloudflare-integration](https://dev.fingerprint.com/docs/cloudflare-integration).
 
-The worker code essentially does the followings:
-- Serves the latest JS Pro Agent
-- Acts as a proxy for the identification HTTP request, converts cookies into 1st party cookies in the process
+## License
 
-You can find the full documentation [here](https://dev.fingerprint.com/docs/cloudflare-integration). 
+This project is licensed under the MIT license. See the [LICENSE](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/blob/main/LICENSE) file for more info.
