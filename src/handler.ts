@@ -1,4 +1,4 @@
-import { getScriptDownloadPath, getVisitorIdPath, getHealthCheckPath, WorkerEnv } from './env'
+import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv } from './env'
 
 import { createErrorResponse } from './utils'
 import { handleDownloadScript, handleIngressAPI, handleHealthCheck } from './handlers'
@@ -11,7 +11,7 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
     return handleDownloadScript(request)
   }
 
-  if (pathname === getVisitorIdPath(env)) {
+  if (pathname === getGetResultPath(env)) {
     return handleIngressAPI(request)
   }
 
