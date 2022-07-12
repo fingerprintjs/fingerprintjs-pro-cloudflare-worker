@@ -1,12 +1,12 @@
 /**
- * FingerprintJS Pro Cloudflare Worker v0.0.3 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
+ * FingerprintJS Pro Cloudflare Worker v0.0.4 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
 const Defaults = {
     WORKER_PATH: 'cf-worker',
     AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
-    VISITOR_ID_PATH: 'visitorId',
+    GET_RESULT_PATH: 'getResult',
     REGION: 'us',
     AGENT_VERSION: '3',
 };
@@ -21,24 +21,24 @@ function isVarSet(variable) {
     };
 }
 const workerPathVarName = 'WORKER_PATH';
-const getWorkerPath = getVarOrDefault(workerPathVarName, Defaults);
+const getWorkerPathVar = getVarOrDefault(workerPathVarName, Defaults);
 const isWorkerPathSet = isVarSet(workerPathVarName);
 const agentScriptDownloadPathVarName = 'AGENT_SCRIPT_DOWNLOAD_PATH';
-const getAgentPath = getVarOrDefault(agentScriptDownloadPathVarName, Defaults);
+const getAgentPathVar = getVarOrDefault(agentScriptDownloadPathVarName, Defaults);
 const isScriptDownloadPathSet = isVarSet(agentScriptDownloadPathVarName);
 function getScriptDownloadPath(env) {
-    const agentPath = getAgentPath(env);
-    return `/${getWorkerPath(env)}/${agentPath}`;
+    const agentPathVar = getAgentPathVar(env);
+    return `/${getWorkerPathVar(env)}/${agentPathVar}`;
 }
-const visitorIdPathVarName = 'VISITOR_ID_PATH';
-const getVisitorPath = getVarOrDefault(visitorIdPathVarName, Defaults);
-const isVisitorIdPathSet = isVarSet(visitorIdPathVarName);
-function getVisitorIdPath(env) {
-    const visitorPath = getVisitorPath(env);
-    return `/${getWorkerPath(env)}/${visitorPath}`;
+const getResultPathVarName = 'GET_RESULT_PATH';
+const getGetResultPathVar = getVarOrDefault(getResultPathVarName, Defaults);
+const isGetResultPathSet = isVarSet(getResultPathVarName);
+function getGetResultPath(env) {
+    const getResultPathVar = getGetResultPathVar(env);
+    return `/${getWorkerPathVar(env)}/${getResultPathVar}`;
 }
 function getHealthCheckPath(env) {
-    return `/${getWorkerPath(env)}/health`;
+    return `/${getWorkerPathVar(env)}/health`;
 }
 function getAgentScriptEndpoint(searchParams) {
     const apiKey = searchParams.get('apiKey') || Defaults.API_KEY;
@@ -9483,7 +9483,7 @@ async function fetchCacheable(request, ttl) {
     return fetch(request, { cf: { cacheTtl: ttl } });
 }
 
-const INT_VERSION = '0.0.3';
+const INT_VERSION = '0.0.4';
 const HEADER_NAME = 'ii';
 function getHeaderValue(type) {
     return `fingerprintjs-pro-cloudflare/${INT_VERSION}/${type}`;
@@ -9577,7 +9577,7 @@ async function handleIngressAPI(request) {
 function buildEnvInfo(env) {
     const workerPath = {
         envVarName: workerPathVarName,
-        value: getWorkerPath(env),
+        value: getWorkerPathVar(env),
         isSet: isWorkerPathSet(env),
     };
     const scriptDownloadPath = {
@@ -9585,15 +9585,15 @@ function buildEnvInfo(env) {
         value: getScriptDownloadPath(env),
         isSet: isScriptDownloadPathSet(env),
     };
-    const visitorIdPath = {
-        envVarName: visitorIdPathVarName,
-        value: getVisitorIdPath(env),
-        isSet: isVisitorIdPathSet(env),
+    const getResultPath = {
+        envVarName: getResultPathVarName,
+        value: getGetResultPath(env),
+        isSet: isGetResultPathSet(env),
     };
     return {
         workerPath,
         scriptDownloadPath,
-        visitorIdPath,
+        getResultPath,
     };
 }
 function buildHeaders() {
@@ -9605,7 +9605,7 @@ function buildBody(env) {
     return {
         success: true,
         envInfo: buildEnvInfo(env),
-        version: '0.0.3',
+        version: '0.0.4',
     };
 }
 function handleHealthCheck(env) {
@@ -9624,7 +9624,7 @@ async function handleRequest(request, env) {
     if (pathname === getScriptDownloadPath(env)) {
         return handleDownloadScript(request);
     }
-    if (pathname === getVisitorIdPath(env)) {
+    if (pathname === getGetResultPath(env)) {
         return handleIngressAPI(request);
     }
     if (pathname === getHealthCheckPath(env)) {
