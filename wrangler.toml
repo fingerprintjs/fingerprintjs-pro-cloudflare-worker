@@ -18,3 +18,4 @@ main = "./fingerprintjs-pro-cloudflare-worker.esm.js"
 type = "ESModule"
 globs = ["**/*.js"]
 
+compatibility_date = "2022-07-13"
