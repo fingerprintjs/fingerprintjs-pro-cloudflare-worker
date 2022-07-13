@@ -16,7 +16,7 @@ test.describe('visitorId', () => {
     expect(matches.length).toEqual(2)
     const visitorId = matches[1]
     expect(visitorId).toBeTruthy()
-    expect(visitorId).toHaveLength(20)
+    expect(visitorId).toHaveLength(19)
   }
 
   test('should show visitorId in the HTML', async ({ page }) => {
