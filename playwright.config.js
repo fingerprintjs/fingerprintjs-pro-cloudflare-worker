@@ -1,6 +1,4 @@
-import { PlaywrightTestConfig } from '@playwright/test';
-
-const config: PlaywrightTestConfig = {
+const config = {
   testDir: './test/e2e',
 };
 
