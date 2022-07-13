@@ -5,6 +5,7 @@ account_id = ""
 zone_id = ""
 route = ""
 workers_dev = true
+compatibility_date = "2022-06-13"
 
 [build]
 command = "yarn install && yarn build"
@@ -18,4 +19,3 @@ main = "./fingerprintjs-pro-cloudflare-worker.esm.js"
 type = "ESModule"
 globs = ["**/*.js"]
 
-compatibility_date = "2022-06-13"
