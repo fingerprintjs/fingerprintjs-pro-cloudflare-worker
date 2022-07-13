@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Upgrade version
-        run: yarn version --${{ github.event.inputs.version_bump }}
+        run: yarn version --${{ github.event.inputs.version_bump }}  --no-git-tag-version
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
