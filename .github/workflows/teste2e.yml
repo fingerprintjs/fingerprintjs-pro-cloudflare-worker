@@ -34,6 +34,6 @@ jobs:
           CLOUDFLARE_ZONE_ID: ${{secrets.CF_ZONE_ID}}
           CLOUDFLARE_ROUTE: ${{secrets.CF_ROUTE}}
       - name: Install dependencies
-        run: yarn install && yarn upgrade --pattern playwright --pure-lockfile && npx playwright install-deps
+        run: npx playwright install
       - name: Run test
         run: yarn test:e2e
