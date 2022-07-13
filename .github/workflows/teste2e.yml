@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: "16.10"
       - name: check node
-        run: node -v
+        run: yarn node -v
       - name: Publish
         uses: cloudflare/wrangler-action@1.2.0
         with:
