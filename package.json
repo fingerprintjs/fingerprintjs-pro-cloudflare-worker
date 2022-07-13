@@ -14,7 +14,7 @@
     "lint:fix": "yarn lint --fix",
     "test": "jest",
     "test:dts": "tsc --noEmit --isolatedModules dist/fingerprintjs-pro-cloudflare-worker.d.ts",
-    "test:e2e": "playwright"
+    "test:e2e": "playwright test"
   },
   "main": "dist/fingerprintjs-pro-cloudflare-worker.esm.js",
   "module": "dist/fingerprintjs-pro-cloudflare-worker.esm.js",
