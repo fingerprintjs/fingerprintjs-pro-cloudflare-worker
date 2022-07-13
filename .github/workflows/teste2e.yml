@@ -25,6 +25,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "16.10"
+      - name: check node
+        run: node -v
       - name: Publish
         uses: cloudflare/wrangler-action@1.2.0
         with:
