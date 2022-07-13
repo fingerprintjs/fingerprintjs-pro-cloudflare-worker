@@ -25,17 +25,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "16.10"
-      - name: check node
-        run: yarn node -v
       - name: Publish
-        uses: cloudflare/wrangler-action@1.2.0
+        uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
         env:
           CF_ACCOUNT_ID: ${{secrets.CF_ACCOUNT_ID}}
           CF_ZONE_ID: ${{secrets.CF_ZONE_ID}}
           CF_ROUTE: ${{secrets.CF_ROUTE}}
-      - name: Install Node packages
-        run: yarn install
       - name: Run test
         run: yarn test:e2e
