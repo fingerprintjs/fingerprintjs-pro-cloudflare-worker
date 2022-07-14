@@ -1,10 +1,16 @@
 import { test, expect, Page, request, APIRequestContext } from '@playwright/test'
-import { wait } from './utils'
+import { areVisitorIdAndRequestIdValid, wait } from './utils'
 
 const npmWebsiteURL = 'https://pro-agent-npm-test.cfi-fingerprint.com/'
 const workerURL = 'https://automated-test.cfi-fingerprint.com/fpjs-worker'
 // @ts-ignore
 const INT_VERSION = process.env.worker_version
+
+interface GetResult {
+  requestId: string
+  visitorId: string
+  visitorFound: boolean
+}
 
 test.describe('visitorId', () => {
   async function waitUntilVersion(
@@ -34,16 +40,18 @@ test.describe('visitorId', () => {
       waitUntil: 'networkidle',
     })
 
-    const el = await page.waitForSelector('#root > div')
+    const el = await page.waitForSelector('#result > code')
     const textContent = await el.textContent()
-    expect(textContent != null).toBeTruthy()
-    const matches = (textContent as string).match(/Visitor Id is (.*)/) as string[]
-    expect(matches != null).toBeTruthy()
-    expect(matches.length).toEqual(2)
-    const visitorId = matches[1]
-    expect(visitorId).toBeTruthy()
-    expect(visitorId).toHaveLength(20)
-    // todo check requestId
+    expect(textContent != null).toStrictEqual(true)
+    let jsonContent
+    try {
+      jsonContent = JSON.parse(textContent as string)
+    } catch (e) {
+      // do nothing
+    }
+    expect(jsonContent).toBeTruthy()
+    const { visitorId, requestId } = jsonContent as GetResult
+    expect(areVisitorIdAndRequestIdValid(visitorId, requestId)).toStrictEqual(true)
   }
 
   test('should show visitorId in the HTML', async ({ page }) => {
