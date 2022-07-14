@@ -1,45 +1,56 @@
-name: Test e2e
+import { test, expect, Page, request, APIRequestContext } from '@playwright/test'
+import { wait } from './utils'
 
-on:
-  workflow_dispatch:
-    inputs:
-      version_bump:
-        description: 'A type of version bump'
-        default: 'patch'
-        required: true
-        type: choice
-        options:
-          - major
-          - minor
-          - patch
+const npmWebsiteURL = 'https://pro-agent-npm-test.cfi-fingerprint.com/'
+const workerURL = 'https://automated-test.cfi-fingerprint.com/fpjs-worker'
+// @ts-ignore
+const INT_VERSION = process.env.worker_version
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    name: Build & Deploy
-    steps:
-      - uses: actions/checkout@v2
-      - name: Upgrade version
-        run: yarn version --${{ github.event.inputs.version_bump }}  --no-git-tag-version
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: "16.10"
-      - name: Publish
-        uses: cloudflare/wrangler-action@2.0.0
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{secrets.CF_ACCOUNT_ID}}
-          CLOUDFLARE_ZONE_ID: ${{secrets.CF_ZONE_ID}}
-          CLOUDFLARE_ROUTE: ${{secrets.CF_ROUTE}}
-      - name: Get version
-        id: version
-        uses: notiz-dev/github-action-json-property@v0.1.0
-        with:
-          path: 'package.json'
-          prop_path: 'version'
-      - name: Install dependencies
-        run: npx playwright install
-      - name: Run test
-        run: worker_version=${{steps.version.outputs.prop}} yarn test:e2e
+test.describe('visitorId', () => {
+  async function waitUntilVersion(
+    reqContext: APIRequestContext,
+    expectedVersion: string,
+    retryCounter = 0,
+    maxRetries = 10,
+  ): Promise<boolean> {
+    const res = await reqContext.get(`${workerURL}/health`)
+    const jsonRes = await res.json()
+    const version = (jsonRes as { version: string }).version
+    if (version === expectedVersion) {
+      return Promise.resolve(true)
+    }
+
+    const newRetryCounter = retryCounter + 1
+    if (newRetryCounter > maxRetries) {
+      return Promise.resolve(false)
+    }
+
+    await wait(1000)
+    return waitUntilVersion(reqContext, expectedVersion, newRetryCounter, maxRetries)
+  }
+
+  async function runTest(page: Page, url: string) {
+    await page.goto(url, {
+      waitUntil: 'networkidle',
+    })
+
+    const el = await page.waitForSelector('#root > div')
+    const textContent = await el.textContent()
+    expect(textContent != null).toBeTruthy()
+    const matches = (textContent as string).match(/Visitor Id is (.*)/) as string[]
+    expect(matches != null).toBeTruthy()
+    expect(matches.length).toEqual(2)
+    const visitorId = matches[1]
+    expect(visitorId).toBeTruthy()
+    expect(visitorId).toHaveLength(20)
+    // todo check requestId
+  }
+
+  test('should show visitorId in the HTML', async ({ page }) => {
+    const reqContext = await request.newContext()
+    const versionSuccess = await waitUntilVersion(reqContext, INT_VERSION)
+    expect(versionSuccess).toBeTruthy()
+
+    await runTest(page, npmWebsiteURL)
+  })
+})
