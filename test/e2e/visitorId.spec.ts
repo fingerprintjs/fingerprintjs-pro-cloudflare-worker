@@ -2,7 +2,7 @@ import { test, expect, Page, request, APIRequestContext } from '@playwright/test
 import { wait } from './utils'
 
 const npmWebsiteURL = 'https://pro-agent-npm-test.cfi-fingerprint.com/'
-const workerURL = 'https://pro-agent-npm-test.cfi-fingerprint.com/fpjs-worker'
+const workerURL = 'https://automated-test.cfi-fingerprint.com/fpjs-worker'
 // @ts-ignore
 const INT_VERSION = process.env.worker_version
 
