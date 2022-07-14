@@ -12,17 +12,17 @@ test.describe('visitorId', () => {
     expectedVersion: string,
     retryCounter = 0,
     maxRetries = 10,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const res = await reqContext.get(`${workerURL}/health`)
     const jsonRes = await res.json()
     const version = (jsonRes as { version: string }).version
     if (version === expectedVersion) {
-      return Promise.resolve()
+      return Promise.resolve(true)
     }
 
     const newRetryCounter = retryCounter + 1
     if (newRetryCounter > maxRetries) {
-      return Promise.reject()
+      return Promise.resolve(false)
     }
 
     await wait(1000)
