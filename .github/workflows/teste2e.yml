@@ -29,10 +29,13 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
+          secrets: |
+            WORKER_PATH
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{secrets.CF_ACCOUNT_ID}}
           CLOUDFLARE_ZONE_ID: ${{secrets.CF_ZONE_ID}}
           CLOUDFLARE_ROUTE: ${{secrets.CF_ROUTE}}
+          WORKER_PATH: "fpjs-worker"
       - name: Get version
         id: version
         uses: notiz-dev/github-action-json-property@v0.1.0
