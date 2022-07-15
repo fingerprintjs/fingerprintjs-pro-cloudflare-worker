@@ -41,6 +41,8 @@ jobs:
       - name: Modify wrangler.toml
         run: |
            sed -i 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
+           echo ${{steps.random-path-generator.outputs.WORKER_NAME}}
+           cat wrangler.toml
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
