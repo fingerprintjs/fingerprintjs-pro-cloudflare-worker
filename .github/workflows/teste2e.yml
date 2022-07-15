@@ -34,10 +34,10 @@ jobs:
         id: random-path-generator
       - name: Print outpus
         run: |
-          echo worker name ${{steps.random-path-generator.outputs.WORKER_NAME}
-          echo worker path ${{steps.random-path-generator.outputs.WORKER_PATH}
-          echo get result path ${{steps.random-path-generator.outputs.GET_RESULT_PATH}
-          echo agent download path ${{steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH}
+          echo worker name ${{steps.random-path-generator.outputs.WORKER_NAME}}
+          echo worker path ${{steps.random-path-generator.outputs.WORKER_PATH}}
+          echo get result path ${{steps.random-path-generator.outputs.GET_RESULT_PATH}}
+          echo agent download path ${{steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH}}
       - name: Modify wrangler.toml
         run: |
            sed -i '' 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
