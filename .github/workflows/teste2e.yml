@@ -28,6 +28,7 @@ jobs:
       - name: Generate random paths
         run: |
           postfix=$(date +%s)
+          echo $postfix
           echo '::set-output name=WORKER_NAME::automated-test-$postfix'
           echo '::set-output name=WORKER_PATH::fpjs-worker-$postfix'
           echo '::set-output name=GET_RESULT_PATH::get-result-$postfix'
