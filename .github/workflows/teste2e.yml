@@ -25,6 +25,12 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "16.10"
+      - name: Generate random paths
+        run: |
+          echo '::set-output name=WORKER_PATH::fpjs-worker'
+          echo '::set-output name=GET_RESULT_PATH::get-result'
+          echo '::set-output name=AGENT_DOWNLOAD_PATH::agent-download'
+        id: random-path-generator
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
@@ -35,7 +41,9 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{secrets.CF_ACCOUNT_ID}}
           CLOUDFLARE_ZONE_ID: ${{secrets.CF_ZONE_ID}}
           CLOUDFLARE_ROUTE: ${{secrets.CF_ROUTE}}
-          WORKER_PATH: "fpjs-worker"
+          WORKER_PATH: ${{ steps.random-path-generator.outputs.WORKER_PATH }}"
+          GET_RESULT_PATH: ${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}"
+          AGENT_DOWNLOAD_PATH: ${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}"
       - name: Get version
         id: version
         uses: notiz-dev/github-action-json-property@v0.1.0
