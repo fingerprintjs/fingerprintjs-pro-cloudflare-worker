@@ -37,6 +37,8 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           secrets: |
             WORKER_PATH
+            GET_RESULT_PATH
+            AGENT_DOWNLOAD_PATH
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{secrets.CF_ACCOUNT_ID}}
           CLOUDFLARE_ZONE_ID: ${{secrets.CF_ZONE_ID}}
