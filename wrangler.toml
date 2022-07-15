@@ -7,6 +7,11 @@ route = ""
 workers_dev = true
 compatibility_date = "2022-06-13"
 
+[vars]
+WORKER_PATH = fpjs-worker-1657897260
+GET_RESULT_PATH = get-result-1657897260
+AGENT_DOWNLOAD_PATH = agent-download-1657897260
+
 [build]
 command = "yarn install && yarn build"
 
@@ -19,7 +24,3 @@ main = "./fingerprintjs-pro-cloudflare-worker.esm.js"
 type = "ESModule"
 globs = ["**/*.js"]
 
-[vars]
-WORKER_PATH = fpjs-worker-1657897260
-GET_RESULT_PATH = get-result-1657897260
-AGENT_DOWNLOAD_PATH = agent-download-1657897260
