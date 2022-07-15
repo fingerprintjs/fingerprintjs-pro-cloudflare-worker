@@ -27,10 +27,11 @@ jobs:
           node-version: "16.10"
       - name: Generate random paths
         run: |
-          echo '::set-output name=WORKER_NAME::automated-test-$(date +%s)'
-          echo '::set-output name=WORKER_PATH::fpjs-worker-$(date +%s)'
-          echo '::set-output name=GET_RESULT_PATH::get-result-$(date +%s)'
-          echo '::set-output name=AGENT_DOWNLOAD_PATH::agent-download-$(date +%s)'
+          postfix=$(date +%s)
+          echo '::set-output name=WORKER_NAME::automated-test-$postfix'
+          echo '::set-output name=WORKER_PATH::fpjs-worker-$postfix'
+          echo '::set-output name=GET_RESULT_PATH::get-result-$postfix'
+          echo '::set-output name=AGENT_DOWNLOAD_PATH::agent-download-$postfix'
         id: random-path-generator
       - name: Print outpus
         run: |
