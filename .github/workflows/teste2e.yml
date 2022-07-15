@@ -27,10 +27,20 @@ jobs:
           node-version: "16.10"
       - name: Generate random paths
         run: |
+          echo '::set-output name=WORKER_NAME::automated-test'
           echo '::set-output name=WORKER_PATH::fpjs-worker'
           echo '::set-output name=GET_RESULT_PATH::get-result'
           echo '::set-output name=AGENT_DOWNLOAD_PATH::agent-download'
         id: random-path-generator
+      - name: Print outpus
+        run: |
+          echo worker name ${{steps.random-path-generator.outputs.WORKER_NAME}
+          echo worker path ${{steps.random-path-generator.outputs.WORKER_PATH}
+          echo get result path ${{steps.random-path-generator.outputs.GET_RESULT_PATH}
+          echo agent download path ${{steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH}
+      - name: Modify wrangler.toml
+        run: |
+           sed -i '' 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
