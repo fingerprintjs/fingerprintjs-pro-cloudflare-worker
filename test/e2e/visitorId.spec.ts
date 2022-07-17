@@ -30,10 +30,14 @@ test.describe('visitorId', () => {
     const healthEndpoint = `${workerDomain}/${WORKER_PATH}/health`
     console.log({healthEndpoint})
     const res = await reqContext.get(healthEndpoint)
-    const jsonRes = await res.json()
-    const version = (jsonRes as { version: string }).version
-    if (version === expectedVersion) {
-      return Promise.resolve(true)
+    try {
+      const jsonRes = await res.json()
+      const version = (jsonRes as { version: string }).version
+      if (version === expectedVersion) {
+        return Promise.resolve(true)
+      }
+    } catch (e) {
+      // do nothing
     }
 
     const newRetryCounter = retryCounter + 1
