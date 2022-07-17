@@ -11,6 +11,7 @@ const GET_RESULT_PATH = process.env.get_result_path || 'get-result-default'
 const AGENT_DOWNLOAD_PATH = process.env.agent_download_path || 'agent-download-default'
 
 const npmWebsiteURL = `https://automated-test-client.cfi-fingerprint.com?worker-path=${WORKER_PATH}&get-result-path=${GET_RESULT_PATH}&agent-path=${AGENT_DOWNLOAD_PATH}` // todo use URL constructor and searchParams
+console.log({npmWebsiteURL})
 const workerDomain = 'https://automated-test.cfi-fingerprint.com'
 
 interface GetResult {
@@ -26,7 +27,9 @@ test.describe('visitorId', () => {
     retryCounter = 0,
     maxRetries = 10,
   ): Promise<boolean> {
-    const res = await reqContext.get(`${workerDomain}/${WORKER_PATH}/health`)
+    const healthEndpoint = `${workerDomain}/${WORKER_PATH}/health`
+    console.log({healthEndpoint})
+    const res = await reqContext.get(healthEndpoint)
     const jsonRes = await res.json()
     const version = (jsonRes as { version: string }).version
     if (version === expectedVersion) {
