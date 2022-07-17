@@ -44,9 +44,9 @@ jobs:
         run: |
            sed -i 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
            echo [vars] >> wrangler.toml
-           echo WORKER_PATH = "${{ steps.random-path-generator.outputs.WORKER_PATH }}" >> wrangler.toml
-           echo GET_RESULT_PATH = "${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}" >> wrangler.toml
-           echo AGENT_DOWNLOAD_PATH = "${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}" >> wrangler.toml
+           echo WORKER_PATH = \"${{ steps.random-path-generator.outputs.WORKER_PATH }}\" >> wrangler.toml
+           echo GET_RESULT_PATH = \"${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}\" >> wrangler.toml
+           echo AGENT_DOWNLOAD_PATH = \"${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}\" >> wrangler.toml
            cat wrangler.toml
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
