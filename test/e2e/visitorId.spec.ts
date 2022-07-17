@@ -57,6 +57,7 @@ test.describe('visitorId', () => {
     const el = await page.waitForSelector('#result > code')
     const textContent = await el.textContent()
     expect(textContent != null).toStrictEqual(true)
+    console.log({textContent})
     let jsonContent
     try {
       jsonContent = JSON.parse(textContent as string)
