@@ -65,4 +65,4 @@ jobs:
       - name: Install dependencies
         run: npx playwright install
       - name: Run test
-        run: worker_version=${{steps.version.outputs.prop}} yarn test:e2e
+        run: worker_version=${{steps.version.outputs.prop}} worker_path=${{steps.random-path-generator.outputs.WORKER_PATH}} get_result_path=${{ steps.random-path-generator.outputs.GET_RESULT_PATH }} agent_download_path=${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }} yarn test:e2e
