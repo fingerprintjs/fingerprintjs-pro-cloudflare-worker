@@ -25,17 +25,35 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "16.10"
+      - name: Generate random paths
+        run: |
+          postfix=$(date +%s)
+          echo $postfix
+          echo ::set-output name=WORKER_NAME::automated-test-$postfix
+          echo ::set-output name=WORKER_PATH::fpjs-worker-$postfix
+          echo ::set-output name=GET_RESULT_PATH::get-result-$postfix
+          echo ::set-output name=AGENT_DOWNLOAD_PATH::agent-download-$postfix
+        id: random-path-generator
+      - name: Print outpus
+        run: |
+          echo worker name ${{steps.random-path-generator.outputs.WORKER_NAME}}
+          echo worker path ${{steps.random-path-generator.outputs.WORKER_PATH}}
+          echo get result path ${{steps.random-path-generator.outputs.GET_RESULT_PATH}}
+          echo agent download path ${{steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH}}
+      - name: Modify wrangler.toml
+        run: |
+           sed -i 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
+           sed -i 's/route = .*/route = "automated-test-client.cfi-fingerprint.com\/${{steps.random-path-generator.outputs.WORKER_PATH}}\/*"/' wrangler.toml
+           echo [vars] >> wrangler.toml
+           echo WORKER_PATH = \"${{ steps.random-path-generator.outputs.WORKER_PATH }}\" >> wrangler.toml
+           echo GET_RESULT_PATH = \"${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}\" >> wrangler.toml
+           echo AGENT_SCRIPT_DOWNLOAD_PATH = \"${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}\" >> wrangler.toml
+           cat wrangler.toml
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
-          secrets: |
-            WORKER_PATH
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{secrets.CF_ACCOUNT_ID}}
-          CLOUDFLARE_ZONE_ID: ${{secrets.CF_ZONE_ID}}
-          CLOUDFLARE_ROUTE: ${{secrets.CF_ROUTE}}
-          WORKER_PATH: "fpjs-worker"
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
       - name: Get version
         id: version
         uses: notiz-dev/github-action-json-property@v0.1.0
@@ -45,4 +63,4 @@ jobs:
       - name: Install dependencies
         run: npx playwright install
       - name: Run test
-        run: worker_version=${{steps.version.outputs.prop}} yarn test:e2e
+        run: worker_version=${{steps.version.outputs.prop}} worker_path=${{steps.random-path-generator.outputs.WORKER_PATH}} get_result_path=${{ steps.random-path-generator.outputs.GET_RESULT_PATH }} agent_download_path=${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }} yarn test:e2e

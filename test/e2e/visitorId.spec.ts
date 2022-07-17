@@ -1,10 +1,18 @@
 import { test, expect, Page, request, APIRequestContext } from '@playwright/test'
 import { areVisitorIdAndRequestIdValid, wait } from './utils'
 
-const npmWebsiteURL = 'https://pro-agent-npm-test.cfi-fingerprint.com/'
-const workerURL = 'https://automated-test.cfi-fingerprint.com/fpjs-worker'
 // @ts-ignore
 const INT_VERSION = process.env.worker_version
+// @ts-ignore
+const WORKER_PATH = process.env.worker_path || 'fpjs-worker-default'
+// @ts-ignore
+const GET_RESULT_PATH = process.env.get_result_path || 'get-result-default'
+// @ts-ignore
+const AGENT_DOWNLOAD_PATH = process.env.agent_download_path || 'agent-download-default'
+
+const npmWebsiteURL = `https://automated-test-client.cfi-fingerprint.com?worker-path=${WORKER_PATH}&get-result-path=${GET_RESULT_PATH}&agent-download-path=${AGENT_DOWNLOAD_PATH}` // todo use URL constructor and searchParams
+console.log({npmWebsiteURL})
+const workerDomain = 'https://automated-test-client.cfi-fingerprint.com'
 
 interface GetResult {
   requestId: string
@@ -19,11 +27,17 @@ test.describe('visitorId', () => {
     retryCounter = 0,
     maxRetries = 10,
   ): Promise<boolean> {
-    const res = await reqContext.get(`${workerURL}/health`)
-    const jsonRes = await res.json()
-    const version = (jsonRes as { version: string }).version
-    if (version === expectedVersion) {
-      return Promise.resolve(true)
+    const healthEndpoint = `${workerDomain}/${WORKER_PATH}/health`
+    console.log({healthEndpoint})
+    const res = await reqContext.get(healthEndpoint)
+    try {
+      const jsonRes = await res.json()
+      const version = (jsonRes as { version: string }).version
+      if (version === expectedVersion) {
+        return Promise.resolve(true)
+      }
+    } catch (e) {
+      // do nothing
     }
 
     const newRetryCounter = retryCounter + 1
@@ -43,6 +57,7 @@ test.describe('visitorId', () => {
     const el = await page.waitForSelector('#result > code')
     const textContent = await el.textContent()
     expect(textContent != null).toStrictEqual(true)
+    console.log({textContent})
     let jsonContent
     try {
       jsonContent = JSON.parse(textContent as string)

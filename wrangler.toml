@@ -1,4 +1,4 @@
-name = "fingerprintjs-pro-cloudflare-worker"
+name = "automated-test"
 type = "javascript"
 
 account_id = ""
