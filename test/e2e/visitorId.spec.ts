@@ -54,6 +54,7 @@ test.describe('visitorId', () => {
       waitUntil: 'networkidle',
     })
 
+    await wait(5000)
     const el = await page.waitForSelector('#result > code')
     const textContent = await el.textContent()
     expect(textContent != null).toStrictEqual(true)
