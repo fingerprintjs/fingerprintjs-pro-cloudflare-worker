@@ -60,7 +60,7 @@ jobs:
         with:
           path: 'package.json'
           prop_path: 'version'
-      #- name: Install dependencies
-      #  run: npx playwright install
-      #- name: Run test
-      #  run: worker_version=${{steps.version.outputs.prop}} worker_path=${{steps.random-path-generator.outputs.WORKER_PATH}} get_result_path=${{ steps.random-path-generator.outputs.GET_RESULT_PATH }} agent_download_path=${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }} yarn test:e2e
+      - name: Install dependencies
+        run: npx playwright install
+      - name: Run test
+        run: worker_version=${{steps.version.outputs.prop}} worker_path=${{steps.random-path-generator.outputs.WORKER_PATH}} get_result_path=${{ steps.random-path-generator.outputs.GET_RESULT_PATH }} agent_download_path=${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }} yarn test:e2e
