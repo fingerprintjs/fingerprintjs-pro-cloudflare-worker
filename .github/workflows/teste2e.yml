@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - develop
+  schedule:
+    - cron: '30 1 * * *'
   workflow_dispatch:
     inputs:
       version_bump:
