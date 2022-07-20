@@ -1,5 +1,6 @@
 import { test, expect, Page, request, APIRequestContext } from '@playwright/test'
 import { areVisitorIdAndRequestIdValid, wait } from './utils'
+import { ElementHandle } from 'playwright-core'
 
 // @ts-ignore
 const INT_VERSION = process.env.worker_version
@@ -11,7 +12,7 @@ const GET_RESULT_PATH = process.env.get_result_path || 'get-result-default'
 const AGENT_DOWNLOAD_PATH = process.env.agent_download_path || 'agent-download-default'
 
 const workerDomain = `https://${process.env.test_client_domain}`
-const npmWebsiteURL = `${workerDomain}?worker-path=${WORKER_PATH}&get-result-path=${GET_RESULT_PATH}&agent-download-path=${AGENT_DOWNLOAD_PATH}` // todo use URL constructor and searchParams
+const testWebsiteURL = `${workerDomain}?worker-path=${WORKER_PATH}&get-result-path=${GET_RESULT_PATH}&agent-download-path=${AGENT_DOWNLOAD_PATH}` // todo use URL constructor and searchParams
 
 interface GetResult {
   requestId: string
@@ -27,7 +28,7 @@ test.describe('visitorId', () => {
     maxRetries = 10,
   ): Promise<boolean> {
     const healthEndpoint = `${workerDomain}/${WORKER_PATH}/health`
-    console.log({healthEndpoint})
+    console.log({ healthEndpoint })
     const res = await reqContext.get(healthEndpoint)
     try {
       const jsonRes = await res.json()
@@ -48,13 +49,7 @@ test.describe('visitorId', () => {
     return waitUntilVersion(reqContext, expectedVersion, newRetryCounter, maxRetries)
   }
 
-  async function runTest(page: Page, url: string) {
-    await page.goto(url, {
-      waitUntil: 'networkidle',
-    })
-
-    await wait(5000)
-    const el = await page.waitForSelector('#result > code')
+  async function testForElement(el: ElementHandle<SVGElement | HTMLElement>) {
     const textContent = await el.textContent()
     expect(textContent != null).toStrictEqual(true)
     let jsonContent
@@ -68,11 +63,21 @@ test.describe('visitorId', () => {
     expect(areVisitorIdAndRequestIdValid(visitorId, requestId)).toStrictEqual(true)
   }
 
-  test('should show visitorId in the HTML', async ({ page }) => {
+  async function runTest(page: Page, url: string) {
+    await page.goto(url, {
+      waitUntil: 'networkidle',
+    })
+
+    await wait(5000)
+    await page.waitForSelector('#result > code').then(testForElement)
+    await page.waitForSelector('#cdn-result > code').then(testForElement)
+  }
+
+  test('should show visitorId in the HTML (NPM & CDN)', async ({ page }) => {
     const reqContext = await request.newContext()
     const versionSuccess = await waitUntilVersion(reqContext, INT_VERSION)
     expect(versionSuccess).toBeTruthy()
 
-    await runTest(page, npmWebsiteURL)
+    await runTest(page, testWebsiteURL)
   })
 })
