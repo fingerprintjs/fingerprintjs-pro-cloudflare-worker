@@ -1,6 +1,9 @@
 name: Test e2e
 
 on:
+  pull_request:
+    branches:
+      - develop
   workflow_dispatch:
     inputs:
       version_bump:
@@ -14,13 +17,13 @@ on:
           - patch
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    name: Build & Deploy
+  build-and-deploy-and-test-e2e:
+    runs-on: ubuntu-20.04
+    name: Build & Deploy & Test e2e
     steps:
       - uses: actions/checkout@v2
       - name: Upgrade version
-        run: yarn version --${{ github.event.inputs.version_bump }}  --no-git-tag-version
+        run: yarn version --${{ github.event.inputs.version_bump || 'minor' }}  --no-git-tag-version
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
