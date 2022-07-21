@@ -1,0 +1,73 @@
+name: Test e2e
+
+on:
+  pull_request:
+    branches:
+      - develop
+  schedule:
+    - cron: '30 1 * * *'
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'A type of version bump'
+        default: 'patch'
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  build-and-deploy-and-test-e2e:
+    runs-on: ubuntu-20.04
+    name: Build & Deploy & Test e2e
+    steps:
+      - uses: actions/checkout@v2
+      - name: Upgrade version
+        run: yarn version --${{ github.event.inputs.version_bump || 'patch' }}  --no-git-tag-version
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.10"
+      - name: Generate random paths
+        run: |
+          postfix=$(date +%s)
+          echo ::set-output name=WORKER_NAME::automated-test-$postfix
+          echo ::set-output name=WORKER_PATH::fpjs-worker-$postfix
+          echo ::set-output name=GET_RESULT_PATH::get-result-$postfix
+          echo ::set-output name=AGENT_DOWNLOAD_PATH::agent-download-$postfix
+        id: random-path-generator
+      - name: Modify wrangler.toml
+        run: |
+           sed -i 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
+           sed -i 's/route = .*/route = "${{ secrets.TEST_CLIENT_DOMAIN }}\/${{steps.random-path-generator.outputs.WORKER_PATH}}\/*"/' wrangler.toml
+           echo [vars] >> wrangler.toml
+           echo WORKER_PATH = \"${{ steps.random-path-generator.outputs.WORKER_PATH }}\" >> wrangler.toml
+           echo GET_RESULT_PATH = \"${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}\" >> wrangler.toml
+           echo AGENT_SCRIPT_DOWNLOAD_PATH = \"${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}\" >> wrangler.toml
+           cat wrangler.toml
+      - name: Publish
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+      - name: Get version
+        id: version
+        uses: notiz-dev/github-action-json-property@v0.1.0
+        with:
+          path: 'package.json'
+          prop_path: 'version'
+      - name: Install dependencies
+        run: npx playwright install
+      - name: Run test
+        run:  yarn test:e2e
+        env:
+          test_client_domain: ${{secrets.TEST_CLIENT_DOMAIN}}
+          worker_version: ${{steps.version.outputs.prop}}
+          worker_path: ${{steps.random-path-generator.outputs.WORKER_PATH}}
+          get_result_path: ${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}
+          agent_download_path: ${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}
+      - name: Clean up worker
+        run: |
+          curl -i -X DELETE "https://api.cloudflare.com/client/v4/accounts/${{secrets.CF_ACCOUNT_ID}}/workers/scripts/${{steps.random-path-generator.outputs.WORKER_NAME}}" -H"Authorization: bearer ${{secrets.CF_API_TOKEN}}"

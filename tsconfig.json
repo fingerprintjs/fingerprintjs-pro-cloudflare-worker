@@ -15,7 +15,8 @@
     "exactOptionalPropertyTypes": true,
     "types": [
       "@cloudflare/workers-types",
-      "@types/jest"
+      "@types/jest",
+      "node"
     ]
   },
   "files": ["src/index.ts"],
