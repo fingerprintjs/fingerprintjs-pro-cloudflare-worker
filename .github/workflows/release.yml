@@ -60,7 +60,7 @@ jobs:
 
       - name: Commit and push a new version of the scripts
         run: |
-          git commit package.json dist/ -m "feat new scripts v${{steps.version.outputs.prop}}"
+          git commit package.json dist/ -m "build: new scripts v${{steps.version.outputs.prop}}"
           git push "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
           git tag -a "v${{steps.version.outputs.prop}}" -m "v${{steps.version.outputs.prop}}"
           git push --tags "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
