@@ -14,7 +14,8 @@
     "lint:fix": "yarn lint --fix",
     "test": "jest",
     "test:dts": "tsc --noEmit --isolatedModules dist/fingerprintjs-pro-cloudflare-worker.d.ts",
-    "test:e2e": "npx playwright test"
+    "test:e2e": "npx playwright test",
+    "prepare": "husky install"
   },
   "main": "dist/fingerprintjs-pro-cloudflare-worker.esm.js",
   "module": "dist/fingerprintjs-pro-cloudflare-worker.esm.js",
@@ -25,6 +26,8 @@
   ],
   "devDependencies": {
     "@cloudflare/workers-types": "^3.4.0",
+    "@commitlint/cli": "^17.0.3",
+    "@commitlint/config-conventional": "^17.0.3",
     "@playwright/test": "^1.23.2",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-replace": "^4.0.0",
@@ -36,6 +39,7 @@
     "eslint": "^8.9.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^8.0.0",
     "jest": "^27.5.1",
     "prettier": "2.6.2",
     "rollup": "^2.70.1",
