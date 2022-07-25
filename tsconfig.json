@@ -6,16 +6,19 @@
     "target": "es2020",
     "resolveJsonModule": true,
     "importHelpers": true,
+    "noEmitOnError": true,
     "allowSyntheticDefaultImports": true,
     "noErrorTruncation": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
+    "noImplicitAny": true,
     "exactOptionalPropertyTypes": true,
     "types": [
       "@cloudflare/workers-types",
-      "@types/jest"
+      "@types/jest",
+      "node"
     ]
   },
   "files": ["src/index.ts"],

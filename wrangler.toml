@@ -1,20 +1,13 @@
-name = "fingerprintjs-pro-cloudflare-worker"
-type = "javascript"
-
 account_id = ""
-zone_id = ""
 route = ""
+name = ""
+main = "./dist/fingerprintjs-pro-cloudflare-worker.esm.js"
 workers_dev = true
+compatibility_date = "2022-07-21"
 
 [build]
 command = "yarn install && yarn build"
 
-[build.upload]
-format = "modules"
-dir = "./dist"
-main = "./fingerprintjs-pro-cloudflare-worker.esm.js"
-
-[[build.upload.rules]]
+[[rules]]
 type = "ESModule"
 globs = ["**/*.js"]
-
