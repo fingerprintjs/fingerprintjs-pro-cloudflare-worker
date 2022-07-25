@@ -52,7 +52,7 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
       - name: Get version
         id: version
-        uses: notiz-dev/github-action-json-property@v0.1.0
+        uses: notiz-dev/github-action-json-property@2192e246737701f108a4571462b76c75e7376216 # commit hash = v0.1.0
         with:
           path: 'package.json'
           prop_path: 'version'
