@@ -26,6 +26,7 @@ const commonInput = {
   plugins: [
     replace({
       __current_worker_version__: packageJson.version,
+      preventAssignment: true,
     }),
     jsonPlugin(),
     typescript(),
