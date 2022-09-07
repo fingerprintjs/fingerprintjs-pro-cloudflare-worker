@@ -19,5 +19,5 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
     return handleHealthCheck(env)
   }
 
-  return createErrorResponse(`unmatched path ${pathname}`)
+  return createErrorResponse(request, `unmatched path ${pathname}`)
 }

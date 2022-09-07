@@ -7,7 +7,7 @@ export default {
     try {
       return await handleRequest(request, env).then(returnHttpResponse)
     } catch (e) {
-      return createErrorResponse(e)
+      return createErrorResponse(request, e)
     }
   },
 }
