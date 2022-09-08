@@ -43,7 +43,7 @@ function generateRequestId(): string {
   return `${now}.cfi-${uniqueId}`
 }
 
-export function createErrorResponse(error: string | Error | unknown) {
+export function createErrorResponse(request: Request, error: string | Error | unknown) {
   const reason = errorToString(error)
   const errorBody: ErrorData = {
     code: 'Failed',
@@ -55,5 +55,10 @@ export function createErrorResponse(error: string | Error | unknown) {
     requestId: generateRequestId(),
     products: {},
   }
-  return new Response(JSON.stringify(responseBody), { status: 500 })
+  const requestOrigin = request.headers.get('origin') || ''
+  const responseHeaders: HeadersInit = {
+    'Access-Control-Allow-Origin': requestOrigin,
+    'Access-Control-Allow-Credentials': 'true',
+  }
+  return new Response(JSON.stringify(responseBody), { status: 500, headers: responseHeaders })
 }
