@@ -26,10 +26,15 @@ jobs:
 
     steps:
       - name: Checkout develop branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: develop
           fetch-depth: 0
+
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.node-version'
 
       - name: Set git settings
         uses: fregante/setup-git-user@2e28d51939d2a84005a917d2f844090637f435f8 # commit hash = v1.1.0
