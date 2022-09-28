@@ -4,4 +4,5 @@ module.exports = {
   testEnvironment: 'node',
   testRegex: '/test/.+test.tsx?$',
   passWithNoTests: true,
+  setupFiles: ['./jest.setup.js'],
 }
