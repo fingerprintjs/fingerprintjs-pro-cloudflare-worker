@@ -32,7 +32,7 @@ function addEnvVarsInformation(env: WorkerEnv): string {
   if (!isAllVarsAvailable) {
     result += `
     <span>
-    The folliwing environment variables are not defined. Please reach out our support team.
+    The following environment variables are not defined. Please reach out our support team.
     </span>
     `
     if (!isWorkerPathAvailable) {
@@ -96,7 +96,7 @@ function buildBody(env: WorkerEnv): string {
   return body
 }
 
-export function handleHealthPage(env: WorkerEnv): Response {
+export function handleStatusPage(env: WorkerEnv): Response {
   const headers = buildHeaders()
   const body = buildBody(env)
 

@@ -1,7 +1,7 @@
-import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv, getHealthPagePath } from './env'
+import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv, getStatusPagePath } from './env'
 
 import { createErrorResponse } from './utils'
-import { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleHealthPage } from './handlers'
+import { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleStatusPage } from './handlers'
 
 export async function handleRequest(request: Request, env: WorkerEnv): Promise<Response> {
   const url = new URL(request.url)
@@ -19,8 +19,8 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
     return handleHealthCheck(env)
   }
 
-  if (pathname === getHealthPagePath(env)) {
-    return handleHealthPage(env)
+  if (pathname === getStatusPagePath(env)) {
+    return handleStatusPage(env)
   }
 
   return createErrorResponse(request, `unmatched path ${pathname}`)

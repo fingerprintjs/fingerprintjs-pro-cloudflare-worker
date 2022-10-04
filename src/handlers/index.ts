@@ -1,6 +1,6 @@
 import { handleDownloadScript } from './handleDownloadScript'
 import { handleIngressAPI } from './handleIngressAPI'
 import { handleHealthCheck } from './handleHealthCheck'
-import { handleHealthPage } from './handleHealthPage'
+import { handleStatusPage } from './handleStatusPage'
 
-export { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleHealthPage }
+export { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleStatusPage }

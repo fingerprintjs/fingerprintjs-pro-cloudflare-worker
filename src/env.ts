@@ -50,7 +50,7 @@ export function getHealthCheckPath(env: WorkerEnv) {
   return `/${getWorkerPathVar(env)}/health`
 }
 
-export function getHealthPagePath(env: WorkerEnv) {
+export function getStatusPagePath(env: WorkerEnv) {
   return `/${getWorkerPathVar(env)}/status`
 }
 
