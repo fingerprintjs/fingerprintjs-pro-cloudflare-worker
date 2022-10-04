@@ -50,6 +50,10 @@ export function getHealthCheckPath(env: WorkerEnv) {
   return `/${getWorkerPathVar(env)}/health`
 }
 
+export function getHealthPagePath(env: WorkerEnv) {
+  return `/${getWorkerPathVar(env)}/status`
+}
+
 export function getAgentScriptEndpoint(searchParams: URLSearchParams) {
   const apiKey = searchParams.get('apiKey') || Defaults.API_KEY
   const apiVersion = searchParams.get('version') || Defaults.AGENT_VERSION
