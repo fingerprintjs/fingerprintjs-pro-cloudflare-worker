@@ -7,12 +7,17 @@ export function createCookieObjectFromHeaderValue(cookieValue: string): [string,
   let cookieName: string = ''
   const cookieObject: Cookie = cookieValue.split('; ').reduce(
     (prev: Cookie, flag: string, index: number) => {
-      const kv = flag.split('=')
-      const key = index === 0 ? 'value' : kv[0]
-      if (index === 0) {
-        cookieName = kv[0]
+      const equalSignIndex = flag.indexOf('=')
+      if (equalSignIndex === -1) {
+        return { ...prev, [flag]: undefined }
       }
-      const value = kv[1]
+      const key = flag.slice(0, equalSignIndex)
+      const value = flag.slice(equalSignIndex + 1, flag.length)
+      if (index === 0) {
+        cookieName = key
+        return { ...prev, value }
+      }
+
       return { ...prev, [key]: value }
     },
     { value: '' },
