@@ -21,9 +21,9 @@ export function createCookieObjectFromHeaderValue(cookieValue: string): [string,
   return [cookieName, cookieObject]
 }
 
-export function createCookieStringFromObject(name: string, value: Cookie) {
-  const flags = Object.entries(value).filter(([k]) => k !== name && k !== 'value')
-  const nameValue = `${name}=${value.value}`
+export function createCookieStringFromObject(name: string, cookie: Cookie) {
+  const flags = Object.entries(cookie).filter(([k]) => k !== name && k !== 'value')
+  const nameValue = `${name}=${cookie.value}`
   const rest = flags.map(([k, v]) => (v ? `${k}=${v}` : k))
   return [nameValue, ...rest].join('; ')
 }
