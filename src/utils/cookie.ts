@@ -1,6 +1,6 @@
 export type Cookie = {
   value: string
-  [key: string]: string
+  [key: string]: string | undefined
 }
 
 export function createCookieObjectFromHeaderValue(cookieValue: string): [string, Cookie] {
@@ -27,8 +27,15 @@ export function createCookieObjectFromHeaderValue(cookieValue: string): [string,
 }
 
 export function createCookieStringFromObject(name: string, cookie: Cookie) {
-  const flags = Object.entries(cookie).filter(([k]) => k !== name && k !== 'value')
+  const rest: string[] = []
+  for (const key in cookie) {
+    if (key === name || key === 'value') {
+      continue
+    }
+    const flagValue = cookie[key]
+    const flag = flagValue ? `${key}=${flagValue}` : key
+    rest.push(flag)
+  }
   const nameValue = `${name}=${cookie.value}`
-  const rest = flags.map(([k, v]) => (v ? `${k}=${v}` : k))
   return [nameValue, ...rest].join('; ')
 }
