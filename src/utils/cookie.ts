@@ -27,15 +27,14 @@ export function createCookieObjectFromHeaderValue(cookieValue: string): [string,
 }
 
 export function createCookieStringFromObject(name: string, cookie: Cookie) {
-  const rest: string[] = []
+  const result: string[] = [`${name}=${cookie.value}`]
   for (const key in cookie) {
     if (key === name || key === 'value') {
       continue
     }
     const flagValue = cookie[key]
     const flag = flagValue ? `${key}=${flagValue}` : key
-    rest.push(flag)
+    result.push(flag)
   }
-  const nameValue = `${name}=${cookie.value}`
-  return [nameValue, ...rest].join('; ')
+  return result.join('; ')
 }
