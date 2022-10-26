@@ -33,7 +33,7 @@ jobs:
       - name: Create Coverage Badges
         uses: jaywcjlove/coverage-badges-cli@e07f25709cd25486855c1ba1b26da53576ff3620
         with:
-          source: coverage/coverage-final.json
+          source: coverage/coverage-summary.json
           output: coverage/lcov-report/badges.svg
 
       - name: Deploy
