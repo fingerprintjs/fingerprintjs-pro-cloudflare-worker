@@ -37,12 +37,3 @@ jobs:
         run: yarn build
       - name: Typecheck
         run: yarn test:dts
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          directory: ./coverage
-          fail_ci_if_error: true
-          flags: unittests
-          name: fingerprint-pro-cloudflare-worker
-          verbose: true
