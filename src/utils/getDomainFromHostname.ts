@@ -1,4 +1,4 @@
-import * as domainSuffixList from './domain-suffix-list.json'
+import domainSuffixList from './domain-suffix-list.json'
 
 function findETLDMatch(hostname: string): string | null {
   let currentMatch = null

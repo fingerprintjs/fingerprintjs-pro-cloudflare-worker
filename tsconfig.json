@@ -14,6 +14,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noImplicitAny": true,
+    "esModuleInterop": true,
     "exactOptionalPropertyTypes": true,
     "types": [
       "@cloudflare/workers-types",
