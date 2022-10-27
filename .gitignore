@@ -3,7 +3,6 @@
 
 # code coverage
 /coverage
-coverage.txt
 
 # Random excess stuff
 .DS_Store
