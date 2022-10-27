@@ -62,7 +62,7 @@ describe('createCookieObjectFromHeaderValue', () => {
   })
 })
 
-describe('only createCookieStringFromObject', () => {
+describe('createCookieStringFromObject', () => {
   const f = createCookieStringFromObject
   it("returns a cookie string for ['key', {value: 'value'}]", () => {
     expect(f('key', { value: 'value' })).toBe('key=value')
