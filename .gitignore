@@ -1,6 +1,8 @@
 # Project artifacts
 /node_modules/
 
+# code coverage
+/coverage
 
 # Random excess stuff
 .DS_Store
