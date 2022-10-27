@@ -39,3 +39,5 @@ jobs:
         run: yarn test:dts
       - name: Jest coverage comment
         uses: MishaKav/jest-coverage-comment@d6ed1d30c2d40422e2d4f09c61da686bba77dfc2
+        with:
+          coverage-path: ./coverage.txt
