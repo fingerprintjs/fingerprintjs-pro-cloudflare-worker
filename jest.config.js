@@ -5,5 +5,5 @@ module.exports = {
   testRegex: '/test/.+test.tsx?$',
   passWithNoTests: true,
   setupFiles: ['./jest.setup.js'],
-  coverageReporters: ['lcov', 'json-summary', 'text'],
+  coverageReporters: ['lcov', 'json-summary', 'text', 'json'],
 }
