@@ -6,6 +6,12 @@ import {
   getDomainFromHostname,
 } from '../utils'
 
+declare global {
+  interface Headers {
+    getAll: (headerName: string) => string[]
+  }
+}
+
 function copySearchParams(oldURL: URL, newURL: URL) {
   newURL.search = new URLSearchParams(oldURL.search).toString()
 }
@@ -25,7 +31,6 @@ function createResponseWithFirstPartyCookies(request: Request, response: Respons
   const hostname = new URL(origin).hostname
   const eTLDPlusOneDomain = getDomainFromHostname(hostname)
   const newHeaders = new Headers(response.headers)
-  // @ts-ignore getAll is unable to be resolved
   const cookiesArray: string[] = newHeaders.getAll('set-cookie')
   newHeaders.delete('set-cookie')
   for (const cookieValue of cookiesArray) {
