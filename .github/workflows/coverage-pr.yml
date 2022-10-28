@@ -10,10 +10,26 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Jest coverage comment
+        id: coverage
         uses: ArtiomTr/jest-coverage-report-action@9f733792c44d05327cb371766bf78a5261e43936
         with:
           package-manager: yarn
-          output: comment
+          output: report-markdown
+      - name: Read coverage text report
+        id: coverage-text
+        shell: bash
+        run: |
+          OUTPUT=$(sed -e '1d' -e '$d' coverage/coverage.txt)
+          OUTPUT="${OUTPUT//'%'/'%25'}"
+          OUTPUT="${OUTPUT//$'\n'/'%0A'}"
+          OUTPUT="${OUTPUT//$'\r'/'%0D'}"
+          echo "::set-output name=content::$OUTPUT"
+      - uses: marocchino/sticky-pull-request-comment@adca94abcaf73c10466a71cc83ae561fd66d1a56
+        with:
+          message: |
+            ${{ steps.coverage.outputs.report }}
+            <details>
+              <summary>Show full coverage report</summary>
 
-
-
+              ${{ steps.coverage-text.outputs.content }}
+            </details>
