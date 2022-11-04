@@ -1,9 +1,9 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: 'miniflare',
   testRegex: '/test/.+test.tsx?$',
   passWithNoTests: true,
-  setupFiles: ['./jest.setup.js'],
+  // setupFiles: ['./jest.setup.js'],
   coverageReporters: ['lcov', 'json-summary'],
 }
