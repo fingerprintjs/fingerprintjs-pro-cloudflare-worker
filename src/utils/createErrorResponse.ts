@@ -1,4 +1,4 @@
-export interface FPJSAgentResponse {
+export interface FPJSResponse {
   v: '2'
   notifications?: Notification[]
   requestId: string
@@ -43,13 +43,13 @@ function generateRequestId(): string {
   return `${now}.cfi-${uniqueId}`
 }
 
-export function createErrorResponse(request: Request, error: string | Error | unknown) {
+export function createErrorResponse(request: Request, error: string | Error | unknown): Response {
   const reason = errorToString(error)
   const errorBody: ErrorData = {
     code: 'Failed',
     message: `An error occurred with Cloudflare worker. Reason: ${reason}`,
   }
-  const responseBody: FPJSAgentResponse = {
+  const responseBody: FPJSResponse = {
     v: '2',
     error: errorBody,
     requestId: generateRequestId(),
