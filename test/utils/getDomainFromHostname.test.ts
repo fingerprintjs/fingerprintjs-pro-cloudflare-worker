@@ -4,6 +4,9 @@ describe('getDomainFromHostname', () => {
   test('empty string returns empty string', () => {
     expect(getDomainFromHostname('')).toBe('')
   })
+  test('non existent TLD returns the argument', () => {
+    expect(getDomainFromHostname('domain.nonexistenttld')).toBe('domain.nonexistenttld')
+  })
   test('example.com returns example.com', () => {
     expect(getDomainFromHostname('example.com')).toBe('example.com')
   })
