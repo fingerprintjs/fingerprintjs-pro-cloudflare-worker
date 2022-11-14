@@ -1,6 +1,6 @@
 import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv, getStatusPagePath } from './env'
 
-import { createErrorResponse } from './utils'
+import { createErrorResponseForIngress, createErrorResponseForProCDN } from './utils'
 import { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleStatusPage } from './handlers'
 
 export async function handleRequest(request: Request, env: WorkerEnv): Promise<Response> {
@@ -11,7 +11,7 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
     try {
       return await handleDownloadScript(request)
     } catch (e) {
-      return new Response(null, { status: 404 })
+      return createErrorResponseForProCDN(e)
     }
   }
 
@@ -19,7 +19,7 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
     try {
       return await handleIngressAPI(request)
     } catch (e) {
-      return createErrorResponse(request, e)
+      return createErrorResponseForIngress(request, e)
     }
   }
 
