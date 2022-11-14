@@ -1,13 +1,9 @@
 import { handleRequest } from './handler'
 import { WorkerEnv } from './env'
-import { createErrorResponse, returnHttpResponse } from './utils'
+import { returnHttpResponse } from './utils'
 
 export default {
   async fetch(request: Request, env: WorkerEnv) {
-    try {
-      return await handleRequest(request, env).then(returnHttpResponse)
-    } catch (e) {
-      return createErrorResponse(request, e)
-    }
+    return handleRequest(request, env).then(returnHttpResponse)
   },
 }
