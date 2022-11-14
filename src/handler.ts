@@ -31,5 +31,5 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
     return handleStatusPage(env)
   }
 
-  return createErrorResponse(request, `unmatched path ${pathname}`)
+  return new Response(JSON.stringify({ error: `unmatched path ${pathname}` }), { status: 404 })
 }
