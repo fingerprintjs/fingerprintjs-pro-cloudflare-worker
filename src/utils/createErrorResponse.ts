@@ -12,7 +12,7 @@ export interface Notification {
 }
 
 export interface ErrorData {
-  code?: 'Failed'
+  code?: 'IntegrationFailed'
   message: string
 }
 
@@ -43,10 +43,10 @@ function generateRequestId(): string {
   return `${now}.cfi-${uniqueId}`
 }
 
-export function createErrorResponse(request: Request, error: string | Error | unknown): Response {
+export function createErrorResponseForIngress(request: Request, error: string | Error | unknown): Response {
   const reason = errorToString(error)
   const errorBody: ErrorData = {
-    code: 'Failed',
+    code: 'IntegrationFailed',
     message: `An error occurred with Cloudflare worker. Reason: ${reason}`,
   }
   const responseBody: FPJSResponse = {
@@ -61,4 +61,9 @@ export function createErrorResponse(request: Request, error: string | Error | un
     'Access-Control-Allow-Credentials': 'true',
   }
   return new Response(JSON.stringify(responseBody), { status: 500, headers: responseHeaders })
+}
+
+export function createErrorResponseForProCDN(error: string | Error | unknown): Response {
+  const responseBody = { error: errorToString(error) }
+  return new Response(JSON.stringify(responseBody), { status: 500 })
 }

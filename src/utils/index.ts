@@ -1,6 +1,6 @@
 import { getDomainFromHostname } from './getDomainFromHostname'
 import { getCacheControlHeaderWithMaxAgeIfLower } from './getCacheControlHeaderWithMaxAgeIfLower'
-import { createErrorResponse } from './createErrorResponse'
+import { createErrorResponseForIngress, createErrorResponseForProCDN } from './createErrorResponse'
 import { fetchCacheable } from './fetchCacheable'
 import {
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
@@ -16,7 +16,8 @@ export {
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
   addTrafficMonitoringSearchParamsForProCDN,
   createCookieObjectFromHeaderValue,
-  createErrorResponse,
+  createErrorResponseForIngress,
+  createErrorResponseForProCDN,
   returnHttpResponse,
   fetchCacheable,
   Cookie,
