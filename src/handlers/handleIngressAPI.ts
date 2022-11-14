@@ -23,12 +23,7 @@ function getCookieValueWithDomain(oldCookieValue: string, domain: string): strin
 }
 
 function createResponseWithFirstPartyCookies(request: Request, response: Response) {
-  const origin = request.headers.get('origin')
-  if (!origin) {
-    return response
-  }
-
-  const hostname = new URL(origin).hostname
+  const hostname = new URL(request.url).hostname
   const eTLDPlusOneDomain = getDomainFromHostname(hostname)
   const newHeaders = new Headers(response.headers)
   const cookiesArray: string[] = newHeaders.getAll('set-cookie')
