@@ -16,7 +16,11 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
   }
 
   if (pathname === getGetResultPath(env)) {
-    return handleIngressAPI(request)
+    try {
+      return await handleIngressAPI(request)
+    } catch (e) {
+      return createErrorResponse(request, e)
+    }
   }
 
   if (pathname === getHealthCheckPath(env)) {
