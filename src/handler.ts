@@ -8,7 +8,11 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
   const pathname = url.pathname
 
   if (pathname === getScriptDownloadPath(env)) {
-    return handleDownloadScript(request)
+    try {
+      return await handleDownloadScript(request)
+    } catch (e) {
+      return new Response(null, { status: 404 })
+    }
   }
 
   if (pathname === getGetResultPath(env)) {
