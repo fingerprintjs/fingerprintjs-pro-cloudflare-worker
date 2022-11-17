@@ -132,8 +132,12 @@ describe('filterCookies', () => {
   it('removes other keys when no match', () => {
     const headers = new Headers()
     headers.set('cookie', 'a=1; b=2')
+    headers.set('authentication', 'basic YWRtaW46MTIzNDU2')
+    headers.set('x-custom-header', 'foo_bar')
     const resultHeaders = filterCookies(headers, (key) => key === 'c')
     expect(resultHeaders.get('cookie')).toBe(null)
+    expect(resultHeaders.get('authentication')).toBe('basic YWRtaW46MTIzNDU2')
+    expect(resultHeaders.get('x-custom-header')).toBe('foo_bar')
   })
   it('works for _iidt', () => {
     const headers = new Headers()
