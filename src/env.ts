@@ -32,7 +32,7 @@ export const agentScriptDownloadPathVarName = 'AGENT_SCRIPT_DOWNLOAD_PATH'
 const getAgentPathVar = getVarOrDefault(agentScriptDownloadPathVarName, Defaults)
 export const isScriptDownloadPathSet = isVarSet(agentScriptDownloadPathVarName)
 
-export function getScriptDownloadPath(env: WorkerEnv) {
+export function getScriptDownloadPath(env: WorkerEnv): string {
   const agentPathVar = getAgentPathVar(env)
   return `/${getWorkerPathVar(env)}/${agentPathVar}`
 }
@@ -41,20 +41,20 @@ export const getResultPathVarName = 'GET_RESULT_PATH'
 const getGetResultPathVar = getVarOrDefault(getResultPathVarName, Defaults)
 export const isGetResultPathSet = isVarSet(getResultPathVarName)
 
-export function getGetResultPath(env: WorkerEnv) {
+export function getGetResultPath(env: WorkerEnv): string {
   const getResultPathVar = getGetResultPathVar(env)
   return `/${getWorkerPathVar(env)}/${getResultPathVar}`
 }
 
-export function getHealthCheckPath(env: WorkerEnv) {
+export function getHealthCheckPath(env: WorkerEnv): string {
   return `/${getWorkerPathVar(env)}/health`
 }
 
-export function getStatusPagePath(env: WorkerEnv) {
+export function getStatusPagePath(env: WorkerEnv): string {
   return `/${getWorkerPathVar(env)}/status`
 }
 
-export function getAgentScriptEndpoint(searchParams: URLSearchParams) {
+export function getAgentScriptEndpoint(searchParams: URLSearchParams): string {
   const apiKey = searchParams.get('apiKey') || Defaults.API_KEY
   const apiVersion = searchParams.get('version') || Defaults.AGENT_VERSION
 
