@@ -55,6 +55,6 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "cookie": "git+https://github.com/jshttp/cookie.git#663c9aeb85c9e046ff2ad2cdec631afdd40a7965"
+    "cookie": "0.5.0"
   }
 }
