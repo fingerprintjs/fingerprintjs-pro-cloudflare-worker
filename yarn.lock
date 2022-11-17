@@ -1869,9 +1869,10 @@ convert-source-map@^1.4.0, convert-source-map@^1.6.0, convert-source-map@^1.7.0:
   dependencies:
     safe-buffer "~5.1.1"
 
-"cookie@git+https://github.com/jshttp/cookie.git#663c9aeb85c9e046ff2ad2cdec631afdd40a7965":
+cookie@0.5.0:
   version "0.5.0"
-  resolved "git+https://github.com/jshttp/cookie.git#663c9aeb85c9e046ff2ad2cdec631afdd40a7965"
+  resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.5.0.tgz#d1f5d71adec6558c58f389987c366aa47e994f8b"
+  integrity sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==
 
 cosmiconfig-typescript-loader@^2.0.0:
   version "2.0.2"
