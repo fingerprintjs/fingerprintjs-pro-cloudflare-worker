@@ -3,6 +3,7 @@ import {
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
   createCookieObjectFromHeaderValue,
   createCookieStringFromObject,
+  filterCookies,
   getDomainFromHostname,
 } from '../utils'
 
@@ -50,7 +51,7 @@ async function handleIngressAPIRaw(request: Request, url: URL) {
   }
 
   console.log(`sending ingress api to ${url}...`)
-  const requestHeaders = new Headers(request.headers)
+  const requestHeaders = filterCookies(request.headers, (key) => key === '_iidt')
 
   const newRequest = new Request(url.toString(), new Request(request, { headers: requestHeaders }))
 
