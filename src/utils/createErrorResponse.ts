@@ -34,13 +34,13 @@ function generateRandomString(length: number): string {
 }
 
 function generateRequestUniqueId(): string {
-  return generateRandomString(2)
+  return generateRandomString(6)
 }
 
 function generateRequestId(): string {
   const uniqueId = generateRequestUniqueId()
   const now = new Date().getTime()
-  return `${now}.cfi-${uniqueId}`
+  return `${now}.${uniqueId}`
 }
 
 export function createErrorResponseForIngress(request: Request, error: string | Error | unknown): Response {

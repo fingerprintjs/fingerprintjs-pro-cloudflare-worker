@@ -26,7 +26,7 @@ describe('createErrorResponseForIngress', () => {
       expect(errorData.error).not.toBeNull()
       expect(errorData.error?.code).toBe('IntegrationFailed')
       expect(errorData.error?.message).toBe(`An error occurred with Cloudflare worker. Reason: some error message`)
-      expect(errorData.requestId).toMatch(/^\d{13}\.cfi-[a-zA-Z\d]{2}$/)
+      expect(errorData.requestId).toMatch(/^\d{13}\.[a-zA-Z\d]{6}$/)
       expect(errorData.products).toStrictEqual({})
     })
   })
