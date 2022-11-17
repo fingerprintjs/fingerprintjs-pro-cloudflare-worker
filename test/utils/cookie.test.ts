@@ -1,4 +1,4 @@
-import { createCookieObjectFromHeaderValue, Cookie, createCookieStringFromObject } from '../../src/utils'
+import { createCookieObjectFromHeaderValue, Cookie, createCookieStringFromObject, filterCookies } from '../../src/utils'
 
 const alphanumericString = 'abcdefghijklmnopqrstuvwxyz'
 const alphanumericStringCapital = alphanumericString.toUpperCase()
@@ -112,5 +112,35 @@ describe('createCookieObjectFromHeaderValue and createCookieStringFromObject tog
     const cookieString =
       '_iidt=jF5EK63pIrQofJ2za7GCbkn+Wy35Qmf2TLAih50+S2fNq86nv9wPH/aOuY7Xkcv1GUIKB1ky2aYT1ilQKoHHZW2tWA==; Path=/; Domain=fpjs.io; Expires=Tue, 24 Oct 2023 08:31:07 GMT; HttpOnly; Secure; SameSite=None'
     expect(createCookieStringFromObject(...createCookieObjectFromHeaderValue(cookieString))).toBe(cookieString)
+  })
+})
+
+describe('filterCookies', () => {
+  it('works when there is no cookie', () => {
+    const headers = new Headers()
+    headers.set('x', 'y')
+    const resultHeaders = filterCookies(headers, (key) => key === 'a')
+    expect(resultHeaders.get('cookie')).toBe(null)
+    expect(resultHeaders.get('x')).toBe('y')
+  })
+  it('removes other keys', () => {
+    const headers = new Headers()
+    headers.set('cookie', 'a=1; b=2')
+    const resultHeaders = filterCookies(headers, (key) => key === 'a')
+    expect(resultHeaders.get('cookie')).toBe('a=1')
+  })
+  it('removes other keys when no match', () => {
+    const headers = new Headers()
+    headers.set('cookie', 'a=1; b=2')
+    const resultHeaders = filterCookies(headers, (key) => key === 'c')
+    expect(resultHeaders.get('cookie')).toBe(null)
+  })
+  it('works for _iidt', () => {
+    const headers = new Headers()
+    const _iidtCookieValue =
+      'jF5EK63pIrQofJ2za7GCbkn+Wy35Qmf2TLAih50+S2fNq86nv9wPH/aOuY7Xkcv1GUIKB1ky2aYT1ilQKoHHZW2tWA=='
+    headers.set('cookie', `x=y; _iidt=${_iidtCookieValue}; b=2`)
+    const resultHeaders = filterCookies(headers, (key) => key === '_iidt')
+    expect(resultHeaders.get('cookie')).toBe(`_iidt=${_iidtCookieValue}`)
   })
 })

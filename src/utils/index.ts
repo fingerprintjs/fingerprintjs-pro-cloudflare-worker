@@ -7,7 +7,7 @@ import {
   addTrafficMonitoringSearchParamsForProCDN,
 } from './addTrafficMonitoring'
 import { returnHttpResponse } from './returnHttpResponse'
-import { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue } from './cookie'
+import { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue, filterCookies } from './cookie'
 
 export {
   getDomainFromHostname,
@@ -19,6 +19,7 @@ export {
   createErrorResponseForIngress,
   createErrorResponseForProCDN,
   returnHttpResponse,
+  filterCookies,
   fetchCacheable,
   Cookie,
 }
