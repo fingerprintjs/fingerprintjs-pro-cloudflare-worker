@@ -55,7 +55,7 @@ export function getStatusPagePath(env: WorkerEnv): string {
 }
 
 export function getAgentScriptEndpoint(searchParams: URLSearchParams): string {
-  const apiKey = searchParams.get('apiKey') || Defaults.API_KEY
+  const apiKey = searchParams.get('apiKey')
   const apiVersion = searchParams.get('version') || Defaults.AGENT_VERSION
 
   const base = `https://fpcdn.io/v${apiVersion}/${apiKey}`
