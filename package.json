@@ -35,6 +35,7 @@
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.1",
+    "@types/cookie": "^0.5.1",
     "@types/jest": "^29.0.3",
     "@types/node": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
@@ -52,5 +53,8 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "ts-jest": "^29.0.2",
     "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "cookie": "git+https://github.com/jshttp/cookie.git#663c9aeb85c9e046ff2ad2cdec631afdd40a7965"
   }
 }
