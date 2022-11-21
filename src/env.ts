@@ -2,12 +2,14 @@ export type WorkerEnv = {
   WORKER_PATH: string | null
   AGENT_SCRIPT_DOWNLOAD_PATH: string | null
   GET_RESULT_PATH: string | null
+  PROXY_SECRET: string | null
 }
 
 const Defaults: WorkerEnv & Record<string, string> = {
   WORKER_PATH: 'cf-worker',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
   GET_RESULT_PATH: 'getResult',
+  PROXY_SECRET: '',
   REGION: 'us',
   AGENT_VERSION: '3',
 }
@@ -44,6 +46,14 @@ export const isGetResultPathSet = isVarSet(getResultPathVarName)
 export function getGetResultPath(env: WorkerEnv): string {
   const getResultPathVar = getGetResultPathVar(env)
   return `/${getWorkerPathVar(env)}/${getResultPathVar}`
+}
+
+export const proxySecretVarName = 'PROXY_SECRET'
+const getProxySecretVar = getVarOrDefault(proxySecretVarName, Defaults)
+export const isProxySecretSet = isVarSet(proxySecretVarName)
+
+export function getProxySecret(env: WorkerEnv): string {
+  return getProxySecretVar(env)
 }
 
 export function getHealthCheckPath(env: WorkerEnv): string {

@@ -9,6 +9,8 @@ import {
   workerPathVarName,
   agentScriptDownloadPathVarName,
   getResultPathVarName,
+  proxySecretVarName,
+  isProxySecretSet,
 } from '../env'
 
 type EnvVarInfo = {
@@ -36,10 +38,17 @@ function buildEnvInfo(env: WorkerEnv): { [key: string]: EnvVarInfo } {
     isSet: isGetResultPathSet(env),
   }
 
+  const proxySecret: EnvVarInfo = {
+    envVarName: proxySecretVarName,
+    value: '******',
+    isSet: isProxySecretSet(env),
+  }
+
   return {
     workerPath,
     scriptDownloadPath,
     getResultPath,
+    proxySecret,
   }
 }
 

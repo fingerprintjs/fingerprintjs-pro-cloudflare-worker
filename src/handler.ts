@@ -17,7 +17,7 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
 
   if (pathname === getGetResultPath(env)) {
     try {
-      return await handleIngressAPI(request)
+      return await handleIngressAPI(request, env)
     } catch (e) {
       return createErrorResponseForIngress(request, e)
     }
