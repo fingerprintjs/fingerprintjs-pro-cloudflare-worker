@@ -25,7 +25,7 @@ describe('addProxyIntegrationHeaders', () => {
     env.PROXY_SECRET = null
     addProxyIntegrationHeaders(headers, env)
     expect(headers.get('FPJS-Proxy-Secret')).toBe(null)
-    expect(headers.get('FPJS-Proxy-Client-IP')).toBe('19.117.63.126')
+    expect(headers.get('FPJS-Proxy-Client-IP')).toBe(null)
     expect(headers.get('x-custom-header')).toBe('custom-value')
   })
   test('ipv6', () => {
