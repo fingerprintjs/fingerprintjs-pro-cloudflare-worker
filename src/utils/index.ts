@@ -7,6 +7,7 @@ import {
   addTrafficMonitoringSearchParamsForProCDN,
 } from './addTrafficMonitoring'
 import { returnHttpResponse } from './returnHttpResponse'
+import { addProxyIntegrationHeaders } from './addProxyIntegrationHeaders'
 import { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue, filterCookies } from './cookie'
 
 export {
@@ -18,6 +19,7 @@ export {
   createCookieObjectFromHeaderValue,
   createErrorResponseForIngress,
   createErrorResponseForProCDN,
+  addProxyIntegrationHeaders,
   returnHttpResponse,
   filterCookies,
   fetchCacheable,
