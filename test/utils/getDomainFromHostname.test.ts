@@ -19,6 +19,15 @@ describe('getDomainFromHostname', () => {
   test('dev.fingerprint.com returns fingerprint.com', () => {
     expect(getDomainFromHostname('dev.fingerprint.com')).toBe('fingerprint.com')
   })
+  test('lbradley.net returns lbradley.net', () => {
+    expect(getDomainFromHostname('lbradley.net')).toBe('lbradley.net')
+  })
+  test('www.lbradley.net returns lbradley.net', () => {
+    expect(getDomainFromHostname('www.lbradley.net')).toBe('lbradley.net')
+  })
+  test('sub2.sub.lbradley.net returns lbradley.net', () => {
+    expect(getDomainFromHostname('sub2.sub.lbradley.net')).toBe('lbradley.net')
+  })
   test('611.to returns 611.to', () => {
     expect(getDomainFromHostname('611.to')).toBe('611.to')
   })
