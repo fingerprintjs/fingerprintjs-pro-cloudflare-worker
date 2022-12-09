@@ -1,12 +1,15 @@
 /**
- * FingerprintJS Pro Cloudflare Worker v1.0.0 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
+ * FingerprintJS Pro Cloudflare Worker v1.1.0 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
+
+import { parse } from 'cookie';
 
 const Defaults = {
     WORKER_PATH: 'cf-worker',
     AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
     GET_RESULT_PATH: 'getResult',
+    PROXY_SECRET: '',
     REGION: 'us',
     AGENT_VERSION: '3',
 };
@@ -37,11 +40,20 @@ function getGetResultPath(env) {
     const getResultPathVar = getGetResultPathVar(env);
     return `/${getWorkerPathVar(env)}/${getResultPathVar}`;
 }
+const proxySecretVarName = 'PROXY_SECRET';
+const getProxySecretVar = getVarOrDefault(proxySecretVarName, Defaults);
+const isProxySecretSet = isVarSet(proxySecretVarName);
+function getProxySecret(env) {
+    return getProxySecretVar(env);
+}
 function getHealthCheckPath(env) {
     return `/${getWorkerPathVar(env)}/health`;
 }
+function getStatusPagePath(env) {
+    return `/${getWorkerPathVar(env)}/status`;
+}
 function getAgentScriptEndpoint(searchParams) {
-    const apiKey = searchParams.get('apiKey') || Defaults.API_KEY;
+    const apiKey = searchParams.get('apiKey');
     const apiVersion = searchParams.get('version') || Defaults.AGENT_VERSION;
     const base = `https://fpcdn.io/v${apiVersion}/${apiKey}`;
     const loaderVersion = searchParams.get('loaderVersion');
@@ -1078,6 +1090,11 @@ var domainSuffixList = [
 	"muni.il",
 	"net.il",
 	"org.il",
+	"ישראל",
+	"אקדמיה.ישראל",
+	"ישוב.ישראל",
+	"צהל.ישראל",
+	"ממשל.ישראל",
 	"im",
 	"ac.im",
 	"co.im",
@@ -1089,18 +1106,47 @@ var domainSuffixList = [
 	"tt.im",
 	"tv.im",
 	"in",
-	"co.in",
-	"firm.in",
-	"net.in",
-	"org.in",
-	"gen.in",
-	"ind.in",
-	"nic.in",
+	"5g.in",
+	"6g.in",
 	"ac.in",
+	"ai.in",
+	"am.in",
+	"bihar.in",
+	"biz.in",
+	"business.in",
+	"ca.in",
+	"cn.in",
+	"co.in",
+	"com.in",
+	"coop.in",
+	"cs.in",
+	"delhi.in",
+	"dr.in",
 	"edu.in",
-	"res.in",
+	"er.in",
+	"firm.in",
+	"gen.in",
 	"gov.in",
+	"gujarat.in",
+	"ind.in",
+	"info.in",
+	"int.in",
+	"internet.in",
+	"io.in",
+	"me.in",
 	"mil.in",
+	"net.in",
+	"nic.in",
+	"org.in",
+	"pg.in",
+	"post.in",
+	"pro.in",
+	"res.in",
+	"travel.in",
+	"tv.in",
+	"uk.in",
+	"up.in",
+	"us.in",
 	"info",
 	"int",
 	"eu.int",
@@ -6375,7 +6421,6 @@ var domainSuffixList = [
 	"broker",
 	"brother",
 	"brussels",
-	"bugatti",
 	"build",
 	"builders",
 	"business",
@@ -6390,7 +6435,6 @@ var domainSuffixList = [
 	"cam",
 	"camera",
 	"camp",
-	"cancerresearch",
 	"canon",
 	"capetown",
 	"capital",
@@ -7395,6 +7439,7 @@ var domainSuffixList = [
 	"611.to",
 	"graphox.us",
 	"*.devcdnaccesso.com",
+	"*.on-acorn.io",
 	"adobeaemcloud.com",
 	"*.dev.adobeaemcloud.com",
 	"hlx.live",
@@ -7417,6 +7462,102 @@ var domainSuffixList = [
 	"*.compute-1.amazonaws.com",
 	"*.compute.amazonaws.com.cn",
 	"us-east-1.amazonaws.com",
+	"s3.cn-north-1.amazonaws.com.cn",
+	"s3.dualstack.ap-northeast-1.amazonaws.com",
+	"s3.dualstack.ap-northeast-2.amazonaws.com",
+	"s3.ap-northeast-2.amazonaws.com",
+	"s3-website.ap-northeast-2.amazonaws.com",
+	"s3.dualstack.ap-south-1.amazonaws.com",
+	"s3.ap-south-1.amazonaws.com",
+	"s3-website.ap-south-1.amazonaws.com",
+	"s3.dualstack.ap-southeast-1.amazonaws.com",
+	"s3.dualstack.ap-southeast-2.amazonaws.com",
+	"s3.dualstack.ca-central-1.amazonaws.com",
+	"s3.ca-central-1.amazonaws.com",
+	"s3-website.ca-central-1.amazonaws.com",
+	"s3.dualstack.eu-central-1.amazonaws.com",
+	"s3.eu-central-1.amazonaws.com",
+	"s3-website.eu-central-1.amazonaws.com",
+	"s3.dualstack.eu-west-1.amazonaws.com",
+	"s3.dualstack.eu-west-2.amazonaws.com",
+	"s3.eu-west-2.amazonaws.com",
+	"s3-website.eu-west-2.amazonaws.com",
+	"s3.dualstack.eu-west-3.amazonaws.com",
+	"s3.eu-west-3.amazonaws.com",
+	"s3-website.eu-west-3.amazonaws.com",
+	"s3.amazonaws.com",
+	"s3-ap-northeast-1.amazonaws.com",
+	"s3-ap-northeast-2.amazonaws.com",
+	"s3-ap-south-1.amazonaws.com",
+	"s3-ap-southeast-1.amazonaws.com",
+	"s3-ap-southeast-2.amazonaws.com",
+	"s3-ca-central-1.amazonaws.com",
+	"s3-eu-central-1.amazonaws.com",
+	"s3-eu-west-1.amazonaws.com",
+	"s3-eu-west-2.amazonaws.com",
+	"s3-eu-west-3.amazonaws.com",
+	"s3-external-1.amazonaws.com",
+	"s3-fips-us-gov-west-1.amazonaws.com",
+	"s3-sa-east-1.amazonaws.com",
+	"s3-us-east-2.amazonaws.com",
+	"s3-us-gov-west-1.amazonaws.com",
+	"s3-us-west-1.amazonaws.com",
+	"s3-us-west-2.amazonaws.com",
+	"s3-website-ap-northeast-1.amazonaws.com",
+	"s3-website-ap-southeast-1.amazonaws.com",
+	"s3-website-ap-southeast-2.amazonaws.com",
+	"s3-website-eu-west-1.amazonaws.com",
+	"s3-website-sa-east-1.amazonaws.com",
+	"s3-website-us-east-1.amazonaws.com",
+	"s3-website-us-west-1.amazonaws.com",
+	"s3-website-us-west-2.amazonaws.com",
+	"s3.dualstack.sa-east-1.amazonaws.com",
+	"s3.dualstack.us-east-1.amazonaws.com",
+	"s3.dualstack.us-east-2.amazonaws.com",
+	"s3.us-east-2.amazonaws.com",
+	"s3-website.us-east-2.amazonaws.com",
+	"vfs.cloud9.af-south-1.amazonaws.com",
+	"webview-assets.cloud9.af-south-1.amazonaws.com",
+	"vfs.cloud9.ap-east-1.amazonaws.com",
+	"webview-assets.cloud9.ap-east-1.amazonaws.com",
+	"vfs.cloud9.ap-northeast-1.amazonaws.com",
+	"webview-assets.cloud9.ap-northeast-1.amazonaws.com",
+	"vfs.cloud9.ap-northeast-2.amazonaws.com",
+	"webview-assets.cloud9.ap-northeast-2.amazonaws.com",
+	"vfs.cloud9.ap-northeast-3.amazonaws.com",
+	"webview-assets.cloud9.ap-northeast-3.amazonaws.com",
+	"vfs.cloud9.ap-south-1.amazonaws.com",
+	"webview-assets.cloud9.ap-south-1.amazonaws.com",
+	"vfs.cloud9.ap-southeast-1.amazonaws.com",
+	"webview-assets.cloud9.ap-southeast-1.amazonaws.com",
+	"vfs.cloud9.ap-southeast-2.amazonaws.com",
+	"webview-assets.cloud9.ap-southeast-2.amazonaws.com",
+	"vfs.cloud9.ca-central-1.amazonaws.com",
+	"webview-assets.cloud9.ca-central-1.amazonaws.com",
+	"vfs.cloud9.eu-central-1.amazonaws.com",
+	"webview-assets.cloud9.eu-central-1.amazonaws.com",
+	"vfs.cloud9.eu-north-1.amazonaws.com",
+	"webview-assets.cloud9.eu-north-1.amazonaws.com",
+	"vfs.cloud9.eu-south-1.amazonaws.com",
+	"webview-assets.cloud9.eu-south-1.amazonaws.com",
+	"vfs.cloud9.eu-west-1.amazonaws.com",
+	"webview-assets.cloud9.eu-west-1.amazonaws.com",
+	"vfs.cloud9.eu-west-2.amazonaws.com",
+	"webview-assets.cloud9.eu-west-2.amazonaws.com",
+	"vfs.cloud9.eu-west-3.amazonaws.com",
+	"webview-assets.cloud9.eu-west-3.amazonaws.com",
+	"vfs.cloud9.me-south-1.amazonaws.com",
+	"webview-assets.cloud9.me-south-1.amazonaws.com",
+	"vfs.cloud9.sa-east-1.amazonaws.com",
+	"webview-assets.cloud9.sa-east-1.amazonaws.com",
+	"vfs.cloud9.us-east-1.amazonaws.com",
+	"webview-assets.cloud9.us-east-1.amazonaws.com",
+	"vfs.cloud9.us-east-2.amazonaws.com",
+	"webview-assets.cloud9.us-east-2.amazonaws.com",
+	"vfs.cloud9.us-west-1.amazonaws.com",
+	"webview-assets.cloud9.us-west-1.amazonaws.com",
+	"vfs.cloud9.us-west-2.amazonaws.com",
+	"webview-assets.cloud9.us-west-2.amazonaws.com",
 	"cn-north-1.eb.amazonaws.com.cn",
 	"cn-northwest-1.eb.amazonaws.com.cn",
 	"elasticbeanstalk.com",
@@ -7437,63 +7578,11 @@ var domainSuffixList = [
 	"us-gov-west-1.elasticbeanstalk.com",
 	"us-west-1.elasticbeanstalk.com",
 	"us-west-2.elasticbeanstalk.com",
-	"*.elb.amazonaws.com",
 	"*.elb.amazonaws.com.cn",
+	"*.elb.amazonaws.com",
 	"awsglobalaccelerator.com",
-	"s3.amazonaws.com",
-	"s3-ap-northeast-1.amazonaws.com",
-	"s3-ap-northeast-2.amazonaws.com",
-	"s3-ap-south-1.amazonaws.com",
-	"s3-ap-southeast-1.amazonaws.com",
-	"s3-ap-southeast-2.amazonaws.com",
-	"s3-ca-central-1.amazonaws.com",
-	"s3-eu-central-1.amazonaws.com",
-	"s3-eu-west-1.amazonaws.com",
-	"s3-eu-west-2.amazonaws.com",
-	"s3-eu-west-3.amazonaws.com",
-	"s3-external-1.amazonaws.com",
-	"s3-fips-us-gov-west-1.amazonaws.com",
-	"s3-sa-east-1.amazonaws.com",
-	"s3-us-gov-west-1.amazonaws.com",
-	"s3-us-east-2.amazonaws.com",
-	"s3-us-west-1.amazonaws.com",
-	"s3-us-west-2.amazonaws.com",
-	"s3.ap-northeast-2.amazonaws.com",
-	"s3.ap-south-1.amazonaws.com",
-	"s3.cn-north-1.amazonaws.com.cn",
-	"s3.ca-central-1.amazonaws.com",
-	"s3.eu-central-1.amazonaws.com",
-	"s3.eu-west-2.amazonaws.com",
-	"s3.eu-west-3.amazonaws.com",
-	"s3.us-east-2.amazonaws.com",
-	"s3.dualstack.ap-northeast-1.amazonaws.com",
-	"s3.dualstack.ap-northeast-2.amazonaws.com",
-	"s3.dualstack.ap-south-1.amazonaws.com",
-	"s3.dualstack.ap-southeast-1.amazonaws.com",
-	"s3.dualstack.ap-southeast-2.amazonaws.com",
-	"s3.dualstack.ca-central-1.amazonaws.com",
-	"s3.dualstack.eu-central-1.amazonaws.com",
-	"s3.dualstack.eu-west-1.amazonaws.com",
-	"s3.dualstack.eu-west-2.amazonaws.com",
-	"s3.dualstack.eu-west-3.amazonaws.com",
-	"s3.dualstack.sa-east-1.amazonaws.com",
-	"s3.dualstack.us-east-1.amazonaws.com",
-	"s3.dualstack.us-east-2.amazonaws.com",
-	"s3-website-us-east-1.amazonaws.com",
-	"s3-website-us-west-1.amazonaws.com",
-	"s3-website-us-west-2.amazonaws.com",
-	"s3-website-ap-northeast-1.amazonaws.com",
-	"s3-website-ap-southeast-1.amazonaws.com",
-	"s3-website-ap-southeast-2.amazonaws.com",
-	"s3-website-eu-west-1.amazonaws.com",
-	"s3-website-sa-east-1.amazonaws.com",
-	"s3-website.ap-northeast-2.amazonaws.com",
-	"s3-website.ap-south-1.amazonaws.com",
-	"s3-website.ca-central-1.amazonaws.com",
-	"s3-website.eu-central-1.amazonaws.com",
-	"s3-website.eu-west-2.amazonaws.com",
-	"s3-website.eu-west-3.amazonaws.com",
-	"s3-website.us-east-2.amazonaws.com",
+	"eero.online",
+	"eero-stage.online",
 	"t3l3p0rt.net",
 	"tele.amune.org",
 	"apigee.io",
@@ -7535,6 +7624,7 @@ var domainSuffixList = [
 	"theshop.jp",
 	"shopselect.net",
 	"base.shop",
+	"beagleboard.io",
 	"*.beget.app",
 	"betainabox.com",
 	"bnr.la",
@@ -8038,8 +8128,8 @@ var domainSuffixList = [
 	"blogsite.xyz",
 	"dynv6.net",
 	"e4.cz",
-	"eero.online",
-	"eero-stage.online",
+	"easypanel.app",
+	"easypanel.host",
 	"elementor.cloud",
 	"elementor.cool",
 	"en-root.fr",
@@ -8207,6 +8297,7 @@ var domainSuffixList = [
 	"a.ssl.fastly.net",
 	"b.ssl.fastly.net",
 	"global.ssl.fastly.net",
+	"*.user.fm",
 	"fastvps-server.com",
 	"fastvps.host",
 	"myfast.host",
@@ -8242,6 +8333,10 @@ var domainSuffixList = [
 	"id.forgerock.io",
 	"framer.app",
 	"framercanvas.com",
+	"framer.media",
+	"framer.photos",
+	"framer.website",
+	"framer.wiki",
 	"*.frusky.de",
 	"ravpage.co.il",
 	"0e.vc",
@@ -8799,6 +8894,7 @@ var domainSuffixList = [
 	"cloudapp.net",
 	"azurestaticapps.net",
 	"1.azurestaticapps.net",
+	"2.azurestaticapps.net",
 	"centralus.azurestaticapps.net",
 	"eastasia.azurestaticapps.net",
 	"eastus2.azurestaticapps.net",
@@ -8826,22 +8922,6 @@ var domainSuffixList = [
 	"yali.mythic-beasts.com",
 	"cust.retrosnub.co.uk",
 	"ui.nabu.casa",
-	"pony.club",
-	"of.fashion",
-	"in.london",
-	"of.london",
-	"from.marketing",
-	"with.marketing",
-	"for.men",
-	"repair.men",
-	"and.mom",
-	"for.mom",
-	"for.one",
-	"under.one",
-	"for.sale",
-	"that.win",
-	"from.work",
-	"to.work",
 	"cloud.nospamproxy.com",
 	"netlify.app",
 	"4u.com",
@@ -8976,7 +9056,26 @@ var domainSuffixList = [
 	"omg.lol",
 	"cloudycluster.net",
 	"omniwe.site",
+	"123hjemmeside.dk",
+	"123hjemmeside.no",
+	"123homepage.it",
+	"123kotisivu.fi",
+	"123minsida.se",
+	"123miweb.es",
+	"123paginaweb.pt",
+	"123sait.ru",
+	"123siteweb.fr",
+	"123webseite.at",
+	"123webseite.de",
+	"123website.be",
+	"123website.ch",
+	"123website.lu",
+	"123website.nl",
 	"service.one",
+	"simplesite.com",
+	"simplesite.com.br",
+	"simplesite.gr",
+	"simplesite.pl",
 	"nid.io",
 	"opensocial.site",
 	"opencraft.hosting",
@@ -9070,6 +9169,8 @@ var domainSuffixList = [
 	"rhcloud.com",
 	"app.render.com",
 	"onrender.com",
+	"firewalledreplit.co",
+	"id.firewalledreplit.co",
 	"repl.co",
 	"id.repl.co",
 	"repl.run",
@@ -9164,6 +9265,7 @@ var domainSuffixList = [
 	"beta.bounty-full.com",
 	"small-web.org",
 	"vp4.me",
+	"streamlitapp.com",
 	"try-snowplow.com",
 	"srht.site",
 	"stackhero-network.com",
@@ -9430,10 +9532,8 @@ var domainSuffixList = [
 	"enterprisecloud.nu"
 ];
 
-function getDomainFromHostname(hostname) {
-    if (!hostname) {
-        return hostname;
-    }
+function findETLDMatch(hostname) {
+    let currentMatch = null;
     for (const domainSuffix of domainSuffixList) {
         const lengthDiff = hostname.length - domainSuffix.length;
         if (lengthDiff < 0) {
@@ -9443,49 +9543,45 @@ function getDomainFromHostname(hostname) {
         if (!endsWithSuffix) {
             continue;
         }
-        const partBeforeSuffix = hostname.substring(0, lengthDiff - 1);
-        const lastDotIndex = partBeforeSuffix.lastIndexOf('.');
-        if (lastDotIndex === -1) {
-            return hostname;
+        if (currentMatch == null || currentMatch.length < domainSuffix.length) {
+            currentMatch = domainSuffix;
         }
-        return hostname.substring(lastDotIndex + 1);
     }
-    return hostname;
+    return currentMatch;
+}
+function getDomainFromHostname(hostname) {
+    if (!hostname) {
+        return hostname;
+    }
+    const matchingETLD = findETLDMatch(hostname);
+    if (!matchingETLD) {
+        return hostname;
+    }
+    const lengthDiff = hostname.length - matchingETLD.length;
+    const partBeforeSuffix = hostname.substring(0, lengthDiff - 1);
+    const lastDotIndex = partBeforeSuffix.lastIndexOf('.');
+    if (lastDotIndex === -1) {
+        return hostname;
+    }
+    return hostname.substring(lastDotIndex + 1);
 }
 
-function createCookieStringFromObject(name, value) {
-    const flags = Object.entries(value).filter(([k]) => k !== name && k !== 'value');
-    const nameValue = `${name}=${value.value}`;
-    const rest = flags.map(([k, v]) => (v ? `${k}=${v}` : k));
-    return [nameValue, ...rest].join('; ');
-}
-
-function getCacheControlHeaderWithMaxAgeIfLower(cacheControlHeaderValue, maxMaxAge) {
-    const cacheControlDirectives = cacheControlHeaderValue.split(', ');
-    const maxAgeIndex = cacheControlDirectives.findIndex((directive) => directive.split('=')[0].trim().toLowerCase() === 'max-age');
-    if (maxAgeIndex === -1) {
-        cacheControlDirectives.push(`max-age=${maxMaxAge}`);
+function setDirective(directives, directive, maxMaxAge) {
+    const directiveIndex = directives.findIndex((directivePair) => directivePair.split('=')[0].trim().toLowerCase() === directive);
+    if (directiveIndex === -1) {
+        directives.push(`${directive}=${maxMaxAge}`);
     }
     else {
-        const oldMaxAge = Number(cacheControlDirectives[maxAgeIndex].split('=')[1]);
-        const newMaxAge = Math.min(maxMaxAge, oldMaxAge);
-        cacheControlDirectives[maxAgeIndex] = `max-age=${newMaxAge}`;
+        const oldValue = Number(directives[directiveIndex].split('=')[1]);
+        const newValue = Math.min(maxMaxAge, oldValue);
+        directives[directiveIndex] = `${directive}=${newValue}`;
     }
-    return cacheControlDirectives.join(', ');
 }
-
-function createCookieObjectFromHeaderValue(cookieValue) {
-    let cookieName = '';
-    const cookieObject = cookieValue.split('; ').reduce((prev, flag, index) => {
-        const kv = flag.split('=');
-        const key = index === 0 ? 'value' : kv[0];
-        if (index === 0) {
-            cookieName = kv[0];
-        }
-        const value = kv[1];
-        return { ...prev, [key]: value };
-    }, { value: '' });
-    return [cookieName, cookieObject];
+function getCacheControlHeaderWithMaxAgeIfLower(cacheControlHeaderValue, maxMaxAge) {
+    const cacheControlDirectives = cacheControlHeaderValue.split(', ');
+    setDirective(cacheControlDirectives, 'max-age', maxMaxAge);
+    setDirective(cacheControlDirectives, 's-maxage', maxMaxAge);
+    return cacheControlDirectives.join(', ');
 }
 
 function errorToString(error) {
@@ -9505,17 +9601,17 @@ function generateRandomString(length) {
     return result;
 }
 function generateRequestUniqueId() {
-    return generateRandomString(2);
+    return generateRandomString(6);
 }
 function generateRequestId() {
     const uniqueId = generateRequestUniqueId();
     const now = new Date().getTime();
-    return `${now}.cfi-${uniqueId}`;
+    return `${now}.${uniqueId}`;
 }
-function createErrorResponse(error) {
+function createErrorResponseForIngress(request, error) {
     const reason = errorToString(error);
     const errorBody = {
-        code: 'Failed',
+        code: 'IntegrationFailed',
         message: `An error occurred with Cloudflare worker. Reason: ${reason}`,
     };
     const responseBody = {
@@ -9524,6 +9620,15 @@ function createErrorResponse(error) {
         requestId: generateRequestId(),
         products: {},
     };
+    const requestOrigin = request.headers.get('origin') || '';
+    const responseHeaders = {
+        'Access-Control-Allow-Origin': requestOrigin,
+        'Access-Control-Allow-Credentials': 'true',
+    };
+    return new Response(JSON.stringify(responseBody), { status: 500, headers: responseHeaders });
+}
+function createErrorResponseForProCDN(error) {
+    const responseBody = { error: errorToString(error) };
     return new Response(JSON.stringify(responseBody), { status: 500 });
 }
 
@@ -9531,21 +9636,74 @@ async function fetchCacheable(request, ttl) {
     return fetch(request, { cf: { cacheTtl: ttl } });
 }
 
-const INT_VERSION = '1.0.0';
-const HEADER_NAME = 'ii';
-function getHeaderValue(type) {
+const INT_VERSION = '1.1.0';
+const PARAM_NAME = 'ii';
+function getTrafficMonitoringValue(type) {
     return `fingerprintjs-pro-cloudflare/${INT_VERSION}/${type}`;
 }
 function addTrafficMonitoringSearchParamsForProCDN(url) {
-    url.searchParams.append(HEADER_NAME, getHeaderValue('procdn'));
+    url.searchParams.append(PARAM_NAME, getTrafficMonitoringValue('procdn'));
 }
 function addTrafficMonitoringSearchParamsForVisitorIdRequest(url) {
-    url.searchParams.append(HEADER_NAME, getHeaderValue('ingress'));
+    url.searchParams.append(PARAM_NAME, getTrafficMonitoringValue('ingress'));
 }
 
 function returnHttpResponse(oldResponse) {
     oldResponse.headers.delete('Strict-Transport-Security');
     return oldResponse;
+}
+
+function addProxyIntegrationHeaders(headers, env) {
+    const proxySecret = getProxySecret(env);
+    if (proxySecret) {
+        headers.set('FPJS-Proxy-Secret', proxySecret);
+        headers.set('FPJS-Proxy-Client-IP', headers.get('CF-Connecting-IP') || '');
+    }
+}
+
+function createCookieObjectFromHeaderValue(cookieValue) {
+    let cookieName = '';
+    const cookieObject = cookieValue.split('; ').reduce((prev, flag, index) => {
+        const equalSignIndex = flag.indexOf('=');
+        if (equalSignIndex === -1) {
+            return { ...prev, [flag]: undefined };
+        }
+        const key = flag.slice(0, equalSignIndex);
+        const value = flag.slice(equalSignIndex + 1, flag.length);
+        if (index === 0) {
+            cookieName = key;
+            return { ...prev, value };
+        }
+        return { ...prev, [key]: value };
+    }, { value: '' });
+    return [cookieName, cookieObject];
+}
+function createCookieStringFromObject(name, cookie) {
+    const result = [`${name}=${cookie.value}`];
+    for (const key in cookie) {
+        if (key === name || key === 'value') {
+            continue;
+        }
+        const flagValue = cookie[key];
+        const flag = flagValue ? `${key}=${flagValue}` : key;
+        result.push(flag);
+    }
+    return result.join('; ');
+}
+function filterCookies(headers, filterFunc) {
+    const newHeaders = new Headers(headers);
+    const cookie = parse(headers.get('cookie') || '');
+    const filteredCookieList = [];
+    for (const cookieName in cookie) {
+        if (filterFunc(cookieName)) {
+            filteredCookieList.push(`${cookieName}=${cookie[cookieName]}`);
+        }
+    }
+    newHeaders.delete('cookie');
+    if (filteredCookieList.length > 0) {
+        newHeaders.set('cookie', filteredCookieList.join('; '));
+    }
+    return newHeaders;
 }
 
 function createResponseWithMaxAge(oldResponse, maxMaxAge) {
@@ -9579,14 +9737,9 @@ function getCookieValueWithDomain(oldCookieValue, domain) {
     return createCookieStringFromObject(cookieName, cookieObject);
 }
 function createResponseWithFirstPartyCookies(request, response) {
-    const origin = request.headers.get('origin');
-    if (!origin) {
-        return response;
-    }
-    const hostname = new URL(origin).hostname;
+    const hostname = new URL(request.url).hostname;
     const eTLDPlusOneDomain = getDomainFromHostname(hostname);
     const newHeaders = new Headers(response.headers);
-    // @ts-ignore getAll is unable to be resolved
     const cookiesArray = newHeaders.getAll('set-cookie');
     newHeaders.delete('set-cookie');
     for (const cookieValue of cookiesArray) {
@@ -9599,7 +9752,7 @@ function createResponseWithFirstPartyCookies(request, response) {
         headers: newHeaders,
     });
 }
-async function handleIngressAPIRaw(request, url) {
+async function handleIngressAPIRaw(request, url, headers) {
     if (request == null) {
         throw new Error('request is null');
     }
@@ -9607,19 +9760,21 @@ async function handleIngressAPIRaw(request, url) {
         throw new Error('url is null');
     }
     console.log(`sending ingress api to ${url}...`);
-    const requestHeaders = new Headers(request.headers);
-    const newRequest = new Request(url.toString(), new Request(request, { headers: requestHeaders }));
+    const newRequest = new Request(url.toString(), new Request(request, { headers }));
     const response = await fetch(newRequest);
     return createResponseWithFirstPartyCookies(request, response);
 }
-async function handleIngressAPI(request) {
+async function handleIngressAPI(request, env) {
     const oldURL = new URL(request.url);
     const region = oldURL.searchParams.get('region') || 'us';
     const endpoint = getVisitorIdEndpoint(region);
     const newURL = new URL(endpoint);
     copySearchParams(oldURL, newURL);
     addTrafficMonitoringSearchParamsForVisitorIdRequest(newURL);
-    return handleIngressAPIRaw(request, newURL);
+    let headers = new Headers(request.headers);
+    addProxyIntegrationHeaders(headers, env);
+    headers = filterCookies(headers, (key) => key === '_iidt');
+    return handleIngressAPIRaw(request, newURL, headers);
 }
 
 function buildEnvInfo(env) {
@@ -9638,28 +9793,132 @@ function buildEnvInfo(env) {
         value: getGetResultPath(env),
         isSet: isGetResultPathSet(env),
     };
+    const proxySecret = {
+        envVarName: proxySecretVarName,
+        value: '******',
+        isSet: isProxySecretSet(env),
+    };
     return {
         workerPath,
         scriptDownloadPath,
         getResultPath,
+        proxySecret,
     };
 }
-function buildHeaders() {
+function buildHeaders$1() {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
     return headers;
 }
-function buildBody(env) {
+function buildBody$1(env) {
     return {
         success: true,
         envInfo: buildEnvInfo(env),
-        version: '1.0.0',
+        version: '1.1.0',
     };
 }
 function handleHealthCheck(env) {
+    const headers = buildHeaders$1();
+    const body = buildBody$1(env);
+    return new Response(JSON.stringify(body), {
+        status: 200,
+        statusText: 'OK',
+        headers,
+    });
+}
+
+function buildHeaders() {
+    const headers = new Headers();
+    headers.append('Content-Type', 'text/html');
+    return headers;
+}
+function addWorkerVersion() {
+    return `
+  <span>
+  Worker version: 1.1.0
+  </span>
+  `;
+}
+function addContactInformation() {
+    return `
+  <span>
+  Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
+  </span>
+  `;
+}
+function addEnvVarsInformation(env) {
+    const isWorkerPathAvailable = isWorkerPathSet(env);
+    const isScriptDownloadPathAvailable = isScriptDownloadPathSet(env);
+    const isGetResultPathAvailable = isGetResultPathSet(env);
+    const isAllVarsAvailable = isWorkerPathAvailable && isScriptDownloadPathAvailable && isGetResultPathAvailable;
+    let result = '';
+    if (!isAllVarsAvailable) {
+        result += `
+    <span>
+    The following environment variables are not defined. Please reach out our support team.
+    </span>
+    `;
+        if (!isWorkerPathAvailable) {
+            result += `
+      <span>
+      WORKER_PATH variable is not defined
+      </span>
+      `;
+        }
+        if (!isScriptDownloadPathAvailable) {
+            result += `
+      <span>
+      SCRIPT_DOWNLOAD_PATH is not defined
+      </span>
+      `;
+        }
+        if (!isGetResultPathAvailable) {
+            result += `
+      <span>
+      GET_RESULT_PATH is not defined
+      </span>
+      `;
+        }
+    }
+    else {
+        result += `
+    <span>
+    All environment variables are set
+    </span>
+    `;
+    }
+    return result;
+}
+function buildBody(env) {
+    let body = `
+  <html lang="en-US">
+  <head>
+    <meta charset="utf-8"/>
+  </head>
+  <style>
+    span {
+      display: block;
+      padding-top: 1em;
+      padding-bottom: 1em;
+      text-align: center;
+    }
+  </style>
+  <body>
+  `;
+    body += `<span>Your worker is deployed</span>`;
+    body += addWorkerVersion();
+    body += addEnvVarsInformation(env);
+    body += addContactInformation();
+    body += `  
+  </body>
+  </html>
+  `;
+    return body;
+}
+function handleStatusPage(env) {
     const headers = buildHeaders();
     const body = buildBody(env);
-    return new Response(JSON.stringify(body), {
+    return new Response(body, {
         status: 200,
         statusText: 'OK',
         headers,
@@ -9670,25 +9929,33 @@ async function handleRequest(request, env) {
     const url = new URL(request.url);
     const pathname = url.pathname;
     if (pathname === getScriptDownloadPath(env)) {
-        return handleDownloadScript(request);
+        try {
+            return await handleDownloadScript(request);
+        }
+        catch (e) {
+            return createErrorResponseForProCDN(e);
+        }
     }
     if (pathname === getGetResultPath(env)) {
-        return handleIngressAPI(request);
+        try {
+            return await handleIngressAPI(request, env);
+        }
+        catch (e) {
+            return createErrorResponseForIngress(request, e);
+        }
     }
     if (pathname === getHealthCheckPath(env)) {
         return handleHealthCheck(env);
     }
-    return createErrorResponse(`unmatched path ${pathname}`);
+    if (pathname === getStatusPagePath(env)) {
+        return handleStatusPage(env);
+    }
+    return new Response(JSON.stringify({ error: `unmatched path ${pathname}` }), { status: 404 });
 }
 
 var index = {
     async fetch(request, env) {
-        try {
-            return await handleRequest(request, env).then(returnHttpResponse);
-        }
-        catch (e) {
-            return createErrorResponse(e);
-        }
+        return handleRequest(request, env).then(returnHttpResponse);
     },
 };
 
