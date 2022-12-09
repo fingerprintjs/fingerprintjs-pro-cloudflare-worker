@@ -1,11 +1,11 @@
 import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv, getStatusPagePath } from './env'
 
-import { createErrorResponseForIngress, createErrorResponseForProCDN } from './utils'
+import { createErrorResponseForIngress, createErrorResponseForProCDN, removeTrailingSlashes } from './utils'
 import { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleStatusPage } from './handlers'
 
 export async function handleRequest(request: Request, env: WorkerEnv): Promise<Response> {
   const url = new URL(request.url)
-  const pathname = url.pathname
+  const pathname = removeTrailingSlashes(url.pathname)
 
   if (pathname === getScriptDownloadPath(env)) {
     try {

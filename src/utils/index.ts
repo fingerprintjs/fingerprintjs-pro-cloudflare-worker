@@ -9,6 +9,7 @@ import {
 import { returnHttpResponse } from './returnHttpResponse'
 import { addProxyIntegrationHeaders } from './addProxyIntegrationHeaders'
 import { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue, filterCookies } from './cookie'
+import { removeTrailingSlashes } from './routing'
 
 export {
   getDomainFromHostname,
@@ -20,6 +21,7 @@ export {
   createErrorResponseForIngress,
   createErrorResponseForProCDN,
   addProxyIntegrationHeaders,
+  removeTrailingSlashes,
   returnHttpResponse,
   filterCookies,
   fetchCacheable,
