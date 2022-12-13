@@ -8,6 +8,7 @@ import {
 } from './addTrafficMonitoring'
 import { returnHttpResponse } from './returnHttpResponse'
 import { addProxyIntegrationHeaders } from './addProxyIntegrationHeaders'
+import { getEffectiveTLDPlusOne } from './getEffectiveTLDPlusOne'
 import { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue, filterCookies } from './cookie'
 import { removeTrailingSlashes } from './routing'
 
@@ -21,6 +22,7 @@ export {
   createErrorResponseForIngress,
   createErrorResponseForProCDN,
   addProxyIntegrationHeaders,
+  getEffectiveTLDPlusOne,
   removeTrailingSlashes,
   returnHttpResponse,
   filterCookies,
