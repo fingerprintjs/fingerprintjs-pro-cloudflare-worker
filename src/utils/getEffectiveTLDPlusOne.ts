@@ -4,68 +4,44 @@ import * as Punycode from 'punycode/'
 type Rule = {
   rule: string
   suffix: string
-  punySuffix: number | string
   wildcard: boolean
   exception: boolean
 }
 
-type Result = {
+type ParsedResult = {
   input: string
-  tld: string | null | undefined
-  sld: string | null | undefined
-  domain: string | null | undefined
-  subdomain: string | null | undefined
+  tld: string | null
+  sld: string | null
+  domain: string | null
+  subdomain: string | null
   listed: boolean
 }
 
-//
-// Read rules from file.
-//
-const rules = domainSuffixList.map(function (rule) {
-  return {
-    rule: rule,
-    suffix: rule.replace(/^(\*\.|!)/, ''),
-    punySuffix: -1,
-    wildcard: rule.charAt(0) === '*',
-    exception: rule.charAt(0) === '!',
-  }
-})
-
-//
-// Check if given string ends with `suffix`.
-//
-function endsWith(str: string, suffix: string) {
+function endsWith(str: string, suffix: string): boolean {
   return str.indexOf(suffix, str.length - suffix.length) !== -1
 }
 
-//
-// Find rule for a given domain.
-//
-function findRule(domain: string) {
+function findRule(domain: string): Rule | null {
   const punyDomain = Punycode.toASCII(domain)
-  return rules?.reduce(function (memo: Rule | null, rule: Rule) {
-    if (rule.punySuffix === -1) {
-      rule.punySuffix = Punycode.toASCII(rule.suffix)
+  let foundRule: Rule | null = null
+  let foundRulePunySuffix: string | null = null
+  for (const rule of domainSuffixList) {
+    const suffix = rule.replace(/^(\*\.|!)/, '')
+    const rulePunySuffix = Punycode.toASCII(suffix)
+    if (foundRulePunySuffix != null && foundRulePunySuffix.length > rulePunySuffix.length) {
+      continue
     }
-    if (!endsWith(punyDomain, '.' + rule.punySuffix) && punyDomain !== rule.punySuffix) {
-      return memo
+
+    if (endsWith(punyDomain, '.' + rulePunySuffix) || punyDomain === rulePunySuffix) {
+      const wildcard = rule.charAt(0) === '*'
+      const exception = rule.charAt(0) === '!'
+      foundRule = { rule, suffix, wildcard, exception }
+      foundRulePunySuffix = rulePunySuffix
     }
-    // This has been commented out as it never seems to run. This is because
-    // sub tlds always appear after their parents and we never find a shorter
-    // match.
-    //if (memo) {
-    //  var memoSuffix = Punycode.toASCII(memo.suffix);
-    //  if (memoSuffix.length >= punySuffix.length) {
-    //    return memo;
-    //  }
-    //}
-    return rule
-  }, null)
+  }
+  return foundRule
 }
 
-//
-// Error codes and messages.
-//
 const errorCodes: { [key: string]: string } = {
   DOMAIN_TOO_SHORT: 'Domain name too short.',
   DOMAIN_TOO_LONG: 'Domain name too long. It should be no more than 255 chars.',
@@ -76,11 +52,6 @@ const errorCodes: { [key: string]: string } = {
   LABEL_INVALID_CHARS: 'Domain name label can only contain alphanumeric characters or dashes.',
 }
 
-//
-// Validate domain name and throw if not valid.
-//
-// From wikipedia:
-//
 // Hostnames are composed of series of labels concatenated with dots, as are all
 // domain names. Each label must be between 1 and 63 characters long, and the
 // entire hostname (including the delimiting dots) has a maximum of 255 chars.
@@ -95,18 +66,16 @@ const errorCodes: { [key: string]: string } = {
 // * http://en.wikipedia.org/wiki/Domain_name
 // * http://en.wikipedia.org/wiki/Hostname
 //
-function validate(input: string) {
-  // Before we can validate we need to take care of IDNs with unicode chars.
+function validate(input: string): string | null {
   const ascii = Punycode.toASCII(input)
 
-  if (ascii.length < 1) {
-    return 'DOMAIN_TOO_SHORT'
-  }
-  if (ascii.length > 255) {
-    return 'DOMAIN_TOO_LONG'
-  }
+  // if (ascii.length < 1) {
+  //   return 'DOMAIN_TOO_SHORT'
+  // }
+  // if (ascii.length > 255) {
+  //   return 'DOMAIN_TOO_LONG'
+  // }
 
-  // Check each part's length and allowed chars.
   const labels = ascii.split('.')
   let label
 
@@ -115,56 +84,53 @@ function validate(input: string) {
     if (!label.length) {
       return 'LABEL_TOO_SHORT'
     }
-    if (label.length > 63) {
-      return 'LABEL_TOO_LONG'
-    }
-    if (label.charAt(0) === '-') {
-      return 'LABEL_STARTS_WITH_DASH'
-    }
-    if (label.charAt(label.length - 1) === '-') {
-      return 'LABEL_ENDS_WITH_DASH'
-    }
-    if (!/^[a-z0-9\-]+$/.test(label)) {
-      return 'LABEL_INVALID_CHARS'
-    }
+    // if (label.length > 63) {
+    //   return 'LABEL_TOO_LONG'
+    // }
+    // if (label.charAt(0) === '-') {
+    //   return 'LABEL_STARTS_WITH_DASH'
+    // }
+    // if (label.charAt(label.length - 1) === '-') {
+    //   return 'LABEL_ENDS_WITH_DASH'
+    // }
+    // if (!/^[a-z0-9\-]+$/.test(label)) {
+    //   return 'LABEL_INVALID_CHARS'
+    // }
   }
 
   return null
 }
 
-//
-// Public API
-//
-
-//
-// Parse domain.
-//
-function parse(input: string): Result {
-  // Force domain to lowercase.
-  let domain = input.slice(0).toLowerCase()
-
-  // Handle FQDN.
-  // TODO: Simply remove trailing dot?
-  if (domain.charAt(domain.length - 1) === '.') {
-    domain = domain.slice(0, domain.length - 1)
+function parsePunycode(domain: string, parsed: ParsedResult): ParsedResult {
+  if (!/xn--/.test(domain)) {
+    return parsed
   }
+  if (parsed.domain) {
+    parsed.domain = Punycode.toASCII(parsed.domain)
+  }
+  if (parsed.subdomain) {
+    parsed.subdomain = Punycode.toASCII(parsed.subdomain)
+  }
+  return parsed
+}
 
-  // Validate and sanitise input.
-  const error = validate(domain)
-  if (error) {
+function parse(domain: string): ParsedResult {
+  const domainSanitized = domain.toLowerCase()
+  const validationErrorCode = validate(domain)
+  if (validationErrorCode) {
     throw new Error(
       JSON.stringify({
-        input: input,
+        input: domain,
         error: {
-          message: errorCodes[error],
-          code: error,
+          message: errorCodes[validationErrorCode],
+          code: validationErrorCode,
         },
       }),
     )
   }
 
-  const parsed: Result = {
-    input: input,
+  const parsed: ParsedResult = {
+    input: domain,
     tld: null,
     sld: null,
     domain: null,
@@ -172,43 +138,21 @@ function parse(input: string): Result {
     listed: false,
   }
 
-  const domainParts = domain.split('.')
+  const domainParts = domainSanitized.split('.')
 
-  // Non-Internet TLD
-  if (domainParts[domainParts.length - 1] === 'local') {
-    return parsed
-  }
-
-  const handlePunycode = function () {
-    if (!/xn--/.test(domain)) {
-      return parsed
-    }
-    if (parsed.domain) {
-      parsed.domain = Punycode.toASCII(parsed.domain)
-    }
-    if (parsed.subdomain) {
-      parsed.subdomain = Punycode.toASCII(parsed.subdomain)
-    }
-    return parsed
-  }
-
-  const rule = findRule(domain)
-
-  // Unlisted tld.
+  const rule = findRule(domainSanitized)
   if (!rule) {
     if (domainParts.length < 2) {
       return parsed
     }
-    parsed.tld = domainParts.pop()
-    parsed.sld = domainParts.pop()
-    parsed.domain = [parsed.sld, parsed.tld].join('.')
+    parsed.tld = domainParts.pop()!!
+    parsed.sld = domainParts.pop()!!
+    parsed.domain = `${parsed.sld}.${parsed.tld}`
     if (domainParts.length) {
-      parsed.subdomain = domainParts.pop()
+      parsed.subdomain = domainParts.pop()!!
     }
-    return handlePunycode()
+    return parsePunycode(domain, parsed)
   }
-
-  // At this point we know the public suffix is listed.
   parsed.listed = true
 
   const tldParts = rule.suffix.split('.')
@@ -221,32 +165,28 @@ function parse(input: string): Result {
   parsed.tld = tldParts.join('.')
 
   if (!privateParts.length) {
-    return handlePunycode()
+    return parsePunycode(domainSanitized, parsed)
   }
 
   if (rule.wildcard) {
-    tldParts.unshift(privateParts.pop()!!)
-    parsed.tld = tldParts.join('.')
+    parsed.tld = `${privateParts.pop()!!}.${parsed.tld}`
   }
 
   if (!privateParts.length) {
-    return handlePunycode()
+    return parsePunycode(domainSanitized, parsed)
   }
 
-  parsed.sld = privateParts.pop()
-  parsed.domain = [parsed.sld, parsed.tld].join('.')
+  parsed.sld = privateParts.pop()!!
+  parsed.domain = `${parsed.sld}.${parsed.tld}`
 
   if (privateParts.length) {
     parsed.subdomain = privateParts.join('.')
   }
 
-  return handlePunycode()
+  return parsePunycode(domainSanitized, parsed)
 }
 
-//
-// Get domain.
-//
-function get(domain: string) {
+function get(domain: string): string | null {
   if (!domain) {
     return null
   }

@@ -1,4 +1,3 @@
-import { getDomainFromHostname } from './getDomainFromHostname'
 import { getCacheControlHeaderWithMaxAgeIfLower } from './getCacheControlHeaderWithMaxAgeIfLower'
 import { createErrorResponseForIngress, createErrorResponseForProCDN } from './createErrorResponse'
 import { fetchCacheable } from './fetchCacheable'
@@ -13,7 +12,6 @@ import { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue
 import { removeTrailingSlashes } from './routing'
 
 export {
-  getDomainFromHostname,
   createCookieStringFromObject,
   getCacheControlHeaderWithMaxAgeIfLower,
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
