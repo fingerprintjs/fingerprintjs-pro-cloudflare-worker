@@ -5,7 +5,7 @@ import {
   createCookieObjectFromHeaderValue,
   createCookieStringFromObject,
   filterCookies,
-  getDomainFromHostname,
+  getEffectiveTLDPlusOne,
 } from '../utils'
 
 declare global {
@@ -26,13 +26,15 @@ function getCookieValueWithDomain(oldCookieValue: string, domain: string): strin
 
 function createResponseWithFirstPartyCookies(request: Request, response: Response) {
   const hostname = new URL(request.url).hostname
-  const eTLDPlusOneDomain = getDomainFromHostname(hostname)
+  const eTLDPlusOneDomain = getEffectiveTLDPlusOne(hostname)
   const newHeaders = new Headers(response.headers)
-  const cookiesArray: string[] = newHeaders.getAll('set-cookie')
-  newHeaders.delete('set-cookie')
-  for (const cookieValue of cookiesArray) {
-    const newCookie = getCookieValueWithDomain(cookieValue, eTLDPlusOneDomain)
-    newHeaders.append('set-cookie', newCookie)
+  if (eTLDPlusOneDomain) {
+    const cookiesArray: string[] = newHeaders.getAll('set-cookie')
+    newHeaders.delete('set-cookie')
+    for (const cookieValue of cookiesArray) {
+      const newCookie = getCookieValueWithDomain(cookieValue, eTLDPlusOneDomain)
+      newHeaders.append('set-cookie', newCookie)
+    }
   }
 
   return new Response(response.body, {
