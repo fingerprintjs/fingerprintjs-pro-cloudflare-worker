@@ -1,9 +1,10 @@
 /**
- * FingerprintJS Pro Cloudflare Worker v1.1.0 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
+ * FingerprintJS Pro Cloudflare Worker v1.1.1 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
-import { parse } from 'cookie';
+import * as Punycode from 'punycode/';
+import { parse as parse$1 } from 'cookie';
 
 const Defaults = {
     WORKER_PATH: 'cf-worker',
@@ -63,6 +64,101 @@ function getAgentScriptEndpoint(searchParams) {
 function getVisitorIdEndpoint(region) {
     const prefix = region === Defaults.REGION ? '' : `${region}.`;
     return `https://${prefix}api.fpjs.io`;
+}
+
+function setDirective(directives, directive, maxMaxAge) {
+    const directiveIndex = directives.findIndex((directivePair) => directivePair.split('=')[0].trim().toLowerCase() === directive);
+    if (directiveIndex === -1) {
+        directives.push(`${directive}=${maxMaxAge}`);
+    }
+    else {
+        const oldValue = Number(directives[directiveIndex].split('=')[1]);
+        const newValue = Math.min(maxMaxAge, oldValue);
+        directives[directiveIndex] = `${directive}=${newValue}`;
+    }
+}
+function getCacheControlHeaderWithMaxAgeIfLower(cacheControlHeaderValue, maxMaxAge) {
+    const cacheControlDirectives = cacheControlHeaderValue.split(', ');
+    setDirective(cacheControlDirectives, 'max-age', maxMaxAge);
+    setDirective(cacheControlDirectives, 's-maxage', maxMaxAge);
+    return cacheControlDirectives.join(', ');
+}
+
+function errorToString(error) {
+    try {
+        return typeof error === 'string' ? error : error instanceof Error ? error.message : String(error);
+    }
+    catch (e) {
+        return 'unknown';
+    }
+}
+function generateRandomString(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+function generateRequestUniqueId() {
+    return generateRandomString(6);
+}
+function generateRequestId() {
+    const uniqueId = generateRequestUniqueId();
+    const now = new Date().getTime();
+    return `${now}.${uniqueId}`;
+}
+function createErrorResponseForIngress(request, error) {
+    const reason = errorToString(error);
+    const errorBody = {
+        code: 'IntegrationFailed',
+        message: `An error occurred with Cloudflare worker. Reason: ${reason}`,
+    };
+    const responseBody = {
+        v: '2',
+        error: errorBody,
+        requestId: generateRequestId(),
+        products: {},
+    };
+    const requestOrigin = request.headers.get('origin') || '';
+    const responseHeaders = {
+        'Access-Control-Allow-Origin': requestOrigin,
+        'Access-Control-Allow-Credentials': 'true',
+    };
+    return new Response(JSON.stringify(responseBody), { status: 500, headers: responseHeaders });
+}
+function createErrorResponseForProCDN(error) {
+    const responseBody = { error: errorToString(error) };
+    return new Response(JSON.stringify(responseBody), { status: 500 });
+}
+
+async function fetchCacheable(request, ttl) {
+    return fetch(request, { cf: { cacheTtl: ttl } });
+}
+
+const INT_VERSION = '1.1.1';
+const PARAM_NAME = 'ii';
+function getTrafficMonitoringValue(type) {
+    return `fingerprintjs-pro-cloudflare/${INT_VERSION}/${type}`;
+}
+function addTrafficMonitoringSearchParamsForProCDN(url) {
+    url.searchParams.append(PARAM_NAME, getTrafficMonitoringValue('procdn'));
+}
+function addTrafficMonitoringSearchParamsForVisitorIdRequest(url) {
+    url.searchParams.append(PARAM_NAME, getTrafficMonitoringValue('ingress'));
+}
+
+function returnHttpResponse(oldResponse) {
+    oldResponse.headers.delete('Strict-Transport-Security');
+    return oldResponse;
+}
+
+function addProxyIntegrationHeaders(headers, env) {
+    const proxySecret = getProxySecret(env);
+    if (proxySecret) {
+        headers.set('FPJS-Proxy-Secret', proxySecret);
+        headers.set('FPJS-Proxy-Client-IP', headers.get('CF-Connecting-IP') || '');
+    }
 }
 
 var domainSuffixList = [
@@ -9532,132 +9628,162 @@ var domainSuffixList = [
 	"enterprisecloud.nu"
 ];
 
-function findETLDMatch(hostname) {
-    let currentMatch = null;
-    for (const domainSuffix of domainSuffixList) {
-        const lengthDiff = hostname.length - domainSuffix.length;
-        if (lengthDiff < 0) {
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+function findRule(domain) {
+    const punyDomain = Punycode.toASCII(domain);
+    let foundRule = null;
+    let foundRulePunySuffix = null;
+    for (const rule of domainSuffixList) {
+        const suffix = rule.replace(/^(\*\.|!)/, '');
+        const rulePunySuffix = Punycode.toASCII(suffix);
+        if (foundRulePunySuffix != null && foundRulePunySuffix.length > rulePunySuffix.length) {
             continue;
         }
-        const endsWithSuffix = hostname.substring(lengthDiff).toLowerCase() === domainSuffix.toLowerCase();
-        if (!endsWithSuffix) {
-            continue;
+        if (endsWith(punyDomain, '.' + rulePunySuffix) || punyDomain === rulePunySuffix) {
+            const wildcard = rule.charAt(0) === '*';
+            const exception = rule.charAt(0) === '!';
+            foundRule = { rule, suffix, wildcard, exception };
+            foundRulePunySuffix = rulePunySuffix;
         }
-        if (currentMatch == null || currentMatch.length < domainSuffix.length) {
-            currentMatch = domainSuffix;
+    }
+    return foundRule;
+}
+const errorCodes = {
+    DOMAIN_TOO_SHORT: 'Domain name too short.',
+    DOMAIN_TOO_LONG: 'Domain name too long. It should be no more than 255 chars.',
+    LABEL_STARTS_WITH_DASH: 'Domain name label can not start with a dash.',
+    LABEL_ENDS_WITH_DASH: 'Domain name label can not end with a dash.',
+    LABEL_TOO_LONG: 'Domain name label should be at most 63 chars long.',
+    LABEL_TOO_SHORT: 'Domain name label should be at least 1 character long.',
+    LABEL_INVALID_CHARS: 'Domain name label can only contain alphanumeric characters or dashes.',
+};
+// Hostnames are composed of series of labels concatenated with dots, as are all
+// domain names. Each label must be between 1 and 63 characters long, and the
+// entire hostname (including the delimiting dots) has a maximum of 255 chars.
+//
+// Allowed chars:
+//
+// * `a-z`
+// * `0-9`
+// * `-` but not as a starting or ending character
+// * `.` as a separator for the textual portions of a domain name
+//
+// * http://en.wikipedia.org/wiki/Domain_name
+// * http://en.wikipedia.org/wiki/Hostname
+//
+function validate(input) {
+    const ascii = Punycode.toASCII(input);
+    // if (ascii.length < 1) {
+    //   return 'DOMAIN_TOO_SHORT'
+    // }
+    // if (ascii.length > 255) {
+    //   return 'DOMAIN_TOO_LONG'
+    // }
+    const labels = ascii.split('.');
+    let label;
+    for (let i = 0; i < labels.length; ++i) {
+        label = labels[i];
+        if (!label.length) {
+            return 'LABEL_TOO_SHORT';
         }
+        // if (label.length > 63) {
+        //   return 'LABEL_TOO_LONG'
+        // }
+        // if (label.charAt(0) === '-') {
+        //   return 'LABEL_STARTS_WITH_DASH'
+        // }
+        // if (label.charAt(label.length - 1) === '-') {
+        //   return 'LABEL_ENDS_WITH_DASH'
+        // }
+        // if (!/^[a-z0-9\-]+$/.test(label)) {
+        //   return 'LABEL_INVALID_CHARS'
+        // }
     }
-    return currentMatch;
+    return null;
 }
-function getDomainFromHostname(hostname) {
-    if (!hostname) {
-        return hostname;
+function parsePunycode(domain, parsed) {
+    if (!/xn--/.test(domain)) {
+        return parsed;
     }
-    const matchingETLD = findETLDMatch(hostname);
-    if (!matchingETLD) {
-        return hostname;
+    if (parsed.domain) {
+        parsed.domain = Punycode.toASCII(parsed.domain);
     }
-    const lengthDiff = hostname.length - matchingETLD.length;
-    const partBeforeSuffix = hostname.substring(0, lengthDiff - 1);
-    const lastDotIndex = partBeforeSuffix.lastIndexOf('.');
-    if (lastDotIndex === -1) {
-        return hostname;
+    if (parsed.subdomain) {
+        parsed.subdomain = Punycode.toASCII(parsed.subdomain);
     }
-    return hostname.substring(lastDotIndex + 1);
+    return parsed;
 }
-
-function setDirective(directives, directive, maxMaxAge) {
-    const directiveIndex = directives.findIndex((directivePair) => directivePair.split('=')[0].trim().toLowerCase() === directive);
-    if (directiveIndex === -1) {
-        directives.push(`${directive}=${maxMaxAge}`);
+function parse(domain) {
+    const domainSanitized = domain.toLowerCase();
+    const validationErrorCode = validate(domain);
+    if (validationErrorCode) {
+        throw new Error(JSON.stringify({
+            input: domain,
+            error: {
+                message: errorCodes[validationErrorCode],
+                code: validationErrorCode,
+            },
+        }));
     }
-    else {
-        const oldValue = Number(directives[directiveIndex].split('=')[1]);
-        const newValue = Math.min(maxMaxAge, oldValue);
-        directives[directiveIndex] = `${directive}=${newValue}`;
+    const parsed = {
+        input: domain,
+        tld: null,
+        sld: null,
+        domain: null,
+        subdomain: null,
+        listed: false,
+    };
+    const domainParts = domainSanitized.split('.');
+    const rule = findRule(domainSanitized);
+    if (!rule) {
+        if (domainParts.length < 2) {
+            return parsed;
+        }
+        parsed.tld = domainParts.pop();
+        parsed.sld = domainParts.pop();
+        parsed.domain = `${parsed.sld}.${parsed.tld}`;
+        if (domainParts.length) {
+            parsed.subdomain = domainParts.pop();
+        }
+        return parsePunycode(domain, parsed);
     }
+    parsed.listed = true;
+    const tldParts = rule.suffix.split('.');
+    const privateParts = domainParts.slice(0, domainParts.length - tldParts.length);
+    if (rule.exception) {
+        privateParts.push(tldParts.shift());
+    }
+    parsed.tld = tldParts.join('.');
+    if (!privateParts.length) {
+        return parsePunycode(domainSanitized, parsed);
+    }
+    if (rule.wildcard) {
+        parsed.tld = `${privateParts.pop()}.${parsed.tld}`;
+    }
+    if (!privateParts.length) {
+        return parsePunycode(domainSanitized, parsed);
+    }
+    parsed.sld = privateParts.pop();
+    parsed.domain = `${parsed.sld}.${parsed.tld}`;
+    if (privateParts.length) {
+        parsed.subdomain = privateParts.join('.');
+    }
+    return parsePunycode(domainSanitized, parsed);
 }
-function getCacheControlHeaderWithMaxAgeIfLower(cacheControlHeaderValue, maxMaxAge) {
-    const cacheControlDirectives = cacheControlHeaderValue.split(', ');
-    setDirective(cacheControlDirectives, 'max-age', maxMaxAge);
-    setDirective(cacheControlDirectives, 's-maxage', maxMaxAge);
-    return cacheControlDirectives.join(', ');
+function get(domain) {
+    if (!domain) {
+        return null;
+    }
+    return parse(domain).domain;
 }
-
-function errorToString(error) {
+function getEffectiveTLDPlusOne(hostname) {
     try {
-        return typeof error === 'string' ? error : error instanceof Error ? error.message : String(error);
+        return get(hostname) || '';
     }
     catch (e) {
-        return 'unknown';
-    }
-}
-function generateRandomString(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
-}
-function generateRequestUniqueId() {
-    return generateRandomString(6);
-}
-function generateRequestId() {
-    const uniqueId = generateRequestUniqueId();
-    const now = new Date().getTime();
-    return `${now}.${uniqueId}`;
-}
-function createErrorResponseForIngress(request, error) {
-    const reason = errorToString(error);
-    const errorBody = {
-        code: 'IntegrationFailed',
-        message: `An error occurred with Cloudflare worker. Reason: ${reason}`,
-    };
-    const responseBody = {
-        v: '2',
-        error: errorBody,
-        requestId: generateRequestId(),
-        products: {},
-    };
-    const requestOrigin = request.headers.get('origin') || '';
-    const responseHeaders = {
-        'Access-Control-Allow-Origin': requestOrigin,
-        'Access-Control-Allow-Credentials': 'true',
-    };
-    return new Response(JSON.stringify(responseBody), { status: 500, headers: responseHeaders });
-}
-function createErrorResponseForProCDN(error) {
-    const responseBody = { error: errorToString(error) };
-    return new Response(JSON.stringify(responseBody), { status: 500 });
-}
-
-async function fetchCacheable(request, ttl) {
-    return fetch(request, { cf: { cacheTtl: ttl } });
-}
-
-const INT_VERSION = '1.1.0';
-const PARAM_NAME = 'ii';
-function getTrafficMonitoringValue(type) {
-    return `fingerprintjs-pro-cloudflare/${INT_VERSION}/${type}`;
-}
-function addTrafficMonitoringSearchParamsForProCDN(url) {
-    url.searchParams.append(PARAM_NAME, getTrafficMonitoringValue('procdn'));
-}
-function addTrafficMonitoringSearchParamsForVisitorIdRequest(url) {
-    url.searchParams.append(PARAM_NAME, getTrafficMonitoringValue('ingress'));
-}
-
-function returnHttpResponse(oldResponse) {
-    oldResponse.headers.delete('Strict-Transport-Security');
-    return oldResponse;
-}
-
-function addProxyIntegrationHeaders(headers, env) {
-    const proxySecret = getProxySecret(env);
-    if (proxySecret) {
-        headers.set('FPJS-Proxy-Secret', proxySecret);
-        headers.set('FPJS-Proxy-Client-IP', headers.get('CF-Connecting-IP') || '');
+        return '';
     }
 }
 
@@ -9692,7 +9818,7 @@ function createCookieStringFromObject(name, cookie) {
 }
 function filterCookies(headers, filterFunc) {
     const newHeaders = new Headers(headers);
-    const cookie = parse(headers.get('cookie') || '');
+    const cookie = parse$1(headers.get('cookie') || '');
     const filteredCookieList = [];
     for (const cookieName in cookie) {
         if (filterFunc(cookieName)) {
@@ -9704,6 +9830,10 @@ function filterCookies(headers, filterFunc) {
         newHeaders.set('cookie', filteredCookieList.join('; '));
     }
     return newHeaders;
+}
+
+function removeTrailingSlashes(str) {
+    return str.replace(/\/+$/, '');
 }
 
 function createResponseWithMaxAge(oldResponse, maxMaxAge) {
@@ -9724,8 +9854,8 @@ async function handleDownloadScript(request) {
     const newRequest = new Request(url.toString(), new Request(request, { headers: new Headers(request.headers) }));
     console.log(`Downloading script from cdnEndpoint ${url.toString()}...`);
     const workerCacheTtl = 5 * 60;
-    const maxMageAge = 60 * 60;
-    return fetchCacheable(newRequest, workerCacheTtl).then((res) => createResponseWithMaxAge(res, maxMageAge));
+    const maxMaxAge = 60 * 60;
+    return fetchCacheable(newRequest, workerCacheTtl).then((res) => createResponseWithMaxAge(res, maxMaxAge));
 }
 
 function copySearchParams(oldURL, newURL) {
@@ -9738,13 +9868,15 @@ function getCookieValueWithDomain(oldCookieValue, domain) {
 }
 function createResponseWithFirstPartyCookies(request, response) {
     const hostname = new URL(request.url).hostname;
-    const eTLDPlusOneDomain = getDomainFromHostname(hostname);
+    const eTLDPlusOneDomain = getEffectiveTLDPlusOne(hostname);
     const newHeaders = new Headers(response.headers);
-    const cookiesArray = newHeaders.getAll('set-cookie');
-    newHeaders.delete('set-cookie');
-    for (const cookieValue of cookiesArray) {
-        const newCookie = getCookieValueWithDomain(cookieValue, eTLDPlusOneDomain);
-        newHeaders.append('set-cookie', newCookie);
+    if (eTLDPlusOneDomain) {
+        const cookiesArray = newHeaders.getAll('set-cookie');
+        newHeaders.delete('set-cookie');
+        for (const cookieValue of cookiesArray) {
+            const newCookie = getCookieValueWithDomain(cookieValue, eTLDPlusOneDomain);
+            newHeaders.append('set-cookie', newCookie);
+        }
     }
     return new Response(response.body, {
         status: response.status,
@@ -9814,7 +9946,7 @@ function buildBody$1(env) {
     return {
         success: true,
         envInfo: buildEnvInfo(env),
-        version: '1.1.0',
+        version: '1.1.1',
     };
 }
 function handleHealthCheck(env) {
@@ -9835,7 +9967,7 @@ function buildHeaders() {
 function addWorkerVersion() {
     return `
   <span>
-  Worker version: 1.1.0
+  Worker version: 1.1.1
   </span>
   `;
 }
@@ -9927,7 +10059,7 @@ function handleStatusPage(env) {
 
 async function handleRequest(request, env) {
     const url = new URL(request.url);
-    const pathname = url.pathname;
+    const pathname = removeTrailingSlashes(url.pathname);
     if (pathname === getScriptDownloadPath(env)) {
         try {
             return await handleDownloadScript(request);
