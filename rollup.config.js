@@ -5,6 +5,7 @@ import dtsPlugin from 'rollup-plugin-dts'
 import licensePlugin from 'rollup-plugin-license'
 import { join } from 'path'
 import replace from '@rollup/plugin-replace'
+import nodeResolve from '@rollup/plugin-node-resolve'
 
 const { dependencies = {} } = require('./package.json')
 const packageJson = require('./package.json')
@@ -32,6 +33,7 @@ const commonInput = {
     typescript(),
     external(),
     commonBanner,
+    nodeResolve({ preferBuiltins: true }),
   ],
 }
 
