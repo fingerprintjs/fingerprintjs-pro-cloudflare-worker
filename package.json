@@ -33,6 +33,7 @@
     "@commitlint/config-conventional": "^17.0.3",
     "@playwright/test": "^1.23.2",
     "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.1",
     "@types/cookie": "^0.5.1",
