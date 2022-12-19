@@ -1,5 +1,5 @@
 /**
- * FingerprintJS Pro Cloudflare Worker v1.1.2 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
+ * FingerprintJS Pro Cloudflare Worker v1.1.3 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
@@ -136,7 +136,7 @@ async function fetchCacheable(request, ttl) {
     return fetch(request, { cf: { cacheTtl: ttl } });
 }
 
-const INT_VERSION = '1.1.2';
+const INT_VERSION = '1.1.3';
 const PARAM_NAME = 'ii';
 function getTrafficMonitoringValue(type) {
     return `fingerprintjs-pro-cloudflare/${INT_VERSION}/${type}`;
@@ -9946,7 +9946,7 @@ function buildBody$1(env) {
     return {
         success: true,
         envInfo: buildEnvInfo(env),
-        version: '1.1.2',
+        version: '1.1.3',
     };
 }
 function handleHealthCheck(env) {
@@ -9967,7 +9967,7 @@ function buildHeaders() {
 function addWorkerVersion() {
     return `
   <span>
-  Worker version: 1.1.2
+  Worker version: 1.1.3
   </span>
   `;
 }
