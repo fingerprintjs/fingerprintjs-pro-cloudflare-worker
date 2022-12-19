@@ -33,7 +33,7 @@ const commonInput = {
     typescript(),
     external(),
     commonBanner,
-    nodeResolve({ preferBuiltins: true }),
+    nodeResolve({ preferBuiltins: false }),
   ],
 }
 
