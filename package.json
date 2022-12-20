@@ -32,6 +32,7 @@
     "@commitlint/cli": "^17.0.3",
     "@commitlint/config-conventional": "^17.0.3",
     "@playwright/test": "^1.23.2",
+    "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^4.0.0",
@@ -52,7 +53,6 @@
     "rollup": "^2.70.1",
     "rollup-plugin-dts": "^4.2.0",
     "rollup-plugin-license": "^2.8.1",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
     "ts-jest": "^29.0.2",
     "typescript": "^4.5.5"
   },
