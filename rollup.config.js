@@ -1,13 +1,12 @@
 import typescript from '@rollup/plugin-typescript'
 import jsonPlugin from '@rollup/plugin-json'
-import external from 'rollup-plugin-peer-deps-external'
 import dtsPlugin from 'rollup-plugin-dts'
 import licensePlugin from 'rollup-plugin-license'
 import { join } from 'path'
 import replace from '@rollup/plugin-replace'
 import nodeResolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
 
-const { dependencies = {} } = require('./package.json')
 const packageJson = require('./package.json')
 
 const inputFile = 'src/index.ts'
@@ -31,9 +30,9 @@ const commonInput = {
     }),
     jsonPlugin(),
     typescript(),
-    external(),
     commonBanner,
     nodeResolve({ preferBuiltins: false }),
+    commonjs(),
   ],
 }
 
@@ -45,7 +44,6 @@ const commonOutput = {
 export default [
   {
     ...commonInput,
-    external: Object.keys(dependencies),
     output: [
       {
         ...commonOutput,
