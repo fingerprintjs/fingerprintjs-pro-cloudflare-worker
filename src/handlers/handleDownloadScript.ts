@@ -26,7 +26,7 @@ export async function handleDownloadScript(request: Request) {
 
   console.log(`Downloading script from cdnEndpoint ${url.toString()}...`)
   const workerCacheTtl = 5 * 60
-  const maxMageAge = 60 * 60
+  const maxMaxAge = 60 * 60
 
-  return fetchCacheable(newRequest, workerCacheTtl).then((res) => createResponseWithMaxAge(res, maxMageAge))
+  return fetchCacheable(newRequest, workerCacheTtl).then((res) => createResponseWithMaxAge(res, maxMaxAge))
 }

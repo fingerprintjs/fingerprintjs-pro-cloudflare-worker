@@ -1,14 +1,14 @@
 const INT_VERSION = '__current_worker_version__'
-const HEADER_NAME = 'ii'
+const PARAM_NAME = 'ii'
 
-function getHeaderValue(type: 'procdn' | 'ingress'): string {
+function getTrafficMonitoringValue(type: 'procdn' | 'ingress'): string {
   return `fingerprintjs-pro-cloudflare/${INT_VERSION}/${type}`
 }
 
 export function addTrafficMonitoringSearchParamsForProCDN(url: URL) {
-  url.searchParams.append(HEADER_NAME, getHeaderValue('procdn'))
+  url.searchParams.append(PARAM_NAME, getTrafficMonitoringValue('procdn'))
 }
 
 export function addTrafficMonitoringSearchParamsForVisitorIdRequest(url: URL) {
-  url.searchParams.append(HEADER_NAME, getHeaderValue('ingress'))
+  url.searchParams.append(PARAM_NAME, getTrafficMonitoringValue('ingress'))
 }

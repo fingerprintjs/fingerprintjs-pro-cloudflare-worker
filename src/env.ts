@@ -2,12 +2,14 @@ export type WorkerEnv = {
   WORKER_PATH: string | null
   AGENT_SCRIPT_DOWNLOAD_PATH: string | null
   GET_RESULT_PATH: string | null
+  PROXY_SECRET: string | null
 }
 
 const Defaults: WorkerEnv & Record<string, string> = {
   WORKER_PATH: 'cf-worker',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
   GET_RESULT_PATH: 'getResult',
+  PROXY_SECRET: '',
   REGION: 'us',
   AGENT_VERSION: '3',
 }
@@ -32,7 +34,7 @@ export const agentScriptDownloadPathVarName = 'AGENT_SCRIPT_DOWNLOAD_PATH'
 const getAgentPathVar = getVarOrDefault(agentScriptDownloadPathVarName, Defaults)
 export const isScriptDownloadPathSet = isVarSet(agentScriptDownloadPathVarName)
 
-export function getScriptDownloadPath(env: WorkerEnv) {
+export function getScriptDownloadPath(env: WorkerEnv): string {
   const agentPathVar = getAgentPathVar(env)
   return `/${getWorkerPathVar(env)}/${agentPathVar}`
 }
@@ -41,17 +43,29 @@ export const getResultPathVarName = 'GET_RESULT_PATH'
 const getGetResultPathVar = getVarOrDefault(getResultPathVarName, Defaults)
 export const isGetResultPathSet = isVarSet(getResultPathVarName)
 
-export function getGetResultPath(env: WorkerEnv) {
+export function getGetResultPath(env: WorkerEnv): string {
   const getResultPathVar = getGetResultPathVar(env)
   return `/${getWorkerPathVar(env)}/${getResultPathVar}`
 }
 
-export function getHealthCheckPath(env: WorkerEnv) {
+export const proxySecretVarName = 'PROXY_SECRET'
+const getProxySecretVar = getVarOrDefault(proxySecretVarName, Defaults)
+export const isProxySecretSet = isVarSet(proxySecretVarName)
+
+export function getProxySecret(env: WorkerEnv): string {
+  return getProxySecretVar(env)
+}
+
+export function getHealthCheckPath(env: WorkerEnv): string {
   return `/${getWorkerPathVar(env)}/health`
 }
 
-export function getAgentScriptEndpoint(searchParams: URLSearchParams) {
-  const apiKey = searchParams.get('apiKey') || Defaults.API_KEY
+export function getStatusPagePath(env: WorkerEnv): string {
+  return `/${getWorkerPathVar(env)}/status`
+}
+
+export function getAgentScriptEndpoint(searchParams: URLSearchParams): string {
+  const apiKey = searchParams.get('apiKey')
   const apiVersion = searchParams.get('version') || Defaults.AGENT_VERSION
 
   const base = `https://fpcdn.io/v${apiVersion}/${apiKey}`

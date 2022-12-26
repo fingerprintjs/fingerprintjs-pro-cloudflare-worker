@@ -10,6 +10,9 @@
 <a href="https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker">
   <img src="https://img.shields.io/github/v/release/fingerprintjs/fingerprintjs-pro-cloudflare-worker" alt="Current NPM version">
 </a>
+<a href="https://fingerprintjs.github.io/fingerprintjs-pro-cloudflare-worker/">
+  <img src="https://raw.githubusercontent.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/gh-pages/badges.svg" alt="coverage">
+</a>
 <a href="https://opensource.org/licenses/MIT">
   <img src="https://img.shields.io/:license-mit-blue.svg" alt="MIT license">
 </a>

@@ -26,10 +26,15 @@ jobs:
 
     steps:
       - name: Checkout develop branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: develop
           fetch-depth: 0
+
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.node-version'
 
       - name: Set git settings
         uses: fregante/setup-git-user@2e28d51939d2a84005a917d2f844090637f435f8 # commit hash = v1.1.0
@@ -70,17 +75,18 @@ jobs:
         with:
           tag: v${{steps.version.outputs.prop}}
           name: Release ${{steps.version.outputs.prop}}
-
-      - name: Create Pull Request from develop to main
-        id: create_pr
-        uses: devops-infra/action-pull-request@a671d0a772ef71131f970e6f02f1e11334f99eab # commit hash = v0.5.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          source_branch: develop
-          target_branch: main
-          title: New version of scripts v${{ steps.version.outputs.prop }}
-          body: New version of scripts v${{ steps.version.outputs.prop }}
-
-      - name: Check PR outputs
-        if: ${{ steps.create_pr.outputs.url }}
-        run: echo "Pull Request URL - ${{ steps.create_pr.outputs.url }}"
+#       Comment out below part because PRs created by bots don't trigger GitHub checks and the PR gets stuck
+#       More info: https://github.com/peter-evans/create-pull-request/issues/48
+#      - name: Create Pull Request from develop to main
+#        id: create_pr
+#        uses: devops-infra/action-pull-request@a671d0a772ef71131f970e6f02f1e11334f99eab # commit hash = v0.5.0
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          source_branch: develop
+#          target_branch: main
+#          title: New version of scripts v${{ steps.version.outputs.prop }}
+#          body: New version of scripts v${{ steps.version.outputs.prop }}
+#
+#      - name: Check PR outputs
+#        if: ${{ steps.create_pr.outputs.url }}
+#        run: echo "Pull Request URL - ${{ steps.create_pr.outputs.url }}"

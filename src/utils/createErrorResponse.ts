@@ -1,4 +1,4 @@
-export interface Response {
+export interface FPJSResponse {
   v: '2'
   notifications?: Notification[]
   requestId: string
@@ -12,7 +12,7 @@ export interface Notification {
 }
 
 export interface ErrorData {
-  code?: 'Failed'
+  code?: 'IntegrationFailed'
   message: string
 }
 
@@ -34,26 +34,36 @@ function generateRandomString(length: number): string {
 }
 
 function generateRequestUniqueId(): string {
-  return generateRandomString(2)
+  return generateRandomString(6)
 }
 
 function generateRequestId(): string {
   const uniqueId = generateRequestUniqueId()
   const now = new Date().getTime()
-  return `${now}.cfi-${uniqueId}`
+  return `${now}.${uniqueId}`
 }
 
-export function createErrorResponse(error: string | Error | unknown) {
+export function createErrorResponseForIngress(request: Request, error: string | Error | unknown): Response {
   const reason = errorToString(error)
   const errorBody: ErrorData = {
-    code: 'Failed',
+    code: 'IntegrationFailed',
     message: `An error occurred with Cloudflare worker. Reason: ${reason}`,
   }
-  const responseBody: Response = {
+  const responseBody: FPJSResponse = {
     v: '2',
     error: errorBody,
     requestId: generateRequestId(),
     products: {},
   }
+  const requestOrigin = request.headers.get('origin') || ''
+  const responseHeaders: HeadersInit = {
+    'Access-Control-Allow-Origin': requestOrigin,
+    'Access-Control-Allow-Credentials': 'true',
+  }
+  return new Response(JSON.stringify(responseBody), { status: 500, headers: responseHeaders })
+}
+
+export function createErrorResponseForProCDN(error: string | Error | unknown): Response {
+  const responseBody = { error: errorToString(error) }
   return new Response(JSON.stringify(responseBody), { status: 500 })
 }

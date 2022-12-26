@@ -1,5 +1,5 @@
 /**
- * FingerprintJS Pro Cloudflare Worker v1.0.0 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
+ * FingerprintJS Pro Cloudflare Worker v1.1.4 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
@@ -7,6 +7,7 @@ const Defaults = {
     WORKER_PATH: 'cf-worker',
     AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
     GET_RESULT_PATH: 'getResult',
+    PROXY_SECRET: '',
     REGION: 'us',
     AGENT_VERSION: '3',
 };
@@ -37,11 +38,20 @@ function getGetResultPath(env) {
     const getResultPathVar = getGetResultPathVar(env);
     return `/${getWorkerPathVar(env)}/${getResultPathVar}`;
 }
+const proxySecretVarName = 'PROXY_SECRET';
+const getProxySecretVar = getVarOrDefault(proxySecretVarName, Defaults);
+const isProxySecretSet = isVarSet(proxySecretVarName);
+function getProxySecret(env) {
+    return getProxySecretVar(env);
+}
 function getHealthCheckPath(env) {
     return `/${getWorkerPathVar(env)}/health`;
 }
+function getStatusPagePath(env) {
+    return `/${getWorkerPathVar(env)}/status`;
+}
 function getAgentScriptEndpoint(searchParams) {
-    const apiKey = searchParams.get('apiKey') || Defaults.API_KEY;
+    const apiKey = searchParams.get('apiKey');
     const apiVersion = searchParams.get('version') || Defaults.AGENT_VERSION;
     const base = `https://fpcdn.io/v${apiVersion}/${apiKey}`;
     const loaderVersion = searchParams.get('loaderVersion');
@@ -51,6 +61,101 @@ function getAgentScriptEndpoint(searchParams) {
 function getVisitorIdEndpoint(region) {
     const prefix = region === Defaults.REGION ? '' : `${region}.`;
     return `https://${prefix}api.fpjs.io`;
+}
+
+function setDirective(directives, directive, maxMaxAge) {
+    const directiveIndex = directives.findIndex((directivePair) => directivePair.split('=')[0].trim().toLowerCase() === directive);
+    if (directiveIndex === -1) {
+        directives.push(`${directive}=${maxMaxAge}`);
+    }
+    else {
+        const oldValue = Number(directives[directiveIndex].split('=')[1]);
+        const newValue = Math.min(maxMaxAge, oldValue);
+        directives[directiveIndex] = `${directive}=${newValue}`;
+    }
+}
+function getCacheControlHeaderWithMaxAgeIfLower(cacheControlHeaderValue, maxMaxAge) {
+    const cacheControlDirectives = cacheControlHeaderValue.split(', ');
+    setDirective(cacheControlDirectives, 'max-age', maxMaxAge);
+    setDirective(cacheControlDirectives, 's-maxage', maxMaxAge);
+    return cacheControlDirectives.join(', ');
+}
+
+function errorToString(error) {
+    try {
+        return typeof error === 'string' ? error : error instanceof Error ? error.message : String(error);
+    }
+    catch (e) {
+        return 'unknown';
+    }
+}
+function generateRandomString(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+function generateRequestUniqueId() {
+    return generateRandomString(6);
+}
+function generateRequestId() {
+    const uniqueId = generateRequestUniqueId();
+    const now = new Date().getTime();
+    return `${now}.${uniqueId}`;
+}
+function createErrorResponseForIngress(request, error) {
+    const reason = errorToString(error);
+    const errorBody = {
+        code: 'IntegrationFailed',
+        message: `An error occurred with Cloudflare worker. Reason: ${reason}`,
+    };
+    const responseBody = {
+        v: '2',
+        error: errorBody,
+        requestId: generateRequestId(),
+        products: {},
+    };
+    const requestOrigin = request.headers.get('origin') || '';
+    const responseHeaders = {
+        'Access-Control-Allow-Origin': requestOrigin,
+        'Access-Control-Allow-Credentials': 'true',
+    };
+    return new Response(JSON.stringify(responseBody), { status: 500, headers: responseHeaders });
+}
+function createErrorResponseForProCDN(error) {
+    const responseBody = { error: errorToString(error) };
+    return new Response(JSON.stringify(responseBody), { status: 500 });
+}
+
+async function fetchCacheable(request, ttl) {
+    return fetch(request, { cf: { cacheTtl: ttl } });
+}
+
+const INT_VERSION = '1.1.4';
+const PARAM_NAME = 'ii';
+function getTrafficMonitoringValue(type) {
+    return `fingerprintjs-pro-cloudflare/${INT_VERSION}/${type}`;
+}
+function addTrafficMonitoringSearchParamsForProCDN(url) {
+    url.searchParams.append(PARAM_NAME, getTrafficMonitoringValue('procdn'));
+}
+function addTrafficMonitoringSearchParamsForVisitorIdRequest(url) {
+    url.searchParams.append(PARAM_NAME, getTrafficMonitoringValue('ingress'));
+}
+
+function returnHttpResponse(oldResponse) {
+    oldResponse.headers.delete('Strict-Transport-Security');
+    return oldResponse;
+}
+
+function addProxyIntegrationHeaders(headers, env) {
+    const proxySecret = getProxySecret(env);
+    if (proxySecret) {
+        headers.set('FPJS-Proxy-Secret', proxySecret);
+        headers.set('FPJS-Proxy-Client-IP', headers.get('CF-Connecting-IP') || '');
+    }
 }
 
 var domainSuffixList = [
@@ -1078,6 +1183,11 @@ var domainSuffixList = [
 	"muni.il",
 	"net.il",
 	"org.il",
+	"ישראל",
+	"אקדמיה.ישראל",
+	"ישוב.ישראל",
+	"צהל.ישראל",
+	"ממשל.ישראל",
 	"im",
 	"ac.im",
 	"co.im",
@@ -1089,18 +1199,47 @@ var domainSuffixList = [
 	"tt.im",
 	"tv.im",
 	"in",
-	"co.in",
-	"firm.in",
-	"net.in",
-	"org.in",
-	"gen.in",
-	"ind.in",
-	"nic.in",
+	"5g.in",
+	"6g.in",
 	"ac.in",
+	"ai.in",
+	"am.in",
+	"bihar.in",
+	"biz.in",
+	"business.in",
+	"ca.in",
+	"cn.in",
+	"co.in",
+	"com.in",
+	"coop.in",
+	"cs.in",
+	"delhi.in",
+	"dr.in",
 	"edu.in",
-	"res.in",
+	"er.in",
+	"firm.in",
+	"gen.in",
 	"gov.in",
+	"gujarat.in",
+	"ind.in",
+	"info.in",
+	"int.in",
+	"internet.in",
+	"io.in",
+	"me.in",
 	"mil.in",
+	"net.in",
+	"nic.in",
+	"org.in",
+	"pg.in",
+	"post.in",
+	"pro.in",
+	"res.in",
+	"travel.in",
+	"tv.in",
+	"uk.in",
+	"up.in",
+	"us.in",
 	"info",
 	"int",
 	"eu.int",
@@ -6375,7 +6514,6 @@ var domainSuffixList = [
 	"broker",
 	"brother",
 	"brussels",
-	"bugatti",
 	"build",
 	"builders",
 	"business",
@@ -6390,7 +6528,6 @@ var domainSuffixList = [
 	"cam",
 	"camera",
 	"camp",
-	"cancerresearch",
 	"canon",
 	"capetown",
 	"capital",
@@ -7395,6 +7532,7 @@ var domainSuffixList = [
 	"611.to",
 	"graphox.us",
 	"*.devcdnaccesso.com",
+	"*.on-acorn.io",
 	"adobeaemcloud.com",
 	"*.dev.adobeaemcloud.com",
 	"hlx.live",
@@ -7417,6 +7555,102 @@ var domainSuffixList = [
 	"*.compute-1.amazonaws.com",
 	"*.compute.amazonaws.com.cn",
 	"us-east-1.amazonaws.com",
+	"s3.cn-north-1.amazonaws.com.cn",
+	"s3.dualstack.ap-northeast-1.amazonaws.com",
+	"s3.dualstack.ap-northeast-2.amazonaws.com",
+	"s3.ap-northeast-2.amazonaws.com",
+	"s3-website.ap-northeast-2.amazonaws.com",
+	"s3.dualstack.ap-south-1.amazonaws.com",
+	"s3.ap-south-1.amazonaws.com",
+	"s3-website.ap-south-1.amazonaws.com",
+	"s3.dualstack.ap-southeast-1.amazonaws.com",
+	"s3.dualstack.ap-southeast-2.amazonaws.com",
+	"s3.dualstack.ca-central-1.amazonaws.com",
+	"s3.ca-central-1.amazonaws.com",
+	"s3-website.ca-central-1.amazonaws.com",
+	"s3.dualstack.eu-central-1.amazonaws.com",
+	"s3.eu-central-1.amazonaws.com",
+	"s3-website.eu-central-1.amazonaws.com",
+	"s3.dualstack.eu-west-1.amazonaws.com",
+	"s3.dualstack.eu-west-2.amazonaws.com",
+	"s3.eu-west-2.amazonaws.com",
+	"s3-website.eu-west-2.amazonaws.com",
+	"s3.dualstack.eu-west-3.amazonaws.com",
+	"s3.eu-west-3.amazonaws.com",
+	"s3-website.eu-west-3.amazonaws.com",
+	"s3.amazonaws.com",
+	"s3-ap-northeast-1.amazonaws.com",
+	"s3-ap-northeast-2.amazonaws.com",
+	"s3-ap-south-1.amazonaws.com",
+	"s3-ap-southeast-1.amazonaws.com",
+	"s3-ap-southeast-2.amazonaws.com",
+	"s3-ca-central-1.amazonaws.com",
+	"s3-eu-central-1.amazonaws.com",
+	"s3-eu-west-1.amazonaws.com",
+	"s3-eu-west-2.amazonaws.com",
+	"s3-eu-west-3.amazonaws.com",
+	"s3-external-1.amazonaws.com",
+	"s3-fips-us-gov-west-1.amazonaws.com",
+	"s3-sa-east-1.amazonaws.com",
+	"s3-us-east-2.amazonaws.com",
+	"s3-us-gov-west-1.amazonaws.com",
+	"s3-us-west-1.amazonaws.com",
+	"s3-us-west-2.amazonaws.com",
+	"s3-website-ap-northeast-1.amazonaws.com",
+	"s3-website-ap-southeast-1.amazonaws.com",
+	"s3-website-ap-southeast-2.amazonaws.com",
+	"s3-website-eu-west-1.amazonaws.com",
+	"s3-website-sa-east-1.amazonaws.com",
+	"s3-website-us-east-1.amazonaws.com",
+	"s3-website-us-west-1.amazonaws.com",
+	"s3-website-us-west-2.amazonaws.com",
+	"s3.dualstack.sa-east-1.amazonaws.com",
+	"s3.dualstack.us-east-1.amazonaws.com",
+	"s3.dualstack.us-east-2.amazonaws.com",
+	"s3.us-east-2.amazonaws.com",
+	"s3-website.us-east-2.amazonaws.com",
+	"vfs.cloud9.af-south-1.amazonaws.com",
+	"webview-assets.cloud9.af-south-1.amazonaws.com",
+	"vfs.cloud9.ap-east-1.amazonaws.com",
+	"webview-assets.cloud9.ap-east-1.amazonaws.com",
+	"vfs.cloud9.ap-northeast-1.amazonaws.com",
+	"webview-assets.cloud9.ap-northeast-1.amazonaws.com",
+	"vfs.cloud9.ap-northeast-2.amazonaws.com",
+	"webview-assets.cloud9.ap-northeast-2.amazonaws.com",
+	"vfs.cloud9.ap-northeast-3.amazonaws.com",
+	"webview-assets.cloud9.ap-northeast-3.amazonaws.com",
+	"vfs.cloud9.ap-south-1.amazonaws.com",
+	"webview-assets.cloud9.ap-south-1.amazonaws.com",
+	"vfs.cloud9.ap-southeast-1.amazonaws.com",
+	"webview-assets.cloud9.ap-southeast-1.amazonaws.com",
+	"vfs.cloud9.ap-southeast-2.amazonaws.com",
+	"webview-assets.cloud9.ap-southeast-2.amazonaws.com",
+	"vfs.cloud9.ca-central-1.amazonaws.com",
+	"webview-assets.cloud9.ca-central-1.amazonaws.com",
+	"vfs.cloud9.eu-central-1.amazonaws.com",
+	"webview-assets.cloud9.eu-central-1.amazonaws.com",
+	"vfs.cloud9.eu-north-1.amazonaws.com",
+	"webview-assets.cloud9.eu-north-1.amazonaws.com",
+	"vfs.cloud9.eu-south-1.amazonaws.com",
+	"webview-assets.cloud9.eu-south-1.amazonaws.com",
+	"vfs.cloud9.eu-west-1.amazonaws.com",
+	"webview-assets.cloud9.eu-west-1.amazonaws.com",
+	"vfs.cloud9.eu-west-2.amazonaws.com",
+	"webview-assets.cloud9.eu-west-2.amazonaws.com",
+	"vfs.cloud9.eu-west-3.amazonaws.com",
+	"webview-assets.cloud9.eu-west-3.amazonaws.com",
+	"vfs.cloud9.me-south-1.amazonaws.com",
+	"webview-assets.cloud9.me-south-1.amazonaws.com",
+	"vfs.cloud9.sa-east-1.amazonaws.com",
+	"webview-assets.cloud9.sa-east-1.amazonaws.com",
+	"vfs.cloud9.us-east-1.amazonaws.com",
+	"webview-assets.cloud9.us-east-1.amazonaws.com",
+	"vfs.cloud9.us-east-2.amazonaws.com",
+	"webview-assets.cloud9.us-east-2.amazonaws.com",
+	"vfs.cloud9.us-west-1.amazonaws.com",
+	"webview-assets.cloud9.us-west-1.amazonaws.com",
+	"vfs.cloud9.us-west-2.amazonaws.com",
+	"webview-assets.cloud9.us-west-2.amazonaws.com",
 	"cn-north-1.eb.amazonaws.com.cn",
 	"cn-northwest-1.eb.amazonaws.com.cn",
 	"elasticbeanstalk.com",
@@ -7437,63 +7671,11 @@ var domainSuffixList = [
 	"us-gov-west-1.elasticbeanstalk.com",
 	"us-west-1.elasticbeanstalk.com",
 	"us-west-2.elasticbeanstalk.com",
-	"*.elb.amazonaws.com",
 	"*.elb.amazonaws.com.cn",
+	"*.elb.amazonaws.com",
 	"awsglobalaccelerator.com",
-	"s3.amazonaws.com",
-	"s3-ap-northeast-1.amazonaws.com",
-	"s3-ap-northeast-2.amazonaws.com",
-	"s3-ap-south-1.amazonaws.com",
-	"s3-ap-southeast-1.amazonaws.com",
-	"s3-ap-southeast-2.amazonaws.com",
-	"s3-ca-central-1.amazonaws.com",
-	"s3-eu-central-1.amazonaws.com",
-	"s3-eu-west-1.amazonaws.com",
-	"s3-eu-west-2.amazonaws.com",
-	"s3-eu-west-3.amazonaws.com",
-	"s3-external-1.amazonaws.com",
-	"s3-fips-us-gov-west-1.amazonaws.com",
-	"s3-sa-east-1.amazonaws.com",
-	"s3-us-gov-west-1.amazonaws.com",
-	"s3-us-east-2.amazonaws.com",
-	"s3-us-west-1.amazonaws.com",
-	"s3-us-west-2.amazonaws.com",
-	"s3.ap-northeast-2.amazonaws.com",
-	"s3.ap-south-1.amazonaws.com",
-	"s3.cn-north-1.amazonaws.com.cn",
-	"s3.ca-central-1.amazonaws.com",
-	"s3.eu-central-1.amazonaws.com",
-	"s3.eu-west-2.amazonaws.com",
-	"s3.eu-west-3.amazonaws.com",
-	"s3.us-east-2.amazonaws.com",
-	"s3.dualstack.ap-northeast-1.amazonaws.com",
-	"s3.dualstack.ap-northeast-2.amazonaws.com",
-	"s3.dualstack.ap-south-1.amazonaws.com",
-	"s3.dualstack.ap-southeast-1.amazonaws.com",
-	"s3.dualstack.ap-southeast-2.amazonaws.com",
-	"s3.dualstack.ca-central-1.amazonaws.com",
-	"s3.dualstack.eu-central-1.amazonaws.com",
-	"s3.dualstack.eu-west-1.amazonaws.com",
-	"s3.dualstack.eu-west-2.amazonaws.com",
-	"s3.dualstack.eu-west-3.amazonaws.com",
-	"s3.dualstack.sa-east-1.amazonaws.com",
-	"s3.dualstack.us-east-1.amazonaws.com",
-	"s3.dualstack.us-east-2.amazonaws.com",
-	"s3-website-us-east-1.amazonaws.com",
-	"s3-website-us-west-1.amazonaws.com",
-	"s3-website-us-west-2.amazonaws.com",
-	"s3-website-ap-northeast-1.amazonaws.com",
-	"s3-website-ap-southeast-1.amazonaws.com",
-	"s3-website-ap-southeast-2.amazonaws.com",
-	"s3-website-eu-west-1.amazonaws.com",
-	"s3-website-sa-east-1.amazonaws.com",
-	"s3-website.ap-northeast-2.amazonaws.com",
-	"s3-website.ap-south-1.amazonaws.com",
-	"s3-website.ca-central-1.amazonaws.com",
-	"s3-website.eu-central-1.amazonaws.com",
-	"s3-website.eu-west-2.amazonaws.com",
-	"s3-website.eu-west-3.amazonaws.com",
-	"s3-website.us-east-2.amazonaws.com",
+	"eero.online",
+	"eero-stage.online",
 	"t3l3p0rt.net",
 	"tele.amune.org",
 	"apigee.io",
@@ -7535,6 +7717,7 @@ var domainSuffixList = [
 	"theshop.jp",
 	"shopselect.net",
 	"base.shop",
+	"beagleboard.io",
 	"*.beget.app",
 	"betainabox.com",
 	"bnr.la",
@@ -8038,8 +8221,8 @@ var domainSuffixList = [
 	"blogsite.xyz",
 	"dynv6.net",
 	"e4.cz",
-	"eero.online",
-	"eero-stage.online",
+	"easypanel.app",
+	"easypanel.host",
 	"elementor.cloud",
 	"elementor.cool",
 	"en-root.fr",
@@ -8207,6 +8390,7 @@ var domainSuffixList = [
 	"a.ssl.fastly.net",
 	"b.ssl.fastly.net",
 	"global.ssl.fastly.net",
+	"*.user.fm",
 	"fastvps-server.com",
 	"fastvps.host",
 	"myfast.host",
@@ -8242,6 +8426,10 @@ var domainSuffixList = [
 	"id.forgerock.io",
 	"framer.app",
 	"framercanvas.com",
+	"framer.media",
+	"framer.photos",
+	"framer.website",
+	"framer.wiki",
 	"*.frusky.de",
 	"ravpage.co.il",
 	"0e.vc",
@@ -8799,6 +8987,7 @@ var domainSuffixList = [
 	"cloudapp.net",
 	"azurestaticapps.net",
 	"1.azurestaticapps.net",
+	"2.azurestaticapps.net",
 	"centralus.azurestaticapps.net",
 	"eastasia.azurestaticapps.net",
 	"eastus2.azurestaticapps.net",
@@ -8826,22 +9015,6 @@ var domainSuffixList = [
 	"yali.mythic-beasts.com",
 	"cust.retrosnub.co.uk",
 	"ui.nabu.casa",
-	"pony.club",
-	"of.fashion",
-	"in.london",
-	"of.london",
-	"from.marketing",
-	"with.marketing",
-	"for.men",
-	"repair.men",
-	"and.mom",
-	"for.mom",
-	"for.one",
-	"under.one",
-	"for.sale",
-	"that.win",
-	"from.work",
-	"to.work",
 	"cloud.nospamproxy.com",
 	"netlify.app",
 	"4u.com",
@@ -8976,7 +9149,26 @@ var domainSuffixList = [
 	"omg.lol",
 	"cloudycluster.net",
 	"omniwe.site",
+	"123hjemmeside.dk",
+	"123hjemmeside.no",
+	"123homepage.it",
+	"123kotisivu.fi",
+	"123minsida.se",
+	"123miweb.es",
+	"123paginaweb.pt",
+	"123sait.ru",
+	"123siteweb.fr",
+	"123webseite.at",
+	"123webseite.de",
+	"123website.be",
+	"123website.ch",
+	"123website.lu",
+	"123website.nl",
 	"service.one",
+	"simplesite.com",
+	"simplesite.com.br",
+	"simplesite.gr",
+	"simplesite.pl",
 	"nid.io",
 	"opensocial.site",
 	"opencraft.hosting",
@@ -9070,6 +9262,8 @@ var domainSuffixList = [
 	"rhcloud.com",
 	"app.render.com",
 	"onrender.com",
+	"firewalledreplit.co",
+	"id.firewalledreplit.co",
 	"repl.co",
 	"id.repl.co",
 	"repl.run",
@@ -9164,6 +9358,7 @@ var domainSuffixList = [
 	"beta.bounty-full.com",
 	"small-web.org",
 	"vp4.me",
+	"streamlitapp.com",
 	"try-snowplow.com",
 	"srht.site",
 	"stackhero-network.com",
@@ -9430,122 +9625,580 @@ var domainSuffixList = [
 	"enterprisecloud.nu"
 ];
 
-function getDomainFromHostname(hostname) {
-    if (!hostname) {
-        return hostname;
-    }
-    for (const domainSuffix of domainSuffixList) {
-        const lengthDiff = hostname.length - domainSuffix.length;
-        if (lengthDiff < 0) {
-            continue;
-        }
-        const endsWithSuffix = hostname.substring(lengthDiff).toLowerCase() === domainSuffix.toLowerCase();
-        if (!endsWithSuffix) {
-            continue;
-        }
-        const partBeforeSuffix = hostname.substring(0, lengthDiff - 1);
-        const lastDotIndex = partBeforeSuffix.lastIndexOf('.');
-        if (lastDotIndex === -1) {
-            return hostname;
-        }
-        return hostname.substring(lastDotIndex + 1);
-    }
-    return hostname;
+/** Highest positive signed 32-bit float value */
+const maxInt = 2147483647; // aka. 0x7FFFFFFF or 2^31-1
+
+/** Bootstring parameters */
+const base = 36;
+const tMin = 1;
+const tMax = 26;
+const skew = 38;
+const damp = 700;
+const initialBias = 72;
+const initialN = 128; // 0x80
+const delimiter = '-'; // '\x2D'
+const regexNonASCII = /[^\0-\x7E]/; // non-ASCII chars
+const regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g; // RFC 3490 separators
+
+/** Error messages */
+const errors = {
+	'overflow': 'Overflow: input needs wider integers to process',
+	'not-basic': 'Illegal input >= 0x80 (not a basic code point)',
+	'invalid-input': 'Invalid input'
+};
+
+/** Convenience shortcuts */
+const baseMinusTMin = base - tMin;
+const floor = Math.floor;
+const stringFromCharCode = String.fromCharCode;
+
+/*--------------------------------------------------------------------------*/
+
+/**
+ * A generic error utility function.
+ * @private
+ * @param {String} type The error type.
+ * @returns {Error} Throws a `RangeError` with the applicable error message.
+ */
+function error(type) {
+	throw new RangeError(errors[type]);
 }
 
-function createCookieStringFromObject(name, value) {
-    const flags = Object.entries(value).filter(([k]) => k !== name && k !== 'value');
-    const nameValue = `${name}=${value.value}`;
-    const rest = flags.map(([k, v]) => (v ? `${k}=${v}` : k));
-    return [nameValue, ...rest].join('; ');
+/**
+ * A generic `Array#map` utility function.
+ * @private
+ * @param {Array} array The array to iterate over.
+ * @param {Function} callback The function that gets called for every array
+ * item.
+ * @returns {Array} A new array of values returned by the callback function.
+ */
+function map(array, fn) {
+	const result = [];
+	let length = array.length;
+	while (length--) {
+		result[length] = fn(array[length]);
+	}
+	return result;
 }
 
-function getCacheControlHeaderWithMaxAgeIfLower(cacheControlHeaderValue, maxMaxAge) {
-    const cacheControlDirectives = cacheControlHeaderValue.split(', ');
-    const maxAgeIndex = cacheControlDirectives.findIndex((directive) => directive.split('=')[0].trim().toLowerCase() === 'max-age');
-    if (maxAgeIndex === -1) {
-        cacheControlDirectives.push(`max-age=${maxMaxAge}`);
+/**
+ * A simple `Array#map`-like wrapper to work with domain name strings or email
+ * addresses.
+ * @private
+ * @param {String} domain The domain name or email address.
+ * @param {Function} callback The function that gets called for every
+ * character.
+ * @returns {Array} A new string of characters returned by the callback
+ * function.
+ */
+function mapDomain(string, fn) {
+	const parts = string.split('@');
+	let result = '';
+	if (parts.length > 1) {
+		// In email addresses, only the domain name should be punycoded. Leave
+		// the local part (i.e. everything up to `@`) intact.
+		result = parts[0] + '@';
+		string = parts[1];
+	}
+	// Avoid `split(regex)` for IE8 compatibility. See #17.
+	string = string.replace(regexSeparators, '\x2E');
+	const labels = string.split('.');
+	const encoded = map(labels, fn).join('.');
+	return result + encoded;
+}
+
+/**
+ * Creates an array containing the numeric code points of each Unicode
+ * character in the string. While JavaScript uses UCS-2 internally,
+ * this function will convert a pair of surrogate halves (each of which
+ * UCS-2 exposes as separate characters) into a single code point,
+ * matching UTF-16.
+ * @see `punycode.ucs2.encode`
+ * @see <https://mathiasbynens.be/notes/javascript-encoding>
+ * @memberOf punycode.ucs2
+ * @name decode
+ * @param {String} string The Unicode input string (UCS-2).
+ * @returns {Array} The new array of code points.
+ */
+function ucs2decode(string) {
+	const output = [];
+	let counter = 0;
+	const length = string.length;
+	while (counter < length) {
+		const value = string.charCodeAt(counter++);
+		if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+			// It's a high surrogate, and there is a next character.
+			const extra = string.charCodeAt(counter++);
+			if ((extra & 0xFC00) == 0xDC00) { // Low surrogate.
+				output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+			} else {
+				// It's an unmatched surrogate; only append this code unit, in case the
+				// next code unit is the high surrogate of a surrogate pair.
+				output.push(value);
+				counter--;
+			}
+		} else {
+			output.push(value);
+		}
+	}
+	return output;
+}
+
+/**
+ * Converts a digit/integer into a basic code point.
+ * @see `basicToDigit()`
+ * @private
+ * @param {Number} digit The numeric value of a basic code point.
+ * @returns {Number} The basic code point whose value (when used for
+ * representing integers) is `digit`, which needs to be in the range
+ * `0` to `base - 1`. If `flag` is non-zero, the uppercase form is
+ * used; else, the lowercase form is used. The behavior is undefined
+ * if `flag` is non-zero and `digit` has no uppercase form.
+ */
+const digitToBasic = function(digit, flag) {
+	//  0..25 map to ASCII a..z or A..Z
+	// 26..35 map to ASCII 0..9
+	return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
+};
+
+/**
+ * Bias adaptation function as per section 3.4 of RFC 3492.
+ * https://tools.ietf.org/html/rfc3492#section-3.4
+ * @private
+ */
+const adapt = function(delta, numPoints, firstTime) {
+	let k = 0;
+	delta = firstTime ? floor(delta / damp) : delta >> 1;
+	delta += floor(delta / numPoints);
+	for (/* no initialization */; delta > baseMinusTMin * tMax >> 1; k += base) {
+		delta = floor(delta / baseMinusTMin);
+	}
+	return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
+};
+
+/**
+ * Converts a string of Unicode symbols (e.g. a domain name label) to a
+ * Punycode string of ASCII-only symbols.
+ * @memberOf punycode
+ * @param {String} input The string of Unicode symbols.
+ * @returns {String} The resulting Punycode string of ASCII-only symbols.
+ */
+const encode = function(input) {
+	const output = [];
+
+	// Convert the input in UCS-2 to an array of Unicode code points.
+	input = ucs2decode(input);
+
+	// Cache the length.
+	let inputLength = input.length;
+
+	// Initialize the state.
+	let n = initialN;
+	let delta = 0;
+	let bias = initialBias;
+
+	// Handle the basic code points.
+	for (const currentValue of input) {
+		if (currentValue < 0x80) {
+			output.push(stringFromCharCode(currentValue));
+		}
+	}
+
+	let basicLength = output.length;
+	let handledCPCount = basicLength;
+
+	// `handledCPCount` is the number of code points that have been handled;
+	// `basicLength` is the number of basic code points.
+
+	// Finish the basic string with a delimiter unless it's empty.
+	if (basicLength) {
+		output.push(delimiter);
+	}
+
+	// Main encoding loop:
+	while (handledCPCount < inputLength) {
+
+		// All non-basic code points < n have been handled already. Find the next
+		// larger one:
+		let m = maxInt;
+		for (const currentValue of input) {
+			if (currentValue >= n && currentValue < m) {
+				m = currentValue;
+			}
+		}
+
+		// Increase `delta` enough to advance the decoder's <n,i> state to <m,0>,
+		// but guard against overflow.
+		const handledCPCountPlusOne = handledCPCount + 1;
+		if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
+			error('overflow');
+		}
+
+		delta += (m - n) * handledCPCountPlusOne;
+		n = m;
+
+		for (const currentValue of input) {
+			if (currentValue < n && ++delta > maxInt) {
+				error('overflow');
+			}
+			if (currentValue == n) {
+				// Represent delta as a generalized variable-length integer.
+				let q = delta;
+				for (let k = base; /* no condition */; k += base) {
+					const t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+					if (q < t) {
+						break;
+					}
+					const qMinusT = q - t;
+					const baseMinusT = base - t;
+					output.push(
+						stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0))
+					);
+					q = floor(qMinusT / baseMinusT);
+				}
+
+				output.push(stringFromCharCode(digitToBasic(q, 0)));
+				bias = adapt(delta, handledCPCountPlusOne, handledCPCount == basicLength);
+				delta = 0;
+				++handledCPCount;
+			}
+		}
+
+		++delta;
+		++n;
+
+	}
+	return output.join('');
+};
+
+/**
+ * Converts a Unicode string representing a domain name or an email address to
+ * Punycode. Only the non-ASCII parts of the domain name will be converted,
+ * i.e. it doesn't matter if you call it with a domain that's already in
+ * ASCII.
+ * @memberOf punycode
+ * @param {String} input The domain name or email address to convert, as a
+ * Unicode string.
+ * @returns {String} The Punycode representation of the given domain name or
+ * email address.
+ */
+const toASCII = function(input) {
+	return mapDomain(input, function(string) {
+		return regexNonASCII.test(string)
+			? 'xn--' + encode(string)
+			: string;
+	});
+};
+
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+function findRule(domain) {
+    const punyDomain = toASCII(domain);
+    let foundRule = null;
+    let foundRulePunySuffix = null;
+    for (const rule of domainSuffixList) {
+        const suffix = rule.replace(/^(\*\.|!)/, '');
+        const rulePunySuffix = toASCII(suffix);
+        if (foundRulePunySuffix != null && foundRulePunySuffix.length > rulePunySuffix.length) {
+            continue;
+        }
+        if (endsWith(punyDomain, '.' + rulePunySuffix) || punyDomain === rulePunySuffix) {
+            const wildcard = rule.charAt(0) === '*';
+            const exception = rule.charAt(0) === '!';
+            foundRule = { rule, suffix, wildcard, exception };
+            foundRulePunySuffix = rulePunySuffix;
+        }
     }
-    else {
-        const oldMaxAge = Number(cacheControlDirectives[maxAgeIndex].split('=')[1]);
-        const newMaxAge = Math.min(maxMaxAge, oldMaxAge);
-        cacheControlDirectives[maxAgeIndex] = `max-age=${newMaxAge}`;
+    return foundRule;
+}
+const errorCodes = {
+    DOMAIN_TOO_SHORT: 'Domain name too short.',
+    DOMAIN_TOO_LONG: 'Domain name too long. It should be no more than 255 chars.',
+    LABEL_STARTS_WITH_DASH: 'Domain name label can not start with a dash.',
+    LABEL_ENDS_WITH_DASH: 'Domain name label can not end with a dash.',
+    LABEL_TOO_LONG: 'Domain name label should be at most 63 chars long.',
+    LABEL_TOO_SHORT: 'Domain name label should be at least 1 character long.',
+    LABEL_INVALID_CHARS: 'Domain name label can only contain alphanumeric characters or dashes.',
+};
+// Hostnames are composed of series of labels concatenated with dots, as are all
+// domain names. Each label must be between 1 and 63 characters long, and the
+// entire hostname (including the delimiting dots) has a maximum of 255 chars.
+//
+// Allowed chars:
+//
+// * `a-z`
+// * `0-9`
+// * `-` but not as a starting or ending character
+// * `.` as a separator for the textual portions of a domain name
+//
+// * http://en.wikipedia.org/wiki/Domain_name
+// * http://en.wikipedia.org/wiki/Hostname
+//
+function validate(input) {
+    const ascii = toASCII(input);
+    // if (ascii.length < 1) {
+    //   return 'DOMAIN_TOO_SHORT'
+    // }
+    // if (ascii.length > 255) {
+    //   return 'DOMAIN_TOO_LONG'
+    // }
+    const labels = ascii.split('.');
+    let label;
+    for (let i = 0; i < labels.length; ++i) {
+        label = labels[i];
+        if (!label.length) {
+            return 'LABEL_TOO_SHORT';
+        }
+        // if (label.length > 63) {
+        //   return 'LABEL_TOO_LONG'
+        // }
+        // if (label.charAt(0) === '-') {
+        //   return 'LABEL_STARTS_WITH_DASH'
+        // }
+        // if (label.charAt(label.length - 1) === '-') {
+        //   return 'LABEL_ENDS_WITH_DASH'
+        // }
+        // if (!/^[a-z0-9\-]+$/.test(label)) {
+        //   return 'LABEL_INVALID_CHARS'
+        // }
     }
-    return cacheControlDirectives.join(', ');
+    return null;
+}
+function parsePunycode(domain, parsed) {
+    if (!/xn--/.test(domain)) {
+        return parsed;
+    }
+    if (parsed.domain) {
+        parsed.domain = toASCII(parsed.domain);
+    }
+    if (parsed.subdomain) {
+        parsed.subdomain = toASCII(parsed.subdomain);
+    }
+    return parsed;
+}
+function parse$1(domain) {
+    const domainSanitized = domain.toLowerCase();
+    const validationErrorCode = validate(domain);
+    if (validationErrorCode) {
+        throw new Error(JSON.stringify({
+            input: domain,
+            error: {
+                message: errorCodes[validationErrorCode],
+                code: validationErrorCode,
+            },
+        }));
+    }
+    const parsed = {
+        input: domain,
+        tld: null,
+        sld: null,
+        domain: null,
+        subdomain: null,
+        listed: false,
+    };
+    const domainParts = domainSanitized.split('.');
+    const rule = findRule(domainSanitized);
+    if (!rule) {
+        if (domainParts.length < 2) {
+            return parsed;
+        }
+        parsed.tld = domainParts.pop();
+        parsed.sld = domainParts.pop();
+        parsed.domain = `${parsed.sld}.${parsed.tld}`;
+        if (domainParts.length) {
+            parsed.subdomain = domainParts.pop();
+        }
+        return parsePunycode(domain, parsed);
+    }
+    parsed.listed = true;
+    const tldParts = rule.suffix.split('.');
+    const privateParts = domainParts.slice(0, domainParts.length - tldParts.length);
+    if (rule.exception) {
+        privateParts.push(tldParts.shift());
+    }
+    parsed.tld = tldParts.join('.');
+    if (!privateParts.length) {
+        return parsePunycode(domainSanitized, parsed);
+    }
+    if (rule.wildcard) {
+        parsed.tld = `${privateParts.pop()}.${parsed.tld}`;
+    }
+    if (!privateParts.length) {
+        return parsePunycode(domainSanitized, parsed);
+    }
+    parsed.sld = privateParts.pop();
+    parsed.domain = `${parsed.sld}.${parsed.tld}`;
+    if (privateParts.length) {
+        parsed.subdomain = privateParts.join('.');
+    }
+    return parsePunycode(domainSanitized, parsed);
+}
+function get(domain) {
+    if (!domain) {
+        return null;
+    }
+    return parse$1(domain).domain;
+}
+function getEffectiveTLDPlusOne(hostname) {
+    try {
+        return get(hostname) || '';
+    }
+    catch (e) {
+        return '';
+    }
+}
+
+/*!
+ * cookie
+ * Copyright(c) 2012-2014 Roman Shtylman
+ * Copyright(c) 2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+/**
+ * Module exports.
+ * @public
+ */
+
+var parse_1 = parse;
+
+/**
+ * Parse a cookie header.
+ *
+ * Parse the given cookie header string into an object
+ * The object has the various cookies as keys(names) => values
+ *
+ * @param {string} str
+ * @param {object} [options]
+ * @return {object}
+ * @public
+ */
+
+function parse(str, options) {
+  if (typeof str !== 'string') {
+    throw new TypeError('argument str must be a string');
+  }
+
+  var obj = {};
+  var opt = options || {};
+  var dec = opt.decode || decode;
+
+  var index = 0;
+  while (index < str.length) {
+    var eqIdx = str.indexOf('=', index);
+
+    // no more cookie pairs
+    if (eqIdx === -1) {
+      break
+    }
+
+    var endIdx = str.indexOf(';', index);
+
+    if (endIdx === -1) {
+      endIdx = str.length;
+    } else if (endIdx < eqIdx) {
+      // backtrack on prior semicolon
+      index = str.lastIndexOf(';', eqIdx - 1) + 1;
+      continue
+    }
+
+    var key = str.slice(index, eqIdx).trim();
+
+    // only assign once
+    if (undefined === obj[key]) {
+      var val = str.slice(eqIdx + 1, endIdx).trim();
+
+      // quoted values
+      if (val.charCodeAt(0) === 0x22) {
+        val = val.slice(1, -1);
+      }
+
+      obj[key] = tryDecode(val, dec);
+    }
+
+    index = endIdx + 1;
+  }
+
+  return obj;
+}
+
+/**
+ * URL-decode string value. Optimized to skip native call when no %.
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+
+function decode (str) {
+  return str.indexOf('%') !== -1
+    ? decodeURIComponent(str)
+    : str
+}
+
+/**
+ * Try decoding a string using a decoding function.
+ *
+ * @param {string} str
+ * @param {function} decode
+ * @private
+ */
+
+function tryDecode(str, decode) {
+  try {
+    return decode(str);
+  } catch (e) {
+    return str;
+  }
 }
 
 function createCookieObjectFromHeaderValue(cookieValue) {
     let cookieName = '';
     const cookieObject = cookieValue.split('; ').reduce((prev, flag, index) => {
-        const kv = flag.split('=');
-        const key = index === 0 ? 'value' : kv[0];
-        if (index === 0) {
-            cookieName = kv[0];
+        const equalSignIndex = flag.indexOf('=');
+        if (equalSignIndex === -1) {
+            return { ...prev, [flag]: undefined };
         }
-        const value = kv[1];
+        const key = flag.slice(0, equalSignIndex);
+        const value = flag.slice(equalSignIndex + 1, flag.length);
+        if (index === 0) {
+            cookieName = key;
+            return { ...prev, value };
+        }
         return { ...prev, [key]: value };
     }, { value: '' });
     return [cookieName, cookieObject];
 }
-
-function errorToString(error) {
-    try {
-        return typeof error === 'string' ? error : error instanceof Error ? error.message : String(error);
+function createCookieStringFromObject(name, cookie) {
+    const result = [`${name}=${cookie.value}`];
+    for (const key in cookie) {
+        if (key === name || key === 'value') {
+            continue;
+        }
+        const flagValue = cookie[key];
+        const flag = flagValue ? `${key}=${flagValue}` : key;
+        result.push(flag);
     }
-    catch (e) {
-        return 'unknown';
+    return result.join('; ');
+}
+function filterCookies(headers, filterFunc) {
+    const newHeaders = new Headers(headers);
+    const cookie = parse_1(headers.get('cookie') || '');
+    const filteredCookieList = [];
+    for (const cookieName in cookie) {
+        if (filterFunc(cookieName)) {
+            filteredCookieList.push(`${cookieName}=${cookie[cookieName]}`);
+        }
     }
-}
-function generateRandomString(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    newHeaders.delete('cookie');
+    if (filteredCookieList.length > 0) {
+        newHeaders.set('cookie', filteredCookieList.join('; '));
     }
-    return result;
-}
-function generateRequestUniqueId() {
-    return generateRandomString(2);
-}
-function generateRequestId() {
-    const uniqueId = generateRequestUniqueId();
-    const now = new Date().getTime();
-    return `${now}.cfi-${uniqueId}`;
-}
-function createErrorResponse(error) {
-    const reason = errorToString(error);
-    const errorBody = {
-        code: 'Failed',
-        message: `An error occurred with Cloudflare worker. Reason: ${reason}`,
-    };
-    const responseBody = {
-        v: '2',
-        error: errorBody,
-        requestId: generateRequestId(),
-        products: {},
-    };
-    return new Response(JSON.stringify(responseBody), { status: 500 });
+    return newHeaders;
 }
 
-async function fetchCacheable(request, ttl) {
-    return fetch(request, { cf: { cacheTtl: ttl } });
-}
-
-const INT_VERSION = '1.0.0';
-const HEADER_NAME = 'ii';
-function getHeaderValue(type) {
-    return `fingerprintjs-pro-cloudflare/${INT_VERSION}/${type}`;
-}
-function addTrafficMonitoringSearchParamsForProCDN(url) {
-    url.searchParams.append(HEADER_NAME, getHeaderValue('procdn'));
-}
-function addTrafficMonitoringSearchParamsForVisitorIdRequest(url) {
-    url.searchParams.append(HEADER_NAME, getHeaderValue('ingress'));
-}
-
-function returnHttpResponse(oldResponse) {
-    oldResponse.headers.delete('Strict-Transport-Security');
-    return oldResponse;
+function removeTrailingSlashes(str) {
+    return str.replace(/\/+$/, '');
 }
 
 function createResponseWithMaxAge(oldResponse, maxMaxAge) {
@@ -9566,8 +10219,8 @@ async function handleDownloadScript(request) {
     const newRequest = new Request(url.toString(), new Request(request, { headers: new Headers(request.headers) }));
     console.log(`Downloading script from cdnEndpoint ${url.toString()}...`);
     const workerCacheTtl = 5 * 60;
-    const maxMageAge = 60 * 60;
-    return fetchCacheable(newRequest, workerCacheTtl).then((res) => createResponseWithMaxAge(res, maxMageAge));
+    const maxMaxAge = 60 * 60;
+    return fetchCacheable(newRequest, workerCacheTtl).then((res) => createResponseWithMaxAge(res, maxMaxAge));
 }
 
 function copySearchParams(oldURL, newURL) {
@@ -9579,19 +10232,16 @@ function getCookieValueWithDomain(oldCookieValue, domain) {
     return createCookieStringFromObject(cookieName, cookieObject);
 }
 function createResponseWithFirstPartyCookies(request, response) {
-    const origin = request.headers.get('origin');
-    if (!origin) {
-        return response;
-    }
-    const hostname = new URL(origin).hostname;
-    const eTLDPlusOneDomain = getDomainFromHostname(hostname);
+    const hostname = new URL(request.url).hostname;
+    const eTLDPlusOneDomain = getEffectiveTLDPlusOne(hostname);
     const newHeaders = new Headers(response.headers);
-    // @ts-ignore getAll is unable to be resolved
-    const cookiesArray = newHeaders.getAll('set-cookie');
-    newHeaders.delete('set-cookie');
-    for (const cookieValue of cookiesArray) {
-        const newCookie = getCookieValueWithDomain(cookieValue, eTLDPlusOneDomain);
-        newHeaders.append('set-cookie', newCookie);
+    if (eTLDPlusOneDomain) {
+        const cookiesArray = newHeaders.getAll('set-cookie');
+        newHeaders.delete('set-cookie');
+        for (const cookieValue of cookiesArray) {
+            const newCookie = getCookieValueWithDomain(cookieValue, eTLDPlusOneDomain);
+            newHeaders.append('set-cookie', newCookie);
+        }
     }
     return new Response(response.body, {
         status: response.status,
@@ -9599,7 +10249,7 @@ function createResponseWithFirstPartyCookies(request, response) {
         headers: newHeaders,
     });
 }
-async function handleIngressAPIRaw(request, url) {
+async function handleIngressAPIRaw(request, url, headers) {
     if (request == null) {
         throw new Error('request is null');
     }
@@ -9607,19 +10257,21 @@ async function handleIngressAPIRaw(request, url) {
         throw new Error('url is null');
     }
     console.log(`sending ingress api to ${url}...`);
-    const requestHeaders = new Headers(request.headers);
-    const newRequest = new Request(url.toString(), new Request(request, { headers: requestHeaders }));
+    const newRequest = new Request(url.toString(), new Request(request, { headers }));
     const response = await fetch(newRequest);
     return createResponseWithFirstPartyCookies(request, response);
 }
-async function handleIngressAPI(request) {
+async function handleIngressAPI(request, env) {
     const oldURL = new URL(request.url);
     const region = oldURL.searchParams.get('region') || 'us';
     const endpoint = getVisitorIdEndpoint(region);
     const newURL = new URL(endpoint);
     copySearchParams(oldURL, newURL);
     addTrafficMonitoringSearchParamsForVisitorIdRequest(newURL);
-    return handleIngressAPIRaw(request, newURL);
+    let headers = new Headers(request.headers);
+    addProxyIntegrationHeaders(headers, env);
+    headers = filterCookies(headers, (key) => key === '_iidt');
+    return handleIngressAPIRaw(request, newURL, headers);
 }
 
 function buildEnvInfo(env) {
@@ -9638,28 +10290,132 @@ function buildEnvInfo(env) {
         value: getGetResultPath(env),
         isSet: isGetResultPathSet(env),
     };
+    const proxySecret = {
+        envVarName: proxySecretVarName,
+        value: '******',
+        isSet: isProxySecretSet(env),
+    };
     return {
         workerPath,
         scriptDownloadPath,
         getResultPath,
+        proxySecret,
     };
 }
-function buildHeaders() {
+function buildHeaders$1() {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
     return headers;
 }
-function buildBody(env) {
+function buildBody$1(env) {
     return {
         success: true,
         envInfo: buildEnvInfo(env),
-        version: '1.0.0',
+        version: '1.1.4',
     };
 }
 function handleHealthCheck(env) {
+    const headers = buildHeaders$1();
+    const body = buildBody$1(env);
+    return new Response(JSON.stringify(body), {
+        status: 200,
+        statusText: 'OK',
+        headers,
+    });
+}
+
+function buildHeaders() {
+    const headers = new Headers();
+    headers.append('Content-Type', 'text/html');
+    return headers;
+}
+function addWorkerVersion() {
+    return `
+  <span>
+  Worker version: 1.1.4
+  </span>
+  `;
+}
+function addContactInformation() {
+    return `
+  <span>
+  Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
+  </span>
+  `;
+}
+function addEnvVarsInformation(env) {
+    const isWorkerPathAvailable = isWorkerPathSet(env);
+    const isScriptDownloadPathAvailable = isScriptDownloadPathSet(env);
+    const isGetResultPathAvailable = isGetResultPathSet(env);
+    const isAllVarsAvailable = isWorkerPathAvailable && isScriptDownloadPathAvailable && isGetResultPathAvailable;
+    let result = '';
+    if (!isAllVarsAvailable) {
+        result += `
+    <span>
+    The following environment variables are not defined. Please reach out our support team.
+    </span>
+    `;
+        if (!isWorkerPathAvailable) {
+            result += `
+      <span>
+      WORKER_PATH variable is not defined
+      </span>
+      `;
+        }
+        if (!isScriptDownloadPathAvailable) {
+            result += `
+      <span>
+      SCRIPT_DOWNLOAD_PATH is not defined
+      </span>
+      `;
+        }
+        if (!isGetResultPathAvailable) {
+            result += `
+      <span>
+      GET_RESULT_PATH is not defined
+      </span>
+      `;
+        }
+    }
+    else {
+        result += `
+    <span>
+    All environment variables are set
+    </span>
+    `;
+    }
+    return result;
+}
+function buildBody(env) {
+    let body = `
+  <html lang="en-US">
+  <head>
+    <meta charset="utf-8"/>
+  </head>
+  <style>
+    span {
+      display: block;
+      padding-top: 1em;
+      padding-bottom: 1em;
+      text-align: center;
+    }
+  </style>
+  <body>
+  `;
+    body += `<span>Your worker is deployed</span>`;
+    body += addWorkerVersion();
+    body += addEnvVarsInformation(env);
+    body += addContactInformation();
+    body += `  
+  </body>
+  </html>
+  `;
+    return body;
+}
+function handleStatusPage(env) {
     const headers = buildHeaders();
     const body = buildBody(env);
-    return new Response(JSON.stringify(body), {
+    return new Response(body, {
         status: 200,
         statusText: 'OK',
         headers,
@@ -9668,27 +10424,35 @@ function handleHealthCheck(env) {
 
 async function handleRequest(request, env) {
     const url = new URL(request.url);
-    const pathname = url.pathname;
+    const pathname = removeTrailingSlashes(url.pathname);
     if (pathname === getScriptDownloadPath(env)) {
-        return handleDownloadScript(request);
+        try {
+            return await handleDownloadScript(request);
+        }
+        catch (e) {
+            return createErrorResponseForProCDN(e);
+        }
     }
     if (pathname === getGetResultPath(env)) {
-        return handleIngressAPI(request);
+        try {
+            return await handleIngressAPI(request, env);
+        }
+        catch (e) {
+            return createErrorResponseForIngress(request, e);
+        }
     }
     if (pathname === getHealthCheckPath(env)) {
         return handleHealthCheck(env);
     }
-    return createErrorResponse(`unmatched path ${pathname}`);
+    if (pathname === getStatusPagePath(env)) {
+        return handleStatusPage(env);
+    }
+    return new Response(JSON.stringify({ error: `unmatched path ${pathname}` }), { status: 404 });
 }
 
 var index = {
     async fetch(request, env) {
-        try {
-            return await handleRequest(request, env).then(returnHttpResponse);
-        }
-        catch (e) {
-            return createErrorResponse(e);
-        }
+        return handleRequest(request, env).then(returnHttpResponse);
     },
 };
 

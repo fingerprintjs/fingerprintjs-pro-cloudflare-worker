@@ -1,23 +1,35 @@
-import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv } from './env'
+import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv, getStatusPagePath } from './env'
 
-import { createErrorResponse } from './utils'
-import { handleDownloadScript, handleIngressAPI, handleHealthCheck } from './handlers'
+import { createErrorResponseForIngress, createErrorResponseForProCDN, removeTrailingSlashes } from './utils'
+import { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleStatusPage } from './handlers'
 
 export async function handleRequest(request: Request, env: WorkerEnv): Promise<Response> {
   const url = new URL(request.url)
-  const pathname = url.pathname
+  const pathname = removeTrailingSlashes(url.pathname)
 
   if (pathname === getScriptDownloadPath(env)) {
-    return handleDownloadScript(request)
+    try {
+      return await handleDownloadScript(request)
+    } catch (e) {
+      return createErrorResponseForProCDN(e)
+    }
   }
 
   if (pathname === getGetResultPath(env)) {
-    return handleIngressAPI(request)
+    try {
+      return await handleIngressAPI(request, env)
+    } catch (e) {
+      return createErrorResponseForIngress(request, e)
+    }
   }
 
   if (pathname === getHealthCheckPath(env)) {
     return handleHealthCheck(env)
   }
 
-  return createErrorResponse(`unmatched path ${pathname}`)
+  if (pathname === getStatusPagePath(env)) {
+    return handleStatusPage(env)
+  }
+
+  return new Response(JSON.stringify({ error: `unmatched path ${pathname}` }), { status: 404 })
 }
