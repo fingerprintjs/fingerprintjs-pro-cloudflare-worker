@@ -1,13 +1,14 @@
 import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv, getStatusPagePath } from './env'
 
-import { createErrorResponseForIngress, createErrorResponseForProCDN, removeTrailingSlashes } from './utils'
+import { createErrorResponseForIngress, createErrorResponseForProCDN } from './utils'
 import { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleStatusPage } from './handlers'
+import { createRoute } from './utils/routing'
 
 export async function handleRequest(request: Request, env: WorkerEnv): Promise<Response> {
   const url = new URL(request.url)
-  const pathname = removeTrailingSlashes(url.pathname)
 
-  if (pathname === getScriptDownloadPath(env)) {
+  const scriptDownloadRoute = createRoute(getScriptDownloadPath(env))
+  if (url.pathname.match(scriptDownloadRoute)) {
     try {
       return await handleDownloadScript(request)
     } catch (e) {
@@ -15,7 +16,8 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
     }
   }
 
-  if (pathname === getGetResultPath(env)) {
+  const getResultRoute = createRoute(getGetResultPath(env))
+  if (url.pathname.match(getResultRoute)) {
     try {
       return await handleIngressAPI(request, env)
     } catch (e) {
@@ -23,13 +25,15 @@ export async function handleRequest(request: Request, env: WorkerEnv): Promise<R
     }
   }
 
-  if (pathname === getHealthCheckPath(env)) {
+  const healthRoute = createRoute(getHealthCheckPath(env))
+  if (url.pathname.match(healthRoute)) {
     return handleHealthCheck(env)
   }
 
-  if (pathname === getStatusPagePath(env)) {
+  const statusRoute = createRoute(getStatusPagePath(env))
+  if (url.pathname.match(statusRoute)) {
     return handleStatusPage(env)
   }
 
-  return new Response(JSON.stringify({ error: `unmatched path ${pathname}` }), { status: 404 })
+  return new Response(JSON.stringify({ error: `unmatched path ${url.pathname}` }), { status: 404 })
 }
