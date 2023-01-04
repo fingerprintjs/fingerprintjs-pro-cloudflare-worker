@@ -1,33 +1,19 @@
-export function removeTrailingSlashes(str: string): string {
-  return str.replace(/\/+$/, '')
+export function removeTrailingSlashesAndMultiSlashes(str: string): string {
+  return str.replace(/\/+$/, '').replace(/(?<=\/)\/+/, '')
 }
 
-function addTrailingWildcard(str: string): string {
+export function addTrailingWildcard(str: string): string {
   return str.replace(/(\/?)\*/g, '($1.*)?')
 }
 
-function removeTrailingSlashAndDoubleSlash(str: string): string {
-  return str.replace(/(\/$)|((?<=\/)\/)/, '')
-}
-
-function makeGreedy(str: string): string {
-  return str.replace(/(:(\w+)\+)/, '(?<$2>.*)')
-}
-
-function replaceNamedParams(str: string): string {
-  return str.replace(/:(\w+)(\?)?(\.)?/g, '$2(?<$1>[^/]+)$2$3')
-}
-
-function replaceDot(str: string): string {
+export function replaceDot(str: string): string {
   return str.replace(/\.(?=[\w(])/, '\\.')
 }
 
 export function createRoute(route: string): RegExp {
   let routeRegExp = route
-  routeRegExp = addTrailingWildcard(routeRegExp)
-  routeRegExp = removeTrailingSlashAndDoubleSlash(routeRegExp)
-  routeRegExp = makeGreedy(routeRegExp)
-  routeRegExp = replaceNamedParams(routeRegExp)
-  routeRegExp = replaceDot(routeRegExp)
+  // routeRegExp = addTrailingWildcard(routeRegExp) // Can be uncommented if wildcard (*) is needed
+  routeRegExp = removeTrailingSlashesAndMultiSlashes(routeRegExp)
+  // routeRegExp = replaceDot(routeRegExp) // Can be uncommented if dot (.) is needed
   return RegExp(`^${routeRegExp}/*$`)
 }
