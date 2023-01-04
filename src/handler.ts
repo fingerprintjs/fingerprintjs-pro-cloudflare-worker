@@ -2,7 +2,7 @@ import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv,
 
 import { createErrorResponseForIngress, createErrorResponseForProCDN } from './utils'
 import { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleStatusPage } from './handlers'
-import { createRoute } from './utils/routing'
+import { createRoute } from './utils'
 
 export async function handleRequest(request: Request, env: WorkerEnv): Promise<Response> {
   const url = new URL(request.url)
