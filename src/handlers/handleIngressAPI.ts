@@ -3,6 +3,7 @@ import {
   addProxyIntegrationHeaders,
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
   createCookieObjectFromHeaderValue,
+  createErrorResponseForIngress,
   createCookieStringFromObject,
   filterCookies,
   getEffectiveTLDPlusOne,
@@ -61,7 +62,7 @@ async function handleIngressAPIRaw(request: Request, url: URL, headers: Headers)
   return createResponseWithFirstPartyCookies(request, response)
 }
 
-export async function handleIngressAPI(request: Request, env: WorkerEnv) {
+async function makeIngressAPIRequest(request: Request, env: WorkerEnv) {
   const oldURL = new URL(request.url)
   const region = oldURL.searchParams.get('region') || 'us'
   const endpoint = getVisitorIdEndpoint(region)
@@ -74,4 +75,12 @@ export async function handleIngressAPI(request: Request, env: WorkerEnv) {
   headers = filterCookies(headers, (key) => key === '_iidt')
 
   return handleIngressAPIRaw(request, newURL, headers)
+}
+
+export async function handleIngressAPI(request: Request, env: WorkerEnv) {
+  try {
+    return await makeIngressAPIRequest(request, env)
+  } catch (e) {
+    return createErrorResponseForIngress(request, e)
+  }
 }
