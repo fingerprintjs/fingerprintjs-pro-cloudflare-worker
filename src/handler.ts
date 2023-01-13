@@ -1,6 +1,5 @@
 import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv, getStatusPagePath } from './env'
 
-import { createErrorResponseForIngress, createErrorResponseForProCDN } from './utils'
 import { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleStatusPage } from './handlers'
 import { createRoute } from './utils'
 
@@ -13,23 +12,11 @@ function createRoutes(env: WorkerEnv): Route[] {
   const routes: Route[] = []
   const downloadScriptRoute: Route = {
     pathPattern: createRoute(getScriptDownloadPath(env)),
-    handler: async (request) => {
-      try {
-        return await handleDownloadScript(request)
-      } catch (e) {
-        return createErrorResponseForProCDN(e)
-      }
-    },
+    handler: handleDownloadScript,
   }
   const ingressAPIRoute: Route = {
     pathPattern: createRoute(getGetResultPath(env)),
-    handler: async (request, env) => {
-      try {
-        return await handleIngressAPI(request, env)
-      } catch (e) {
-        return createErrorResponseForIngress(request, e)
-      }
-    },
+    handler: handleIngressAPI,
   }
   const healthRoute: Route = {
     pathPattern: createRoute(getHealthCheckPath(env)),
