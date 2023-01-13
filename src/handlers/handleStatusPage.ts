@@ -68,9 +68,9 @@ function addEnvVarsInformation(env: WorkerEnv): string {
 
 function buildBody(env: WorkerEnv): string {
   let body = `
-  <html lang="en-US">
+  <html lang='en-US'>
   <head>
-    <meta charset="utf-8"/>
+    <meta charset='utf-8'/>
   </head>
   <style>
     span {
@@ -96,7 +96,10 @@ function buildBody(env: WorkerEnv): string {
   return body
 }
 
-export function handleStatusPage(env: WorkerEnv): Response {
+export function handleStatusPage(request: Request, env: WorkerEnv): Response {
+  if (request.method !== 'GET') {
+    return new Response(null, { status: 405 })
+  }
   const headers = buildHeaders()
   const body = buildBody(env)
 
