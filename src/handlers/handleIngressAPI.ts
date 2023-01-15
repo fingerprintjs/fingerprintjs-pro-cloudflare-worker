@@ -1,4 +1,4 @@
-import { getVisitorIdEndpoint, WorkerEnv } from '../env'
+import { WorkerEnv } from '../env'
 import {
   addProxyIntegrationHeaders,
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
@@ -7,6 +7,7 @@ import {
   createCookieStringFromObject,
   filterCookies,
   getEffectiveTLDPlusOne,
+  getVisitorIdEndpoint,
 } from '../utils'
 
 declare global {
