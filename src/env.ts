@@ -10,8 +10,6 @@ const Defaults: WorkerEnv & Record<string, string> = {
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
   GET_RESULT_PATH: 'getResult',
   PROXY_SECRET: '',
-  REGION: 'us',
-  AGENT_VERSION: '3',
 }
 
 function getVarOrDefault(variable: keyof WorkerEnv, defaults: WorkerEnv): (env: WorkerEnv) => string {
@@ -62,20 +60,4 @@ export function getHealthCheckPath(env: WorkerEnv): string {
 
 export function getStatusPagePath(env: WorkerEnv): string {
   return `/${getWorkerPathVar(env)}/status`
-}
-
-export function getAgentScriptEndpoint(searchParams: URLSearchParams): string {
-  const apiKey = searchParams.get('apiKey')
-  const apiVersion = searchParams.get('version') || Defaults.AGENT_VERSION
-
-  const base = `https://fpcdn.io/v${apiVersion}/${apiKey}`
-  const loaderVersion = searchParams.get('loaderVersion')
-  const lv = loaderVersion ? `/loader_v${loaderVersion}.js` : ''
-
-  return `${base}${lv}`
-}
-
-export function getVisitorIdEndpoint(region: string) {
-  const prefix = region === Defaults.REGION ? '' : `${region}.`
-  return `https://${prefix}api.fpjs.io`
 }

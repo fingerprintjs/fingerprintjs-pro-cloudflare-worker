@@ -3,8 +3,8 @@ import {
   getCacheControlHeaderWithMaxAgeIfLower,
   addTrafficMonitoringSearchParamsForProCDN,
   createErrorResponseForProCDN,
+  getAgentScriptEndpoint,
 } from '../utils'
-import { getAgentScriptEndpoint } from '../env'
 
 function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number): Response {
   const response = new Response(oldResponse.body, oldResponse)

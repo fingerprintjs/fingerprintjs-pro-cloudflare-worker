@@ -10,6 +10,7 @@ import { addProxyIntegrationHeaders } from './addProxyIntegrationHeaders'
 import { getEffectiveTLDPlusOne } from './getEffectiveTLDPlusOne'
 import { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue, filterCookies } from './cookie'
 import { createRoute, addTrailingWildcard, removeTrailingSlashesAndMultiSlashes, replaceDot } from './routing'
+import { getAgentScriptEndpoint, getVisitorIdEndpoint } from './proxyEndpoint'
 
 export {
   createCookieStringFromObject,
@@ -28,5 +29,7 @@ export {
   filterCookies,
   fetchCacheable,
   createRoute,
+  getAgentScriptEndpoint,
+  getVisitorIdEndpoint,
   Cookie,
 }
