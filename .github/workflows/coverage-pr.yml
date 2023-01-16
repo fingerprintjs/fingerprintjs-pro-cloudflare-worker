@@ -1,7 +1,7 @@
 name: Check coverage for PR
 
 on:
-  pull_request:
+  pull_request_target:
 
 jobs:
   run-tests-check-coverage:
@@ -9,6 +9,8 @@ jobs:
     name: Run tests & check coverage
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Jest coverage comment
         id: coverage
         uses: ArtiomTr/jest-coverage-report-action@9f733792c44d05327cb371766bf78a5261e43936
