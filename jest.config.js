@@ -4,6 +4,6 @@ module.exports = {
   testEnvironment: 'miniflare',
   testRegex: '/test/.+test.tsx?$',
   passWithNoTests: true,
-  collectCoverageFrom: ['./src/utils/**.ts'],
+  collectCoverageFrom: ['./src/**/*.ts'],
   coverageReporters: ['lcov', 'json-summary', ['text', { file: 'coverage.txt', path: './' }]],
 }
