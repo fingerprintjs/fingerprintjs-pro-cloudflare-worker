@@ -6,6 +6,10 @@ import {
   getAgentScriptEndpoint,
 } from '../utils'
 
+function copySearchParams(oldURL: URL, newURL: URL): void {
+  newURL.search = new URLSearchParams(oldURL.search).toString()
+}
+
 function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number): Response {
   const response = new Response(oldResponse.body, oldResponse)
   const oldCacheControlHeader = oldResponse.headers.get('cache-control')
@@ -18,14 +22,18 @@ function createResponseWithMaxAge(oldResponse: Response, maxMaxAge: number): Res
   return response
 }
 
-async function makeDownloadScriptRequest(request: Request): Promise<Response> {
-  const requestSearchParams = new URL(request.url).searchParams
-  const agentScriptEndpoint = getAgentScriptEndpoint(requestSearchParams)
-  const url = new URL(agentScriptEndpoint)
-  addTrafficMonitoringSearchParamsForProCDN(url)
-  const newRequest = new Request(url.toString(), new Request(request, { headers: new Headers(request.headers) }))
+function makeDownloadScriptRequest(request: Request): Promise<Response> {
+  const oldURL = new URL(request.url)
+  const agentScriptEndpoint = getAgentScriptEndpoint(oldURL.searchParams)
+  const newURL = new URL(agentScriptEndpoint)
+  copySearchParams(oldURL, newURL)
+  addTrafficMonitoringSearchParamsForProCDN(newURL)
 
-  console.log(`Downloading script from cdnEndpoint ${url.toString()}...`)
+  const headers = new Headers(request.headers)
+  headers.delete('Cookie')
+
+  console.log(`Downloading script from cdnEndpoint ${newURL.toString()}...`)
+  const newRequest = new Request(newURL.toString(), new Request(request, { headers }))
   const workerCacheTtl = 5 * 60
   const maxMaxAge = 60 * 60
 
