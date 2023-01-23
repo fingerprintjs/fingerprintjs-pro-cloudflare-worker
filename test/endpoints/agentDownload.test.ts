@@ -271,7 +271,7 @@ describe('agent download request cache durations', () => {
   })
 })
 
-describe('agent download request and response', () => {
+describe('agent download response', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
 
   beforeAll(() => {
