@@ -8,49 +8,280 @@ const workerEnv: WorkerEnv = {
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
 }
 
-describe('agent download request and response', () => {
-  const fetchSpy = jest.spyOn(globalThis, 'fetch')
+describe('agent download request to the correct URL', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let reqURL: URL
+  let receivedReqURL = ''
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy.mockImplementation(async (input, init) => {
+      const req = new Request(input, init)
+      receivedReqURL = req.url
+      return new Response()
+    })
+  })
+
+  beforeEach(() => {
+    reqURL = new URL('https://example.com/worker_path/agent_download')
+    reqURL.searchParams.append('apiKey', 'someApiKey')
+
+    receivedReqURL = ''
+  })
 
   afterAll(() => {
     fetchSpy.mockRestore()
   })
 
-  test('url search, cf cache and response headers', async () => {
+  test('no version', async () => {
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://fpcdn.io')
+    expect(receivedURL.pathname).toBe('/v3/someApiKey')
+  })
+
+  test('version but no loaderVersion', async () => {
+    reqURL.searchParams.append('version', '4')
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://fpcdn.io')
+    expect(receivedURL.pathname).toBe('/v4/someApiKey')
+  })
+
+  test('both version and loaderVersion', async () => {
+    reqURL.searchParams.append('version', '5')
+    reqURL.searchParams.append('loaderVersion', '1.2.3')
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://fpcdn.io')
+    expect(receivedURL.pathname).toBe('/v5/someApiKey/loader_v1.2.3.js')
+  })
+})
+
+describe('agent download request handles query parameters correctly', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let reqURL: URL
+  let receivedReqURL = ''
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
-      const headers: HeadersInit = {
-        'cache-control': 'max-age=72000',
-        'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
-      }
-      const bodyObject = {
-        url: req.url,
-        cf: (init as RequestInit).cf,
-      }
-      return new Response(JSON.stringify(bodyObject), { headers })
-    })
+      receivedReqURL = req.url
 
-    const headers = new Headers({
+      return new Response('')
+    })
+  })
+
+  beforeEach(() => {
+    reqURL = new URL('https://example.com/worker_path/agent_download')
+    reqURL.searchParams.append('apiKey', 'someApiKey')
+    reqURL.searchParams.append('someKey', 'someValue')
+
+    receivedReqURL = ''
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('traffic monitoring when no ii parameter before', async () => {
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, workerEnv)
+    const url = new URL(receivedReqURL)
+    const iiValues = url.searchParams.getAll('ii')
+    expect(iiValues.length).toBe(1)
+    expect(iiValues[0]).toBe('fingerprintjs-pro-cloudflare/__current_worker_version__/procdn')
+  })
+  test('traffic monitoring when there is ii parameter before', async () => {
+    reqURL.searchParams.append('ii', 'fingerprintjs-pro-react/v1.2.3')
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, workerEnv)
+    const url = new URL(receivedReqURL)
+    const iiValues = url.searchParams.getAll('ii')
+    expect(iiValues.length).toBe(2)
+    expect(iiValues[0]).toBe('fingerprintjs-pro-react/v1.2.3')
+    expect(iiValues[1]).toBe('fingerprintjs-pro-cloudflare/__current_worker_version__/procdn')
+  })
+  test('whole query string when no ii parameter before', async () => {
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, workerEnv)
+    const url = new URL(receivedReqURL)
+    expect(url.search).toBe(
+      '?apiKey=someApiKey' +
+        '&someKey=someValue' +
+        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn',
+    )
+  })
+  test('whole query string when there is ii parameter before', async () => {
+    reqURL.searchParams.append('ii', 'fingerprintjs-pro-react/v1.2.3')
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, workerEnv)
+    const url = new URL(receivedReqURL)
+    expect(url.search).toBe(
+      '?apiKey=someApiKey' +
+        '&someKey=someValue' +
+        '&ii=fingerprintjs-pro-react%2Fv1.2.3' +
+        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn',
+    )
+  })
+})
+
+describe('agent download request handles HTTP headers correctly', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  const reqURL = new URL('https://example.com/worker_path/agent_download?apiKey=someApiKey')
+  let receivedHeaders: Headers
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy.mockImplementation(async (input, init) => {
+      const req = new Request(input, init)
+      receivedHeaders = req.headers
+
+      return new Response('')
+    })
+  })
+
+  beforeEach(() => {
+    receivedHeaders = new Headers()
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('req headers are the same (except Cookie)', async () => {
+    const reqHeaders = new Headers({
+      accept: '*/*',
+      'cache-control': 'no-cache',
+      'accept-language': 'en-US',
+      'user-agent': 'Mozilla/5.0',
+      'x-some-header': 'some value',
+    })
+    const req = new Request(reqURL.toString(), { headers: reqHeaders })
+    await worker.fetch(req, workerEnv)
+    receivedHeaders.forEach((value, key) => {
+      expect(reqHeaders.get(key)).toBe(value)
+    })
+    reqHeaders.forEach((value, key) => {
+      expect(receivedHeaders.get(key)).toBe(value)
+    })
+  })
+  test('req headers do not have cookies', async () => {
+    const reqHeaders = new Headers({
+      accept: '*/*',
+      'cache-control': 'no-cache',
+      'accept-language': 'en-US',
+      'user-agent': 'Mozilla/5.0',
+      'x-some-header': 'some value',
       cookie:
         '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; auth_token=123456',
     })
-    const req = new Request('https://example.com/worker_path/agent_download?apiKey=someApiKey&someKey=someValue', {
-      headers,
-    })
-    const response = await worker.fetch(req, workerEnv)
-    expect(response.headers.get('cache-control')).toBe('max-age=3600, s-maxage=3600')
-    expect(response.headers.get('strict-transport-security')).toBe(null)
-    expect(response.headers.get('cookie')).toBe(null)
-    const responseBody = (await response.json()) as any
-    const url = new URL(responseBody.url)
-    expect(url.origin).toBe('https://fpcdn.io')
-    expect(url.pathname).toBe('/v3/someApiKey')
-    expect(url.search).toBe(
-      '?apiKey=someApiKey&someKey=someValue&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn',
-    )
-    // Note: toStrictEqual does not work for some reason, using double toMatchObject instead
-    expect(responseBody.cf).toMatchObject({ cacheTtl: 300 })
-    expect({ cacheTtl: 300 }).toMatchObject(responseBody.cf)
+    const req = new Request(reqURL.toString(), { headers: reqHeaders })
+    await worker.fetch(req, workerEnv)
+    expect(receivedHeaders.has('cookie')).toBe(false)
   })
+})
+
+describe('agent download request cache durations', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  const reqURL = new URL('https://example.com/worker_path/agent_download?apiKey=someApiKey')
+  let receivedCfObject: IncomingRequestCfProperties | RequestInitCfProperties | null | undefined = null
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+  })
+
+  beforeEach(() => {
+    receivedCfObject = null
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('browser cache set to an hour when original value is higher', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'cache-control': 'public, max-age=3613',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString())
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=60')
+  })
+  test('browser cache is the same when original value is lower than an hour', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'cache-control': 'public, max-age=100',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString())
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=100, s-maxage=60')
+  })
+  test('proxy cache set to a minute when original value is higher', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'cache-control': 'public, max-age=3613, s-maxage=575500',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString())
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=60')
+  })
+  test('proxy cache is the same when original value is lower than a minute', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'cache-control': 'public, max-age=3613, s-maxage=10',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString())
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=10')
+  })
+  test('cloudflare network cache is set to 5 mins', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'cache-control': 'public, max-age=3613, s-maxage=575500',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, workerEnv)
+    expect(receivedCfObject).toMatchObject({ cacheTtl: 300 })
+    expect({ cacheTtl: 300 }).toMatchObject(receivedCfObject!)
+  })
+})
+
+describe('agent download request and response', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
   test("response body and content-type don't change", async () => {
     const agentScript =
       '/** FingerprintJS Pro - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com) /** function hi() { console.log("hello world!!") }'
@@ -64,46 +295,6 @@ describe('agent download request and response', () => {
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('content-type')).toBe('text/javascript; charset=utf-8')
     expect(await response.text()).toBe(agentScript)
-  })
-  test('endpoint url when version exists', async () => {
-    fetchSpy.mockImplementation(async (input, init) => {
-      const req = new Request(input, init)
-      const bodyObject = {
-        url: req.url,
-      }
-      return new Response(JSON.stringify(bodyObject))
-    })
-    const req = new Request(
-      'https://example.com/worker_path/agent_download?apiKey=someApiKey&version=5&someKey=someValue',
-    )
-    const response = await worker.fetch(req, workerEnv)
-    const responseBody = (await response.json()) as any
-    const url = new URL(responseBody.url)
-    expect(url.origin).toBe('https://fpcdn.io')
-    expect(url.pathname).toBe('/v5/someApiKey')
-    expect(url.search).toBe(
-      '?apiKey=someApiKey&version=5&someKey=someValue&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn',
-    )
-  })
-  test('endpoint url when version and loaderVersion exists', async () => {
-    fetchSpy.mockImplementation(async (input, init) => {
-      const req = new Request(input, init)
-      const bodyObject = {
-        url: req.url,
-      }
-      return new Response(JSON.stringify(bodyObject))
-    })
-    const req = new Request(
-      'https://example.com/worker_path/agent_download?apiKey=someApiKey&version=5&loaderVersion=1.2.3',
-    )
-    const response = await worker.fetch(req, workerEnv)
-    const responseBody = (await response.json()) as any
-    const url = new URL(responseBody.url)
-    expect(url.origin).toBe('https://fpcdn.io')
-    expect(url.pathname).toBe('/v5/someApiKey/loader_v1.2.3.js')
-    expect(url.search).toBe(
-      '?apiKey=someApiKey&version=5&loaderVersion=1.2.3&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn',
-    )
   })
   test('failure response', async () => {
     fetchSpy.mockImplementation(async () => {
