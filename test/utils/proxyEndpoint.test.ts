@@ -36,12 +36,20 @@ describe('getAgentScriptEndpoint', () => {
 
 describe('getVisitorIdEndpoint', () => {
   test('us region', () => {
-    expect(getVisitorIdEndpoint('us')).toBe('https://api.fpjs.io')
+    let urlSearchParams = new URLSearchParams()
+    expect(getVisitorIdEndpoint(urlSearchParams)).toBe('https://api.fpjs.io')
+    urlSearchParams = new URLSearchParams()
+    urlSearchParams.set('region', 'us')
+    expect(getVisitorIdEndpoint(urlSearchParams)).toBe('https://api.fpjs.io')
   })
   test('eu region', () => {
-    expect(getVisitorIdEndpoint('eu')).toBe('https://eu.api.fpjs.io')
+    const urlSearchParams = new URLSearchParams()
+    urlSearchParams.set('region', 'eu')
+    expect(getVisitorIdEndpoint(urlSearchParams)).toBe('https://eu.api.fpjs.io')
   })
   test('ap region', () => {
-    expect(getVisitorIdEndpoint('ap')).toBe('https://ap.api.fpjs.io')
+    const urlSearchParams = new URLSearchParams()
+    urlSearchParams.set('region', 'ap')
+    expect(getVisitorIdEndpoint(urlSearchParams)).toBe('https://ap.api.fpjs.io')
   })
 })
