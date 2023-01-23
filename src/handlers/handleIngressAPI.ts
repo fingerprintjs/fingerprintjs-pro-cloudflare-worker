@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-function copySearchParams(oldURL: URL, newURL: URL) {
+function copySearchParams(oldURL: URL, newURL: URL): void {
   newURL.search = new URLSearchParams(oldURL.search).toString()
 }
 
@@ -46,27 +46,9 @@ function createResponseWithFirstPartyCookies(request: Request, response: Respons
   })
 }
 
-async function handleIngressAPIRaw(request: Request, url: URL, headers: Headers) {
-  if (request == null) {
-    throw new Error('request is null')
-  }
-
-  if (url == null) {
-    throw new Error('url is null')
-  }
-
-  console.log(`sending ingress api to ${url}...`)
-
-  const newRequest = new Request(url.toString(), new Request(request, { headers }))
-
-  const response = await fetch(newRequest)
-  return createResponseWithFirstPartyCookies(request, response)
-}
-
-async function makeIngressAPIRequest(request: Request, env: WorkerEnv) {
+function makeIngressAPIRequest(request: Request, env: WorkerEnv) {
   const oldURL = new URL(request.url)
-  const region = oldURL.searchParams.get('region') || 'us'
-  const endpoint = getVisitorIdEndpoint(region)
+  const endpoint = getVisitorIdEndpoint(oldURL.searchParams)
   const newURL = new URL(endpoint)
   copySearchParams(oldURL, newURL)
   addTrafficMonitoringSearchParamsForVisitorIdRequest(newURL)
@@ -75,7 +57,9 @@ async function makeIngressAPIRequest(request: Request, env: WorkerEnv) {
   addProxyIntegrationHeaders(headers, env)
   headers = filterCookies(headers, (key) => key === '_iidt')
 
-  return handleIngressAPIRaw(request, newURL, headers)
+  console.log(`sending ingress api to ${newURL}...`)
+  const newRequest = new Request(newURL.toString(), new Request(request, { headers }))
+  return fetch(newRequest).then((response) => createResponseWithFirstPartyCookies(request, response))
 }
 
 export async function handleIngressAPI(request: Request, env: WorkerEnv) {
