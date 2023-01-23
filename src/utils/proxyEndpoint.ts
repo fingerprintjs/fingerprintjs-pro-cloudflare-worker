@@ -12,7 +12,8 @@ export function getAgentScriptEndpoint(searchParams: URLSearchParams): string {
   return `${base}${lv}`
 }
 
-export function getVisitorIdEndpoint(region: string) {
+export function getVisitorIdEndpoint(searchParams: URLSearchParams): string {
+  const region = searchParams.get('region') || 'us'
   const prefix = region === DEFAULT_REGION ? '' : `${region}.`
   return `https://${prefix}api.fpjs.io`
 }
