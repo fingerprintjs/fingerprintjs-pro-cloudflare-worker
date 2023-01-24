@@ -8,7 +8,7 @@ const workerEnv: WorkerEnv = {
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
 }
 
-describe('agent download request to the correct URL', () => {
+describe('agent download request proxy URL', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
   let reqURL: URL
   let receivedReqURL = ''
@@ -61,7 +61,7 @@ describe('agent download request to the correct URL', () => {
   })
 })
 
-describe('agent download request handles query parameters correctly', () => {
+describe('agent download request query parameters', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
   let reqURL: URL
   let receivedReqURL = ''
@@ -130,7 +130,7 @@ describe('agent download request handles query parameters correctly', () => {
   })
 })
 
-describe('agent download request handles HTTP headers correctly', () => {
+describe('agent download request HTTP headers', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
   const reqURL = new URL('https://example.com/worker_path/agent_download?apiKey=someApiKey')
   let receivedHeaders: Headers
@@ -271,6 +271,42 @@ describe('agent download request cache durations', () => {
   })
 })
 
+describe('agent download request HTTP method', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  const reqURL = new URL('https://example.com/worker_path/agent_download?apiKey=someApiKey')
+  let requestMethod: string
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy.mockImplementation(async (input, init) => {
+      const req = new Request(input, init)
+      requestMethod = req.method
+
+      return new Response('')
+    })
+  })
+
+  beforeEach(() => {
+    requestMethod = ''
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('when method is GET', async () => {
+    const req = new Request(reqURL.toString(), { method: 'GET' })
+    await worker.fetch(req, workerEnv)
+    expect(requestMethod).toBe('GET')
+  })
+
+  test('when method is POST', async () => {
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    expect(requestMethod).toBe('POST')
+  })
+})
+
 describe('agent download response', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
 
@@ -295,6 +331,28 @@ describe('agent download response', () => {
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('content-type')).toBe('text/javascript; charset=utf-8')
     expect(await response.text()).toBe(agentScript)
+  })
+  test('strict-transport-security is removed', async () => {
+    fetchSpy.mockImplementation(async () => {
+      const headers: HeadersInit = {
+        'strict-transport-security': 'max-age=63072000',
+      }
+      return new Response('', { headers })
+    })
+    const req = new Request('https://example.com/worker_path/agent_download')
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('strict-transport-security')).toBe(null)
+  })
+  test('other headers remain the same', async () => {
+    fetchSpy.mockImplementation(async () => {
+      const headers: HeadersInit = {
+        'some-header': 'some-value',
+      }
+      return new Response('', { headers })
+    })
+    const req = new Request('https://example.com/worker_path/agent_download')
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('some-header')).toBe('some-value')
   })
   test('failure response', async () => {
     fetchSpy.mockImplementation(async () => {
