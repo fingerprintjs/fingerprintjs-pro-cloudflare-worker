@@ -21,7 +21,7 @@ jobs:
         uses: fingerprintjs/action-coverage-report-md@v1
         id: coverage-md
         with:
-          srcBasePath: './src/utils'
+          srcBasePath: './src'
       - uses: marocchino/sticky-pull-request-comment@adca94abcaf73c10466a71cc83ae561fd66d1a56
         with:
           message: |
