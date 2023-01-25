@@ -1,0 +1,38 @@
+<% /** @type {string} */ workerVersion _%>
+<% /** @type {boolean} */ isAllVarsAvailable _%>
+<% /** @type {boolean} */ isWorkerPathAvailable _%>
+<% /** @type {boolean} */ isScriptDownloadPathAvailable _%>
+<% /** @type {boolean} */ isGetResultPathAvailable _%>
+<html lang='en-US'>
+<head>
+    <meta charset='utf-8' />
+    <title>Fingerprint Cloudflare Worker</title>
+    <style>
+        span {
+            display: block;
+            padding-top: 1em;
+            padding-bottom: 1em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<span>Your worker is deployed</span>
+<span>Worker version: <%= workerVersion %></span>
+<% if(isAllVarsAvailable) { _%>
+    <span>All environment variables are set</span>
+<% } else { _%>
+    <span>The following environment variables are not defined. Please reach out our support team.</span>
+    <% if (!isWorkerPathAvailable) { _%>
+        <span>WORKER_PATH variable is not defined</span>
+    <% } _%>
+    <% if (!isScriptDownloadPathAvailable) { _%>
+        <span>SCRIPT_DOWNLOAD_PATH variable is not defined</span>
+    <% } _%>
+    <% if (!isGetResultPathAvailable) { _%>
+        <span>GET_RESULT_PATH variable is not defined</span>
+    <% } _%>
+<% } _%>
+<span>Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues</span>
+</body>
+</html>
