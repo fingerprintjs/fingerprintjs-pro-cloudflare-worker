@@ -33,7 +33,7 @@ test.describe('visitorId', () => {
     try {
       const responseBody = await res.text()
       if (responseBody.includes('Your worker is deployed')) {
-        const matches = responseBody.match(/Worker version: ([\d.]+)/)
+        const matches = responseBody.match(/Worker version: ([\d.\-snaphot]+)/)
         if (matches && matches.length > 0) {
           const version = matches[1]
           if (version === expectedVersion) {
