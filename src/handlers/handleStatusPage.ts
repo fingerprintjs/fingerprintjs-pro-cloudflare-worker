@@ -1,4 +1,12 @@
-import { WorkerEnv, isScriptDownloadPathSet, isWorkerPathSet, isGetResultPathSet } from '../env'
+import {
+  WorkerEnv,
+  isScriptDownloadPathSet,
+  isGetResultPathSet,
+  isProxySecretSet,
+  agentScriptDownloadPathVarName,
+  getResultPathVarName,
+  proxySecretVarName,
+} from '../env'
 
 function buildHeaders(): Headers {
   const headers = new Headers()
@@ -23,10 +31,10 @@ function createContactInformationElement(): string {
 }
 
 function createEnvVarsInformationElement(env: WorkerEnv): string {
-  const isWorkerPathAvailable = isWorkerPathSet(env)
   const isScriptDownloadPathAvailable = isScriptDownloadPathSet(env)
   const isGetResultPathAvailable = isGetResultPathSet(env)
-  const isAllVarsAvailable = isWorkerPathAvailable && isScriptDownloadPathAvailable && isGetResultPathAvailable
+  const isProxySecretAvailable = isProxySecretSet(env)
+  const isAllVarsAvailable = isScriptDownloadPathAvailable && isGetResultPathAvailable && isProxySecretAvailable
 
   let result = ''
   if (!isAllVarsAvailable) {
@@ -35,24 +43,24 @@ function createEnvVarsInformationElement(env: WorkerEnv): string {
     The following environment variables are not defined. Please reach out our support team.
     </span>
     `
-    if (!isWorkerPathAvailable) {
-      result += `
-      <span>
-      WORKER_PATH variable is not defined
-      </span>
-      `
-    }
     if (!isScriptDownloadPathAvailable) {
       result += `
       <span>
-      SCRIPT_DOWNLOAD_PATH is not defined
+      ${agentScriptDownloadPathVarName} is not set
       </span>
       `
     }
     if (!isGetResultPathAvailable) {
       result += `
       <span>
-      GET_RESULT_PATH is not defined
+      ${getResultPathVarName} is not set
+      </span>
+      `
+    }
+    if (!isProxySecretAvailable) {
+      result += `
+      <span>
+      ${proxySecretVarName} is not set
       </span>
       `
     }
