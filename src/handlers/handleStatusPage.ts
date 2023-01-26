@@ -6,7 +6,7 @@ function buildHeaders(): Headers {
   return headers
 }
 
-function addWorkerVersion(): string {
+function createWorkerVersionElement(): string {
   return `
   <span>
   Worker version: __current_worker_version__
@@ -14,7 +14,7 @@ function addWorkerVersion(): string {
   `
 }
 
-function addContactInformation(): string {
+function createContactInformationElement(): string {
   return `
   <span>
   Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
@@ -22,7 +22,7 @@ function addContactInformation(): string {
   `
 }
 
-function addEnvVarsInformation(env: WorkerEnv): string {
+function createEnvVarsInformationElement(env: WorkerEnv): string {
   const isWorkerPathAvailable = isWorkerPathSet(env)
   const isScriptDownloadPathAvailable = isScriptDownloadPathSet(env)
   const isGetResultPathAvailable = isGetResultPathSet(env)
@@ -73,23 +73,23 @@ function buildBody(env: WorkerEnv): string {
     <meta charset='utf-8'/>
     <title>Fingerprint Cloudflare Worker</title>
     <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
+    <style>
+      span {
+        display: block;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        text-align: center;
+      }
+    </style>
   </head>
-  <style>
-    span {
-      display: block;
-      padding-top: 1em;
-      padding-bottom: 1em;
-      text-align: center;
-    }
-  </style>
   <body>
   `
 
   body += `<span>Your worker is deployed</span>`
 
-  body += addWorkerVersion()
-  body += addEnvVarsInformation(env)
-  body += addContactInformation()
+  body += createWorkerVersionElement()
+  body += createEnvVarsInformationElement(env)
+  body += createContactInformationElement()
 
   body += `  
   </body>
