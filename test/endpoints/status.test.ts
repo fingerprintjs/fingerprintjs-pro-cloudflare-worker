@@ -2,6 +2,13 @@ import worker from '../../src'
 import { WorkerEnv } from '../../src/env'
 
 describe('status page content', () => {
+  beforeEach(() => {
+    Object.defineProperty(globalThis, 'crypto', {
+      value: {
+        getRandomValues: () => new Uint8Array(24),
+      },
+    })
+  })
   test('when all variables are set', async () => {
     const workerEnv: WorkerEnv = {
       WORKER_PATH: 'worker_path',
@@ -56,6 +63,22 @@ describe('status page content', () => {
     const req = new Request('http://localhost/worker_path/status')
     const response = await worker.fetch(req, workerEnv)
     expect(await response.text()).toMatchSnapshot()
+  })
+})
+
+describe('status page response headers', () => {
+  test('CSP is set', async () => {
+    const workerEnv: WorkerEnv = {
+      WORKER_PATH: 'worker_path',
+      PROXY_SECRET: 'proxy_secret',
+      GET_RESULT_PATH: 'get_result',
+      AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
+    }
+    const req = new Request('http://localhost/worker_path/status')
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('content-security-policy')).toMatch(
+      /^default-src 'self'; img-src https:\/\/fingerprint\.com; style-src 'nonce-[\w=]+'$/,
+    )
   })
 })
 
