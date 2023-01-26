@@ -155,10 +155,17 @@ describe('no match paths', () => {
     ]
   })
   test('no match', async () => {
-    const request = new Request(`https://example.com/${workerPath}/hello`)
-    await handleRequestWithRoutes(request, env, routes)
+    const reqURL = `https://example.com/${workerPath}/hello`
+    const request = new Request(reqURL)
+    const response = await handleRequestWithRoutes(request, env, routes)
     expect(mockAgentDownloadHandler).not.toHaveBeenCalled()
     expect(mockIngressAPIHandler).not.toHaveBeenCalled()
     expect(mockStatusPageHandler).not.toHaveBeenCalled()
+    expect(response.status).toBe(404)
+    expect(response.headers.get('content-type')).toBe('application/json')
+    const responseBody = await response.json()
+    const expected = { error: `unmatched path /${workerPath}/hello` }
+    expect(responseBody).toMatchObject(expected)
+    expect(expected).toMatchObject(responseBody as any)
   })
 })
