@@ -7,7 +7,7 @@ exports[`status page content when agent script download path and proxy secret ar
     <meta charset='utf-8'/>
     <title>Fingerprint Cloudflare Worker</title>
     <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
-    <style>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
       span {
         display: block;
         padding-top: 1em;
@@ -50,7 +50,7 @@ exports[`status page content when agent script download path is not set 1`] = `
     <meta charset='utf-8'/>
     <title>Fingerprint Cloudflare Worker</title>
     <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
-    <style>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
       span {
         display: block;
         padding-top: 1em;
@@ -89,7 +89,7 @@ exports[`status page content when all variables are set 1`] = `
     <meta charset='utf-8'/>
     <title>Fingerprint Cloudflare Worker</title>
     <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
-    <style>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
       span {
         display: block;
         padding-top: 1em;
@@ -124,7 +124,7 @@ exports[`status page content when get result path is not set 1`] = `
     <meta charset='utf-8'/>
     <title>Fingerprint Cloudflare Worker</title>
     <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
-    <style>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
       span {
         display: block;
         padding-top: 1em;
@@ -163,7 +163,7 @@ exports[`status page content when proxy secret is not set 1`] = `
     <meta charset='utf-8'/>
     <title>Fingerprint Cloudflare Worker</title>
     <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
-    <style>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
       span {
         display: block;
         padding-top: 1em;
