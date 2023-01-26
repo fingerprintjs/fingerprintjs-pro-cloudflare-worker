@@ -5,16 +5,16 @@ export type WorkerEnv = {
   PROXY_SECRET: string | null
 }
 
-const Defaults: WorkerEnv & Record<string, string> = {
+const Defaults: WorkerEnv = {
   WORKER_PATH: 'cf-worker',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
   GET_RESULT_PATH: 'getResult',
-  PROXY_SECRET: '',
+  PROXY_SECRET: null,
 }
 
-function getVarOrDefault(variable: keyof WorkerEnv, defaults: WorkerEnv): (env: WorkerEnv) => string {
-  return function (env: WorkerEnv): string {
-    return (env[variable] || defaults[variable]) as string
+function getVarOrDefault(variable: keyof WorkerEnv, defaults: WorkerEnv): (env: WorkerEnv) => string | null {
+  return function (env: WorkerEnv): string | null {
+    return (env[variable] || defaults[variable]) as string | null
   }
 }
 
@@ -50,7 +50,7 @@ export const proxySecretVarName = 'PROXY_SECRET'
 const getProxySecretVar = getVarOrDefault(proxySecretVarName, Defaults)
 export const isProxySecretSet = isVarSet(proxySecretVarName)
 
-export function getProxySecret(env: WorkerEnv): string {
+export function getProxySecret(env: WorkerEnv): string | null {
   return getProxySecretVar(env)
 }
 
