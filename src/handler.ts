@@ -1,6 +1,6 @@
-import { getScriptDownloadPath, getGetResultPath, getHealthCheckPath, WorkerEnv, getStatusPagePath } from './env'
+import { getScriptDownloadPath, getGetResultPath, WorkerEnv, getStatusPagePath } from './env'
 
-import { handleDownloadScript, handleIngressAPI, handleHealthCheck, handleStatusPage } from './handlers'
+import { handleDownloadScript, handleIngressAPI, handleStatusPage } from './handlers'
 import { createRoute } from './utils'
 
 export type Route = {
@@ -18,17 +18,12 @@ function createRoutes(env: WorkerEnv): Route[] {
     pathPattern: createRoute(getGetResultPath(env)),
     handler: handleIngressAPI,
   }
-  const healthRoute: Route = {
-    pathPattern: createRoute(getHealthCheckPath(env)),
-    handler: (_, env) => handleHealthCheck(env),
-  }
   const statusRoute: Route = {
     pathPattern: createRoute(getStatusPagePath(env)),
     handler: (request, env) => handleStatusPage(request, env),
   }
   routes.push(downloadScriptRoute)
   routes.push(ingressAPIRoute)
-  routes.push(healthRoute)
   routes.push(statusRoute)
 
   return routes
