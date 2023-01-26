@@ -71,6 +71,8 @@ function buildBody(env: WorkerEnv): string {
   <html lang='en-US'>
   <head>
     <meta charset='utf-8'/>
+    <title>Fingerprint Cloudflare Worker</title>
+    <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
   </head>
   <style>
     span {
