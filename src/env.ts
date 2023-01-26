@@ -54,10 +54,6 @@ export function getProxySecret(env: WorkerEnv): string {
   return getProxySecretVar(env)
 }
 
-export function getHealthCheckPath(env: WorkerEnv): string {
-  return `/${getWorkerPathVar(env)}/health`
-}
-
 export function getStatusPagePath(env: WorkerEnv): string {
   return `/${getWorkerPathVar(env)}/status`
 }
