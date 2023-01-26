@@ -8,9 +8,23 @@ import {
   proxySecretVarName,
 } from '../env'
 
-function buildHeaders(): Headers {
+function generateNonce() {
+  let result = ''
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const indices = crypto.getRandomValues(new Uint8Array(24))
+  for (const index of indices) {
+    result += characters[index % characters.length]
+  }
+  return btoa(result)
+}
+
+function buildHeaders(styleNonce: string): Headers {
   const headers = new Headers()
   headers.append('Content-Type', 'text/html')
+  headers.append(
+    'Content-Security-Policy',
+    `default-src 'self'; img-src https://fingerprint.com; style-src 'nonce-${styleNonce}'`,
+  )
   return headers
 }
 
@@ -74,14 +88,14 @@ function createEnvVarsInformationElement(env: WorkerEnv): string {
   return result
 }
 
-function buildBody(env: WorkerEnv): string {
+function buildBody(env: WorkerEnv, styleNonce: string): string {
   let body = `
   <html lang='en-US'>
   <head>
     <meta charset='utf-8'/>
     <title>Fingerprint Cloudflare Worker</title>
     <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
-    <style>
+    <style nonce='${styleNonce}'>
       span {
         display: block;
         padding-top: 1em;
@@ -110,8 +124,10 @@ export function handleStatusPage(request: Request, env: WorkerEnv): Response {
   if (request.method !== 'GET') {
     return new Response(null, { status: 405 })
   }
-  const headers = buildHeaders()
-  const body = buildBody(env)
+
+  const styleNonce = generateNonce()
+  const headers = buildHeaders(styleNonce)
+  const body = buildBody(env, styleNonce)
 
   return new Response(body, {
     status: 200,
