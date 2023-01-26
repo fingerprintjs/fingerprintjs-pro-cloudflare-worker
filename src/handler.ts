@@ -29,7 +29,22 @@ function createRoutes(env: WorkerEnv): Route[] {
   return routes
 }
 
-export async function handleRequestWithRoutes(request: Request, env: WorkerEnv, routes: Route[]): Promise<Response> {
+function handleNoMatch(urlPathname: string): Response {
+  const responseHeaders = new Headers({
+    'content-type': 'application/json',
+  })
+
+  return new Response(JSON.stringify({ error: `unmatched path ${urlPathname}` }), {
+    status: 404,
+    headers: responseHeaders,
+  })
+}
+
+export function handleRequestWithRoutes(
+  request: Request,
+  env: WorkerEnv,
+  routes: Route[],
+): Promise<Response> | Response {
   const url = new URL(request.url)
   for (const route of routes) {
     if (url.pathname.match(route.pathPattern)) {
@@ -37,7 +52,7 @@ export async function handleRequestWithRoutes(request: Request, env: WorkerEnv, 
     }
   }
 
-  return new Response(JSON.stringify({ error: `unmatched path ${url.pathname}` }), { status: 404 })
+  return handleNoMatch(url.pathname)
 }
 
 export async function handleRequest(request: Request, env: WorkerEnv): Promise<Response> {
