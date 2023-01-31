@@ -172,7 +172,6 @@ describe('ingress API request headers', () => {
     const req = new Request(reqURL.toString(), { headers: reqHeaders, method: 'POST' })
     await worker.fetch(req, workerEnv)
     receivedHeaders.forEach((value, key) => {
-      console.log({ key, value })
       expect(reqHeaders.get(key)).toBe(value)
     })
     reqHeaders.forEach((value, key) => {
