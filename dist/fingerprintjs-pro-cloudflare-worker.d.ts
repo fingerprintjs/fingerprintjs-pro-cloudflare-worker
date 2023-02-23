@@ -1,5 +1,5 @@
 /**
- * FingerprintJS Pro Cloudflare Worker v1.1.4 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com)
+ * FingerprintJS Pro Cloudflare Worker v1.2.0 - Copyright (c) FingerprintJS, Inc, 2023 (https://fingerprint.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
