@@ -1,12 +1,34 @@
-import { WorkerEnv, isScriptDownloadPathSet, isWorkerPathSet, isGetResultPathSet } from '../env'
+import {
+  WorkerEnv,
+  isScriptDownloadPathSet,
+  isGetResultPathSet,
+  isProxySecretSet,
+  agentScriptDownloadPathVarName,
+  getResultPathVarName,
+  proxySecretVarName,
+} from '../env'
 
-function buildHeaders(): Headers {
+function generateNonce() {
+  let result = ''
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const indices = crypto.getRandomValues(new Uint8Array(24))
+  for (const index of indices) {
+    result += characters[index % characters.length]
+  }
+  return btoa(result)
+}
+
+function buildHeaders(styleNonce: string): Headers {
   const headers = new Headers()
   headers.append('Content-Type', 'text/html')
+  headers.append(
+    'Content-Security-Policy',
+    `default-src 'none'; img-src https://fingerprint.com; style-src 'nonce-${styleNonce}'`,
+  )
   return headers
 }
 
-function addWorkerVersion(): string {
+function createWorkerVersionElement(): string {
   return `
   <span>
   Worker version: __current_worker_version__
@@ -14,7 +36,7 @@ function addWorkerVersion(): string {
   `
 }
 
-function addContactInformation(): string {
+function createContactInformationElement(): string {
   return `
   <span>
   Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
@@ -22,11 +44,11 @@ function addContactInformation(): string {
   `
 }
 
-function addEnvVarsInformation(env: WorkerEnv): string {
-  const isWorkerPathAvailable = isWorkerPathSet(env)
+function createEnvVarsInformationElement(env: WorkerEnv): string {
   const isScriptDownloadPathAvailable = isScriptDownloadPathSet(env)
   const isGetResultPathAvailable = isGetResultPathSet(env)
-  const isAllVarsAvailable = isWorkerPathAvailable && isScriptDownloadPathAvailable && isGetResultPathAvailable
+  const isProxySecretAvailable = isProxySecretSet(env)
+  const isAllVarsAvailable = isScriptDownloadPathAvailable && isGetResultPathAvailable && isProxySecretAvailable
 
   let result = ''
   if (!isAllVarsAvailable) {
@@ -35,24 +57,24 @@ function addEnvVarsInformation(env: WorkerEnv): string {
     The following environment variables are not defined. Please reach out our support team.
     </span>
     `
-    if (!isWorkerPathAvailable) {
-      result += `
-      <span>
-      WORKER_PATH variable is not defined
-      </span>
-      `
-    }
     if (!isScriptDownloadPathAvailable) {
       result += `
       <span>
-      SCRIPT_DOWNLOAD_PATH is not defined
+      ${agentScriptDownloadPathVarName} is not set
       </span>
       `
     }
     if (!isGetResultPathAvailable) {
       result += `
       <span>
-      GET_RESULT_PATH is not defined
+      ${getResultPathVarName} is not set
+      </span>
+      `
+    }
+    if (!isProxySecretAvailable) {
+      result += `
+      <span>
+      ${proxySecretVarName} is not set
       </span>
       `
     }
@@ -66,28 +88,30 @@ function addEnvVarsInformation(env: WorkerEnv): string {
   return result
 }
 
-function buildBody(env: WorkerEnv): string {
+function buildBody(env: WorkerEnv, styleNonce: string): string {
   let body = `
-  <html lang="en-US">
+  <html lang='en-US'>
   <head>
-    <meta charset="utf-8"/>
+    <meta charset='utf-8'/>
+    <title>Fingerprint Cloudflare Worker</title>
+    <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
+    <style nonce='${styleNonce}'>
+      span {
+        display: block;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        text-align: center;
+      }
+    </style>
   </head>
-  <style>
-    span {
-      display: block;
-      padding-top: 1em;
-      padding-bottom: 1em;
-      text-align: center;
-    }
-  </style>
   <body>
   `
 
   body += `<span>Your worker is deployed</span>`
 
-  body += addWorkerVersion()
-  body += addEnvVarsInformation(env)
-  body += addContactInformation()
+  body += createWorkerVersionElement()
+  body += createEnvVarsInformationElement(env)
+  body += createContactInformationElement()
 
   body += `  
   </body>
@@ -96,9 +120,14 @@ function buildBody(env: WorkerEnv): string {
   return body
 }
 
-export function handleStatusPage(env: WorkerEnv): Response {
-  const headers = buildHeaders()
-  const body = buildBody(env)
+export function handleStatusPage(request: Request, env: WorkerEnv): Response {
+  if (request.method !== 'GET') {
+    return new Response(null, { status: 405 })
+  }
+
+  const styleNonce = generateNonce()
+  const headers = buildHeaders(styleNonce)
+  const body = buildBody(env, styleNonce)
 
   return new Response(body, {
     status: 200,

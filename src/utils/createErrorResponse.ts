@@ -59,11 +59,12 @@ export function createErrorResponseForIngress(request: Request, error: string | 
   const responseHeaders: HeadersInit = {
     'Access-Control-Allow-Origin': requestOrigin,
     'Access-Control-Allow-Credentials': 'true',
+    'content-type': 'application/json',
   }
   return new Response(JSON.stringify(responseBody), { status: 500, headers: responseHeaders })
 }
 
 export function createErrorResponseForProCDN(error: string | Error | unknown): Response {
   const responseBody = { error: errorToString(error) }
-  return new Response(JSON.stringify(responseBody), { status: 500 })
+  return new Response(JSON.stringify(responseBody), { status: 500, headers: { 'content-type': 'application/json' } })
 }

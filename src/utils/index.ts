@@ -9,7 +9,8 @@ import { returnHttpResponse } from './returnHttpResponse'
 import { addProxyIntegrationHeaders } from './addProxyIntegrationHeaders'
 import { getEffectiveTLDPlusOne } from './getEffectiveTLDPlusOne'
 import { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue, filterCookies } from './cookie'
-import { removeTrailingSlashes } from './routing'
+import { createRoute, addTrailingWildcard, removeTrailingSlashesAndMultiSlashes, replaceDot } from './routing'
+import { getAgentScriptEndpoint, getVisitorIdEndpoint } from './proxyEndpoint'
 
 export {
   createCookieStringFromObject,
@@ -20,10 +21,15 @@ export {
   createErrorResponseForIngress,
   createErrorResponseForProCDN,
   addProxyIntegrationHeaders,
+  addTrailingWildcard,
+  removeTrailingSlashesAndMultiSlashes,
+  replaceDot,
   getEffectiveTLDPlusOne,
-  removeTrailingSlashes,
   returnHttpResponse,
   filterCookies,
   fetchCacheable,
+  createRoute,
+  getAgentScriptEndpoint,
+  getVisitorIdEndpoint,
   Cookie,
 }

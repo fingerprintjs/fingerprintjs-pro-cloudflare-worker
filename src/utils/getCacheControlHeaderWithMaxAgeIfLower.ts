@@ -11,11 +11,15 @@ function setDirective(directives: string[], directive: 'max-age' | 's-maxage', m
   }
 }
 
-export function getCacheControlHeaderWithMaxAgeIfLower(cacheControlHeaderValue: string, maxMaxAge: number): string {
+export function getCacheControlHeaderWithMaxAgeIfLower(
+  cacheControlHeaderValue: string,
+  maxMaxAge: number,
+  maxSMaxAge: number,
+): string {
   const cacheControlDirectives = cacheControlHeaderValue.split(', ')
 
   setDirective(cacheControlDirectives, 'max-age', maxMaxAge)
-  setDirective(cacheControlDirectives, 's-maxage', maxMaxAge)
+  setDirective(cacheControlDirectives, 's-maxage', maxSMaxAge)
 
   return cacheControlDirectives.join(', ')
 }

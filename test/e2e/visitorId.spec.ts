@@ -21,20 +21,25 @@ interface GetResult {
 }
 
 test.describe('visitorId', () => {
-  async function waitUntilVersion(
+  async function waitUntilOnline(
     reqContext: APIRequestContext,
     expectedVersion: string,
     retryCounter = 0,
     maxRetries = 10,
   ): Promise<boolean> {
-    const healthEndpoint = `https://${workerDomain}/${WORKER_PATH}/health`
-    console.log({ healthEndpoint })
-    const res = await reqContext.get(healthEndpoint)
+    const statusEndpoint = `https://${workerDomain}/${WORKER_PATH}/status`
+    console.log({ statusEndpoint })
+    const res = await reqContext.get(statusEndpoint)
     try {
-      const jsonRes = await res.json()
-      const version = (jsonRes as { version: string }).version
-      if (version === expectedVersion) {
-        return Promise.resolve(true)
+      const responseBody = await res.text()
+      if (responseBody.includes('Your worker is deployed')) {
+        const matches = responseBody.match(/Worker version: ([\d.\-snaphot]+)/)
+        if (matches && matches.length > 0) {
+          const version = matches[1]
+          if (version === expectedVersion) {
+            return Promise.resolve(true)
+          }
+        }
       }
     } catch (e) {
       // do nothing
@@ -46,7 +51,7 @@ test.describe('visitorId', () => {
     }
 
     await wait(1000)
-    return waitUntilVersion(reqContext, expectedVersion, newRetryCounter, maxRetries)
+    return waitUntilOnline(reqContext, expectedVersion, newRetryCounter, maxRetries)
   }
 
   async function testForElement(el: ElementHandle<SVGElement | HTMLElement>) {
@@ -75,8 +80,8 @@ test.describe('visitorId', () => {
 
   test('should show visitorId in the HTML (NPM & CDN)', async ({ page }) => {
     const reqContext = await request.newContext()
-    const versionSuccess = await waitUntilVersion(reqContext, INT_VERSION)
-    expect(versionSuccess).toBeTruthy()
+    const isOnline = await waitUntilOnline(reqContext, INT_VERSION)
+    expect(isOnline).toBeTruthy()
 
     await runTest(page, testWebsiteURL.href)
   })

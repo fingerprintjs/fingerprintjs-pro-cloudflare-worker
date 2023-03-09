@@ -1,0 +1,196 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`status page content when agent script download path and proxy secret are not set 1`] = `
+"
+  <html lang='en-US'>
+  <head>
+    <meta charset='utf-8'/>
+    <title>Fingerprint Cloudflare Worker</title>
+    <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
+      span {
+        display: block;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+  <span>Your worker is deployed</span>
+  <span>
+  Worker version: __current_worker_version__
+  </span>
+  
+    <span>
+    The following environment variables are not defined. Please reach out our support team.
+    </span>
+    
+      <span>
+      AGENT_SCRIPT_DOWNLOAD_PATH is not set
+      </span>
+      
+      <span>
+      PROXY_SECRET is not set
+      </span>
+      
+  <span>
+  Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
+  </span>
+    
+  </body>
+  </html>
+  "
+`;
+
+exports[`status page content when agent script download path is not set 1`] = `
+"
+  <html lang='en-US'>
+  <head>
+    <meta charset='utf-8'/>
+    <title>Fingerprint Cloudflare Worker</title>
+    <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
+      span {
+        display: block;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+  <span>Your worker is deployed</span>
+  <span>
+  Worker version: __current_worker_version__
+  </span>
+  
+    <span>
+    The following environment variables are not defined. Please reach out our support team.
+    </span>
+    
+      <span>
+      AGENT_SCRIPT_DOWNLOAD_PATH is not set
+      </span>
+      
+  <span>
+  Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
+  </span>
+    
+  </body>
+  </html>
+  "
+`;
+
+exports[`status page content when all variables are set 1`] = `
+"
+  <html lang='en-US'>
+  <head>
+    <meta charset='utf-8'/>
+    <title>Fingerprint Cloudflare Worker</title>
+    <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
+      span {
+        display: block;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+  <span>Your worker is deployed</span>
+  <span>
+  Worker version: __current_worker_version__
+  </span>
+  
+    <span>
+    All environment variables are set
+    </span>
+    
+  <span>
+  Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
+  </span>
+    
+  </body>
+  </html>
+  "
+`;
+
+exports[`status page content when get result path is not set 1`] = `
+"
+  <html lang='en-US'>
+  <head>
+    <meta charset='utf-8'/>
+    <title>Fingerprint Cloudflare Worker</title>
+    <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
+      span {
+        display: block;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+  <span>Your worker is deployed</span>
+  <span>
+  Worker version: __current_worker_version__
+  </span>
+  
+    <span>
+    The following environment variables are not defined. Please reach out our support team.
+    </span>
+    
+      <span>
+      GET_RESULT_PATH is not set
+      </span>
+      
+  <span>
+  Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
+  </span>
+    
+  </body>
+  </html>
+  "
+`;
+
+exports[`status page content when proxy secret is not set 1`] = `
+"
+  <html lang='en-US'>
+  <head>
+    <meta charset='utf-8'/>
+    <title>Fingerprint Cloudflare Worker</title>
+    <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
+      span {
+        display: block;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+  <span>Your worker is deployed</span>
+  <span>
+  Worker version: __current_worker_version__
+  </span>
+  
+    <span>
+    The following environment variables are not defined. Please reach out our support team.
+    </span>
+    
+      <span>
+      PROXY_SECRET is not set
+      </span>
+      
+  <span>
+  Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
+  </span>
+    
+  </body>
+  </html>
+  "
+`;
