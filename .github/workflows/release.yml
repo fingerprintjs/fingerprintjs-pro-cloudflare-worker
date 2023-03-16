@@ -34,7 +34,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v3
         with:
-          node-version-file: '.node-version'
+          node-version: 16
 
       - name: Set git settings
         uses: fregante/setup-git-user@2e28d51939d2a84005a917d2f844090637f435f8 # commit hash = v1.1.0
