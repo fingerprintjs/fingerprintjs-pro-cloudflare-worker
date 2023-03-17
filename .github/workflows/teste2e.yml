@@ -35,10 +35,10 @@ jobs:
       - name: Generate random paths
         run: |
           postfix=$(date +%s)
-          echo ::set-output name=WORKER_NAME::automated-test-$postfix
-          echo ::set-output name=WORKER_PATH::fpjs-worker-$postfix
-          echo ::set-output name=GET_RESULT_PATH::get-result-$postfix
-          echo ::set-output name=AGENT_DOWNLOAD_PATH::agent-download-$postfix
+          echo WORKER_NAME=automated-test-$postfix >> $GITHUB_OUTPUT
+          echo WORKER_PATH=fpjs-worker-$postfix >> $GITHUB_OUTPUT
+          echo GET_RESULT_PATH=get-result-$postfix >> $GITHUB_OUTPUT
+          echo AGENT_DOWNLOAD_PATH=agent-download-$postfix >> $GITHUB_OUTPUT
         id: random-path-generator
       - name: Modify wrangler.toml
         run: |
@@ -58,7 +58,7 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
       - name: Get version
         id: version
-        uses: notiz-dev/github-action-json-property@2192e246737701f108a4571462b76c75e7376216 # commit hash = v0.1.0
+        uses: notiz-dev/github-action-json-property@a5a9c668b16513c737c3e1f8956772c99c73f6e8 # commit hash = v0.2.0
         with:
           path: 'package.json'
           prop_path: 'version'
