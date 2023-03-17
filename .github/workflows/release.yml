@@ -58,7 +58,7 @@ jobs:
 
       - name: Get version
         id: version
-        uses: notiz-dev/github-action-json-property@2192e246737701f108a4571462b76c75e7376216 # commit hash = v0.1.0
+        uses: notiz-dev/github-action-json-property@a5a9c668b16513c737c3e1f8956772c99c73f6e8 # commit hash = v0.1.0
         with:
           path: 'package.json'
           prop_path: 'version'
