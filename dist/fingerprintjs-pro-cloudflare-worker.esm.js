@@ -38619,12 +38619,20 @@ function filterCookies(headers, filterFunc) {
 function removeTrailingSlashesAndMultiSlashes(str) {
     return str.replace(/\/+$/, '').replace(/(?<=\/)\/+/, '');
 }
+function addPathnameMatchBeforeRoute(route) {
+    return `[\\/[A-Za-z0-9:.|-]*${route}`;
+}
+function addEndingTrailingSlashToRoute(route) {
+    return `${route}\\/*`;
+}
 function createRoute(route) {
     let routeRegExp = route;
     // routeRegExp = addTrailingWildcard(routeRegExp) // Can be uncommented if wildcard (*) is needed
     routeRegExp = removeTrailingSlashesAndMultiSlashes(routeRegExp);
+    routeRegExp = addPathnameMatchBeforeRoute(routeRegExp);
+    routeRegExp = addEndingTrailingSlashToRoute(routeRegExp);
     // routeRegExp = replaceDot(routeRegExp) // Can be uncommented if dot (.) is needed
-    return RegExp(`^[\\/\\w]*${routeRegExp}\\/*$`);
+    return RegExp(`^${routeRegExp}$`);
 }
 
 const DEFAULT_AGENT_VERSION = '3';
