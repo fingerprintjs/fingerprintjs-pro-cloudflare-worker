@@ -3,7 +3,6 @@ import worker from '../../src'
 import { FPJSResponse } from '../../src/utils/createErrorResponse'
 
 const workerEnv: WorkerEnv = {
-  WORKER_PATH: 'worker_path',
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
@@ -155,7 +154,6 @@ describe('ingress API request headers', () => {
 
   test('req headers are the same (except Cookie) when no proxy secret', async () => {
     const workerEnv: WorkerEnv = {
-      WORKER_PATH: 'worker_path',
       PROXY_SECRET: null,
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',

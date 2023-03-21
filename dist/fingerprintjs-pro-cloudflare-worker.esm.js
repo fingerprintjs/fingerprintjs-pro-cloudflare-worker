@@ -4,7 +4,6 @@
  */
 
 const Defaults = {
-    WORKER_PATH: 'cf-worker',
     AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
     GET_RESULT_PATH: 'getResult',
     PROXY_SECRET: null,
@@ -19,21 +18,19 @@ function isVarSet(variable) {
         return env[variable] != null;
     };
 }
-const workerPathVarName = 'WORKER_PATH';
-const getWorkerPathVar = getVarOrDefault(workerPathVarName, Defaults);
 const agentScriptDownloadPathVarName = 'AGENT_SCRIPT_DOWNLOAD_PATH';
 const getAgentPathVar = getVarOrDefault(agentScriptDownloadPathVarName, Defaults);
 const isScriptDownloadPathSet = isVarSet(agentScriptDownloadPathVarName);
 function getScriptDownloadPath(env) {
     const agentPathVar = getAgentPathVar(env);
-    return `/${getWorkerPathVar(env)}/${agentPathVar}`;
+    return `/${agentPathVar}`;
 }
 const getResultPathVarName = 'GET_RESULT_PATH';
 const getGetResultPathVar = getVarOrDefault(getResultPathVarName, Defaults);
 const isGetResultPathSet = isVarSet(getResultPathVarName);
 function getGetResultPath(env) {
     const getResultPathVar = getGetResultPathVar(env);
-    return `/${getWorkerPathVar(env)}/${getResultPathVar}`;
+    return `/${getResultPathVar}`;
 }
 const proxySecretVarName = 'PROXY_SECRET';
 const getProxySecretVar = getVarOrDefault(proxySecretVarName, Defaults);
@@ -41,8 +38,8 @@ const isProxySecretSet = isVarSet(proxySecretVarName);
 function getProxySecret(env) {
     return getProxySecretVar(env);
 }
-function getStatusPagePath(env) {
-    return `/${getWorkerPathVar(env)}/status`;
+function getStatusPagePath() {
+    return `/status`;
 }
 
 function setDirective(directives, directive, maxMaxAge) {
@@ -38627,7 +38624,7 @@ function createRoute(route) {
     // routeRegExp = addTrailingWildcard(routeRegExp) // Can be uncommented if wildcard (*) is needed
     routeRegExp = removeTrailingSlashesAndMultiSlashes(routeRegExp);
     // routeRegExp = replaceDot(routeRegExp) // Can be uncommented if dot (.) is needed
-    return RegExp(`^${routeRegExp}/*$`);
+    return RegExp(`^[\\/\\w]*${routeRegExp}\\/*$`);
 }
 
 const DEFAULT_AGENT_VERSION = '3';
@@ -38856,7 +38853,7 @@ function createRoutes(env) {
         handler: handleIngressAPI,
     };
     const statusRoute = {
-        pathPattern: createRoute(getStatusPagePath(env)),
+        pathPattern: createRoute(getStatusPagePath()),
         handler: (request, env) => handleStatusPage(request, env),
     };
     routes.push(downloadScriptRoute);

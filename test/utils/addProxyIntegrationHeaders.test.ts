@@ -9,7 +9,6 @@ describe('addProxyIntegrationHeaders', () => {
     headers.set('CF-Connecting-IP', '19.117.63.126')
     headers.set('x-custom-header', 'custom-value')
     env = {
-      WORKER_PATH: 'worker-path',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent-path',
       GET_RESULT_PATH: 'result-path',
       PROXY_SECRET: 'secret_value',

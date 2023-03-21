@@ -15,5 +15,5 @@ export function createRoute(route: string): RegExp {
   // routeRegExp = addTrailingWildcard(routeRegExp) // Can be uncommented if wildcard (*) is needed
   routeRegExp = removeTrailingSlashesAndMultiSlashes(routeRegExp)
   // routeRegExp = replaceDot(routeRegExp) // Can be uncommented if dot (.) is needed
-  return RegExp(`^${routeRegExp}/*$`)
+  return RegExp(`^[\\/\\w]*${routeRegExp}\\/*$`)
 }

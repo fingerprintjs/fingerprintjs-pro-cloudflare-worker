@@ -3,12 +3,10 @@ import { areVisitorIdAndRequestIdValid, wait } from './utils'
 import { ElementHandle } from 'playwright-core'
 
 const INT_VERSION = process.env.worker_version || ''
-const WORKER_PATH = process.env.worker_path || 'fpjs-worker-default'
 const GET_RESULT_PATH = process.env.get_result_path || 'get-result-default'
 const AGENT_DOWNLOAD_PATH = process.env.agent_download_path || 'agent-download-default'
 
 const testWebsiteURL = new URL(`https://${process.env.test_client_domain}`)
-testWebsiteURL.searchParams.set('worker-path', WORKER_PATH)
 testWebsiteURL.searchParams.set('get-result-path', GET_RESULT_PATH)
 testWebsiteURL.searchParams.set('agent-download-path', AGENT_DOWNLOAD_PATH)
 
@@ -27,7 +25,7 @@ test.describe('visitorId', () => {
     retryCounter = 0,
     maxRetries = 10,
   ): Promise<boolean> {
-    const statusEndpoint = `https://${workerDomain}/${WORKER_PATH}/status`
+    const statusEndpoint = `https://${workerDomain}/status`
     console.log({ statusEndpoint })
     const res = await reqContext.get(statusEndpoint)
     try {
