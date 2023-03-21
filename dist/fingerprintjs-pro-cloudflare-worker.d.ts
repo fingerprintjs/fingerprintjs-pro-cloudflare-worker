@@ -4,7 +4,6 @@
  */
 
 declare type WorkerEnv = {
-    WORKER_PATH: string | null;
     AGENT_SCRIPT_DOWNLOAD_PATH: string | null;
     GET_RESULT_PATH: string | null;
     PROXY_SECRET: string | null;
