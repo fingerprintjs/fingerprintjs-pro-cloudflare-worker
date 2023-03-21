@@ -81,7 +81,14 @@ describe('pathNameRegExp', () => {
 })
 
 describe('createRoute', () => {
-  it.each(['/fpjs-worker-path-0123456789/status', '/fpjsworker/status', '/status', '/path/path2/path3/path4/status'])('%s should match with /status', (route) => {
+  const routeCases = [
+      '/fpjs-worker-path-0123456789/status',
+      '/fpjsworker/status',
+      '/status',
+      '/path/path2/path3/path4/status',
+      '/worker_path/status'
+  ]
+  it.each(routeCases)('%s should match with /status', (route) => {
     expect(createRoute('/status').test(route)).toBe(true)
   })
 })
