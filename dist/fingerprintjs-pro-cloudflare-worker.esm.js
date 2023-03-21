@@ -38620,7 +38620,7 @@ function removeTrailingSlashesAndMultiSlashes(str) {
     return str.replace(/\/+$/, '').replace(/(?<=\/)\/+/, '');
 }
 function addPathnameMatchBeforeRoute(route) {
-    return `[\\/[A-Za-z0-9:.|-]*${route}`;
+    return `[\\/[A-Za-z0-9:._-]*${route}`;
 }
 function addEndingTrailingSlashToRoute(route) {
     return `${route}\\/*`;
