@@ -4,6 +4,7 @@
  */
 
 const Defaults = {
+    WORKER_PATH: 'cf-worker',
     AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
     GET_RESULT_PATH: 'getResult',
     PROXY_SECRET: null,
@@ -18,19 +19,21 @@ function isVarSet(variable) {
         return env[variable] != null;
     };
 }
+const workerPathVarName = 'WORKER_PATH';
+const getWorkerPathVar = getVarOrDefault(workerPathVarName, Defaults);
 const agentScriptDownloadPathVarName = 'AGENT_SCRIPT_DOWNLOAD_PATH';
 const getAgentPathVar = getVarOrDefault(agentScriptDownloadPathVarName, Defaults);
 const isScriptDownloadPathSet = isVarSet(agentScriptDownloadPathVarName);
 function getScriptDownloadPath(env) {
     const agentPathVar = getAgentPathVar(env);
-    return `/${agentPathVar}`;
+    return `/${getWorkerPathVar(env)}/${agentPathVar}`;
 }
 const getResultPathVarName = 'GET_RESULT_PATH';
 const getGetResultPathVar = getVarOrDefault(getResultPathVarName, Defaults);
 const isGetResultPathSet = isVarSet(getResultPathVarName);
 function getGetResultPath(env) {
     const getResultPathVar = getGetResultPathVar(env);
-    return `/${getResultPathVar}`;
+    return `/${getWorkerPathVar(env)}/${getResultPathVar}`;
 }
 const proxySecretVarName = 'PROXY_SECRET';
 const getProxySecretVar = getVarOrDefault(proxySecretVarName, Defaults);
@@ -38,8 +41,8 @@ const isProxySecretSet = isVarSet(proxySecretVarName);
 function getProxySecret(env) {
     return getProxySecretVar(env);
 }
-function getStatusPagePath() {
-    return `/status`;
+function getStatusPagePath(env) {
+    return `/${getWorkerPathVar(env)}/status`;
 }
 
 function setDirective(directives, directive, maxMaxAge) {
@@ -38619,20 +38622,12 @@ function filterCookies(headers, filterFunc) {
 function removeTrailingSlashesAndMultiSlashes(str) {
     return str.replace(/\/+$/, '').replace(/(?<=\/)\/+/, '');
 }
-function addPathnameMatchBeforeRoute(route) {
-    return `[\\/[A-Za-z0-9:._-]*${route}`;
-}
-function addEndingTrailingSlashToRoute(route) {
-    return `${route}\\/*`;
-}
 function createRoute(route) {
     let routeRegExp = route;
     // routeRegExp = addTrailingWildcard(routeRegExp) // Can be uncommented if wildcard (*) is needed
     routeRegExp = removeTrailingSlashesAndMultiSlashes(routeRegExp);
-    routeRegExp = addPathnameMatchBeforeRoute(routeRegExp);
-    routeRegExp = addEndingTrailingSlashToRoute(routeRegExp);
     // routeRegExp = replaceDot(routeRegExp) // Can be uncommented if dot (.) is needed
-    return RegExp(`^${routeRegExp}$`);
+    return RegExp(`^${routeRegExp}/*$`);
 }
 
 const DEFAULT_AGENT_VERSION = '3';
@@ -38861,7 +38856,7 @@ function createRoutes(env) {
         handler: handleIngressAPI,
     };
     const statusRoute = {
-        pathPattern: createRoute(getStatusPagePath()),
+        pathPattern: createRoute(getStatusPagePath(env)),
         handler: (request, env) => handleStatusPage(request, env),
     };
     routes.push(downloadScriptRoute);
