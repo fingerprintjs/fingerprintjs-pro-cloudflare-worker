@@ -1,5 +1,5 @@
-import {removeTrailingSlashesAndMultiSlashes, addTrailingWildcard, replaceDot, createRoute} from '../../src/utils'
-import {addEndingTrailingSlashToRoute, addPathnameMatchBeforeRoute} from "../../src/utils/routing";
+import { removeTrailingSlashesAndMultiSlashes, addTrailingWildcard, replaceDot, createRoute } from '../../src/utils'
+import { addEndingTrailingSlashToRoute, addPathnameMatchBeforeRoute } from '../../src/utils/routing'
 
 describe('removeTrailingSlashesAndMultiSlashes', () => {
   it('returns /path for /path', () => {
@@ -63,7 +63,7 @@ describe('replaceDot', () => {
 
 describe('addEndingTrailingSlashToRoute', () => {
   it('should add \\/* to /status', () => {
-    expect(addEndingTrailingSlashToRoute('/status')).toBe('/status\\/*');
+    expect(addEndingTrailingSlashToRoute('/status')).toBe('/status\\/*')
   })
 })
 
@@ -82,11 +82,11 @@ describe('pathNameRegExp', () => {
 
 describe('createRoute', () => {
   const routeCases = [
-      '/fpjs-worker-path-0123456789/status',
-      '/fpjsworker/status',
-      '/status',
-      '/path/path2/path3/path4/status',
-      '/worker_path/status'
+    '/fpjs-worker-path-0123456789/status',
+    '/fpjsworker/status',
+    '/status',
+    '/path/path2/path3/path4/status',
+    '/worker_path/status',
   ]
   it.each(routeCases)('%s should match with /status', (route) => {
     expect(createRoute('/status').test(route)).toBe(true)
