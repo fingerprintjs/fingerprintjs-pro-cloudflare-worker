@@ -62,33 +62,41 @@ describe('replaceDot', () => {
 })
 
 describe('addEndingTrailingSlashToRoute', () => {
-  it('should add \\/* to /status', () => {
+  it('returns /status\\/* for /status', () => {
     expect(addEndingTrailingSlashToRoute('/status')).toBe('/status\\/*')
+  })
+  it('returns \\/* for empty string', () => {
+    expect(addEndingTrailingSlashToRoute('')).toBe('\\/*')
   })
 })
 
-describe('pathNameRegExp', () => {
-  it('should add [\\/[A-Za-z0-9:._-]* to /status', () => {
+describe('addPathnameMatchBeforeRoute', () => {
+  it('returns [\\/[A-Za-z0-9:._-]*/status to /status', () => {
     expect(addPathnameMatchBeforeRoute('/status')).toBe('[\\/[A-Za-z0-9:._-]*/status')
   })
-  it('return true for /path/path2/example-path-2/status when tested', () => {
-    expect(
-      RegExp(`^${addPathnameMatchBeforeRoute(removeTrailingSlashesAndMultiSlashes('/status'))}$`).test(
-        '/path/path2/example-path-2/status',
-      ),
-    ).toBe(true)
+  it('returns [\\/[A-Za-z0-9:._-]* for empty string', () => {
+    expect(addPathnameMatchBeforeRoute('')).toBe('[\\/[A-Za-z0-9:._-]*')
   })
 })
 
 describe('createRoute', () => {
-  const routeCases = [
+  const matchingRouteCases = [
     '/fpjs-worker-path-0123456789/status',
     '/fpjsworker/status',
     '/status',
+    '/status/',
+    '//status',
+    '//status//',
     '/path/path2/path3/path4/status',
+    '/path/path2//path3/path4/status',
     '/worker_path/status',
+    '/status/worker_path/status',
   ]
-  it.each(routeCases)('%s should match with /status', (route) => {
+  it.each(matchingRouteCases)('%s matches /status', (route) => {
     expect(createRoute('/status').test(route)).toBe(true)
+  })
+  const unMatchingRouteCases = ['/status/some-path']
+  it.each(unMatchingRouteCases)("%s doesn't match /status", (route) => {
+    expect(createRoute('/status').test(route)).toBe(false)
   })
 })
