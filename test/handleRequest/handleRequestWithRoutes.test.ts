@@ -45,7 +45,7 @@ describe('download Pro Agent Script', () => {
     expect(mockAgentDownloadHandler).toHaveBeenCalledTimes(1)
   })
   test('incorrect path', async () => {
-    const request = new Request(`https://example.com/${agentScriptDownloadPath}/a`)
+    const request = new Request(`https://example.com/${agentScriptDownloadPath}/some-path`)
     await handleRequestWithRoutes(request, env, routes)
     expect(mockAgentDownloadHandler).not.toHaveBeenCalled()
   })
@@ -84,7 +84,7 @@ describe('get GetResult', () => {
     expect(mockIngressAPIHandler).toHaveBeenCalledTimes(1)
   })
   test('incorrect path', async () => {
-    const request = new Request(`https://example.com/${getResultPath}/a`)
+    const request = new Request(`https://example.com/${getResultPath}/some-path`)
     await handleRequestWithRoutes(request, env, routes)
     expect(mockIngressAPIHandler).not.toHaveBeenCalled()
   })
@@ -123,7 +123,7 @@ describe('status page', () => {
     expect(mockStatusPageHandler).toHaveBeenCalledTimes(1)
   })
   test('incorrect path', async () => {
-    const request = new Request(`https://example.com/status/a`)
+    const request = new Request(`https://example.com/status/some-path`)
     await handleRequestWithRoutes(request, env, routes)
     expect(mockStatusPageHandler).not.toHaveBeenCalled()
   })
