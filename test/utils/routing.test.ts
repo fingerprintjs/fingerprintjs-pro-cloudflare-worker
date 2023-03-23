@@ -71,7 +71,7 @@ describe('addEndingTrailingSlashToRoute', () => {
 })
 
 describe('addPathnameMatchBeforeRoute', () => {
-  it('returns [\\/[A-Za-z0-9:._-]*/status to /status', () => {
+  it('returns [\\/[A-Za-z0-9:._-]*/status for /status', () => {
     expect(addPathnameMatchBeforeRoute('/status')).toBe('[\\/[A-Za-z0-9:._-]*/status')
   })
   it('returns [\\/[A-Za-z0-9:._-]* for empty string', () => {
