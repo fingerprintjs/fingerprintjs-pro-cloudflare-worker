@@ -41,6 +41,8 @@ jobs:
 
       - name: Install Node packages
         run: yarn install
+      - name: Build
+        run: yarn build
       - name: Lint
         run: yarn lint
       - name: Tests
@@ -51,8 +53,6 @@ jobs:
 
       - name: Bump version
         run: yarn version --${{ github.event.inputs.version_bump }}
-      - name: Build
-        run: yarn build
       - name: Type check
         run: yarn test:dts
 
@@ -75,6 +75,7 @@ jobs:
         with:
           tag: v${{steps.version.outputs.prop}}
           name: Release ${{steps.version.outputs.prop}}
+          artifacts: "dist/fingerprintjs-pro-cloudflare-worker.d.ts,dist/fingerprintjs-pro-cloudflare-worker.esm.js"
 #       Comment out below part because PRs created by bots don't trigger GitHub checks and the PR gets stuck
 #       More info: https://github.com/peter-evans/create-pull-request/issues/48
 #      - name: Create Pull Request from develop to main
