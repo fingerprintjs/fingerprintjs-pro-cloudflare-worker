@@ -9,3 +9,4 @@
 .idea/
 .vscode/
 yarn-error.log
+dist/
