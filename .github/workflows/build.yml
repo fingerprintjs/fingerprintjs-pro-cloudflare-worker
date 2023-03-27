@@ -31,9 +31,9 @@ jobs:
         run: yarn install
       - name: Lint
         run: yarn lint
-      - name: Tests
-        run: yarn test
       - name: Build
         run: yarn build
+      - name: Tests
+        run: yarn test
       - name: Typecheck
         run: yarn test:dts
