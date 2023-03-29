@@ -42,6 +42,8 @@ jobs:
       - name: Install Node packages
         run: yarn install
 
+      - name: Disable version tags
+        run: yarn config set version-git-tag false
       - name: Bump version
         run: yarn version --${{ github.event.inputs.version_bump }} --no-commit-hooks
       - name: Build
@@ -50,9 +52,6 @@ jobs:
         run: yarn lint
       - name: Tests
         run: yarn test
-
-      - name: Disable version tags
-        run: yarn config set version-git-tag false
 
       - name: Type check
         run: yarn test:dts
