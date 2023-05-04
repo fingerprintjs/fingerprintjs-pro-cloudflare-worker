@@ -15,7 +15,8 @@
     "test": "jest --coverage",
     "test:dts": "tsc --noEmit --isolatedModules dist/fingerprintjs-pro-cloudflare-worker.d.ts",
     "test:e2e": "npx playwright test",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release": "semantic-release"
   },
   "main": "dist/fingerprintjs-pro-cloudflare-worker.esm.js",
   "module": "dist/fingerprintjs-pro-cloudflare-worker.esm.js",
@@ -37,6 +38,11 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^11.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^8.0.7",
+    "@semantic-release/npm": "^10.0.3",
     "@types/cookie": "^0.5.1",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.5",
@@ -53,6 +59,7 @@
     "rollup": "^2.70.1",
     "rollup-plugin-dts": "^4.2.3",
     "rollup-plugin-license": "^2.8.1",
+    "semantic-release": "^21.0.2",
     "ts-jest": "^29.0.2",
     "typescript": "^4.9.5"
   },
