@@ -10,3 +10,4 @@
 .vscode/
 yarn-error.log
 dist/
+release/node_modules

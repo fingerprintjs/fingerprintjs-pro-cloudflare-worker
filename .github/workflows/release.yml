@@ -19,7 +19,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v3
         with:
-          node-version-file: '.node-version'
+          node-version: '18' # This workflow ignores node-version-file because semantic-release requires node 18 and cloudflare-wrangler-action requires node 16
 
       - name: Install Node packages
         run: yarn install
@@ -31,8 +31,10 @@ jobs:
         run: yarn build
       - name: Type check
         run: yarn test:dts
+      - name: Install release dependencies
+        run: yarn install --cwd=release
       - name: Release
-        run: yarn release
+        run: ./release/node_modules/.bin/semantic-release --extends ./release/.releaserc.js
         env:
           GITHUB_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
           HUSKY: 0
