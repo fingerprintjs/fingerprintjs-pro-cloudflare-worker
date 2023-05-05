@@ -19,7 +19,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # This workflow ignores node-version-file because semantic-release requires node 18 and cloudflare-wrangler-action requires node 16
+          node-version-file: '.node-version'
 
       - name: Install Node packages
         run: yarn install
