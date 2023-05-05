@@ -37,9 +37,8 @@ jobs:
         uses: cycjimmy/semantic-release-action@91ab76a4a393a8d0c4739e9aea1818b56bc953ea
         with:
           extra_plugins: |
-            @semantic-release/changelog@6.0.3
-            @semantic-release/git@10.0.1
             @semantic-release/exec@6.0.3
+            conventional-changelog-conventionalcommits@5.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
           HUSKY: 0
