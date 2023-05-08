@@ -63,8 +63,6 @@ jobs:
           prop_path: 'version'
       - name: Install dependencies
         run: npx playwright install
-      - name: Build
-        run: yarn build
       - name: Run test
         run:  yarn test:e2e
         env:
