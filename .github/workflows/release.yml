@@ -10,6 +10,8 @@ jobs:
     environment: production
     runs-on: ubuntu-latest
 
+    if: github.ref_protected == true
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
