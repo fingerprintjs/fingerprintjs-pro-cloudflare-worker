@@ -28,7 +28,7 @@
     "node": "~16 || ~18"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^3.4.0",
+    "@cloudflare/workers-types": "^4.20230419.0",
     "@commitlint/cli": "^17.5.1",
     "@commitlint/config-conventional": "^17.4.4",
     "@playwright/test": "^1.23.2",
