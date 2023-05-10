@@ -88,7 +88,7 @@ The `teste2e.yml` workflow is responsible for deploying a new Cloudflare worker,
 7. Delete the published Cloudflare worker from the Cloudflare account.
 
 If tests fail, the last step (cleaning up the worker) is never executed by design, so that there is opportunity to inspect the worker to understand what went wrong.
-Do not forget to delete the worker manually after.
+Do not forget to delete the worker manually after using the Cloudflare dashboard. You can find the name of the worker in the workflow logs.
 
 If the required environment variables are supplied, `yarn test:e2e` can be run locally without needing `teste2e.yml`.
 
