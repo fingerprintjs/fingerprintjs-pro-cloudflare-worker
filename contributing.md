@@ -69,8 +69,28 @@ You are required to follow [conventional commits](https://www.conventionalcommit
 
 ### How to test
 
-End-to-end tests are located in `test/e2e` folder and run by [playwright](https://github.com/microsoft/playwright) environment. 
-These tests are run automatically by the `teste2e.yml` workflow on every PR automatically, you don't need to run them locally. 
+#### Unit tests
+
+Run `yarn test`.
+
+#### e2e tests
+
+End-to-end tests are run automatically on every PR. They also run daily on the `main` branch.
+
+End-to-end tests are located in the `test/e2e` folder and run by [playwright](https://github.com/microsoft/playwright) environment. 
+The `teste2e.yml` workflow is responsible for deploying a new Cloudflare worker, running end-to-end tests, and cleaning up the worker in the end. `teste2e.yml` works like this:
+1. Check out the current branch (can be any branch).
+2. Bump version according to the input, default to `patch`.
+3. Generate environment variables, such as `WORKER_NAME` and `GET_RESULT_PATH`. Put them inside `wranger.toml`.
+4. Publish the worker using `cloudfare/wrangler-action` to the designated Cloudflare account.
+5. Install `playwright`.
+6. Run `yarn test:e2e` with env variables `test_client_domain`, `worker_version`, `worker_path`, `get_result_path`, and `agent_download_path`.
+7. Delete the published Cloudflare worker from the Cloudflare account.
+
+If tests fail, the last step (cleaning up the worker) is never executed by design, so that there is opportunity to inspect the worker to understand what went wrong.
+Do not forget to delete the worker manually after.
+
+If the required environment variables are supplied, `yarn test:e2e` can be run locally without needing `teste2e.yml`.
 
 ### How to release a new version
 
