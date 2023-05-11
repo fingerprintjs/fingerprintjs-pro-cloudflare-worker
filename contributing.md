@@ -90,7 +90,7 @@ The `teste2e.yml` workflow is responsible for deploying a new Cloudflare worker,
 If tests fail, the last step (cleaning up the worker) is never executed by design, so that there is opportunity to inspect the worker to understand what went wrong.
 Do not forget to delete the worker manually after using the Cloudflare dashboard. You can find the name of the worker in the workflow logs.
 
-If the required environment variables are supplied, `yarn test:e2e` can be run locally without needing `teste2e.yml`.
+If the required environment variables are supplied, `yarn test:e2e` can be run locally without needing `teste2e.yml`. For example, the command `worker_version=1.2.3 yarn test:e2e` sets `worker_version` as a temporary env variable on *nix systems.
 
 ### How to release a new version
 
