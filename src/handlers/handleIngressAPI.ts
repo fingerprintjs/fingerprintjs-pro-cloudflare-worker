@@ -46,7 +46,7 @@ function createResponseWithFirstPartyCookies(request: Request, response: Respons
   })
 }
 
-function makeIngressAPIRequest(request: Request, env: WorkerEnv) {
+async function makeIngressAPIRequest(request: Request, env: WorkerEnv) {
   const oldURL = new URL(request.url)
   const endpoint = getVisitorIdEndpoint(oldURL.searchParams)
   const newURL = new URL(endpoint)
@@ -58,7 +58,8 @@ function makeIngressAPIRequest(request: Request, env: WorkerEnv) {
   headers = filterCookies(headers, (key) => key === '_iidt')
 
   console.log(`sending ingress api to ${newURL}...`)
-  const newRequest = new Request(newURL.toString(), new Request(request, { headers }))
+  const body = await (request.headers.get('Content-Type') ? request.blob() : Promise.resolve(null))
+  const newRequest = new Request(newURL.toString(), new Request(request, { headers, body }))
   return fetch(newRequest).then((response) => createResponseWithFirstPartyCookies(request, response))
 }
 
