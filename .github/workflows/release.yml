@@ -2,92 +2,43 @@ name: Release
 
 on:
   workflow_dispatch:
-    inputs:
-      version_bump:
-        description: 'A type of version bump'
-        default: 'patch'
-        required: true
-        type: choice
-        options:
-          - major
-          - minor
-          - patch
+
 
 jobs:
   release:
     name: Release new version
-    runs-on: ubuntu-20.04
+    environment: production
+    runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-      pull-requests: write
-
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref_protected == true
 
     steps:
-      - name: Checkout develop branch
+      - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: develop
-          fetch-depth: 0
+          persist-credentials: false
 
       - name: Install node
         uses: actions/setup-node@v3
         with:
           node-version-file: '.node-version'
 
-      - name: Set git settings
-        uses: fregante/setup-git-user@2e28d51939d2a84005a917d2f844090637f435f8 # commit hash = v1.1.0
-
       - name: Install Node packages
         run: yarn install
-
-      - name: Disable version tags
-        run: yarn config set version-git-tag false
-      - name: Bump version
-        run: yarn version --${{ github.event.inputs.version_bump }}
-      - name: Build
-        run: yarn build
       - name: Lint
         run: yarn lint
+      - name: Build
+        run: yarn build
       - name: Tests
         run: yarn test
-
       - name: Type check
         run: yarn test:dts
-
-      - name: Get version
-        id: version
-        uses: notiz-dev/github-action-json-property@a5a9c668b16513c737c3e1f8956772c99c73f6e8 # commit hash = v0.2.0
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@91ab76a4a393a8d0c4739e9aea1818b56bc953ea
         with:
-          path: 'package.json'
-          prop_path: 'version'
-
-      - name: Commit and push a new version of the scripts
-        run: |
-          git commit package.json dist/ -m "build: new scripts v${{steps.version.outputs.prop}}"
-          git push "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
-          git tag -a "v${{steps.version.outputs.prop}}" -m "v${{steps.version.outputs.prop}}"
-          git push --tags "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
-
-      - name: Create a GitHub release
-        uses: ncipollo/release-action@18990f60e0df5c7b33d19565c84c7505b326aeca # commit hash = v1.10.0
-        with:
-          tag: v${{steps.version.outputs.prop}}
-          name: Release ${{steps.version.outputs.prop}}
-          artifacts: "dist/fingerprintjs-pro-cloudflare-worker.d.ts,dist/fingerprintjs-pro-cloudflare-worker.esm.js"
-#       Comment out below part because PRs created by bots don't trigger GitHub checks and the PR gets stuck
-#       More info: https://github.com/peter-evans/create-pull-request/issues/48
-#      - name: Create Pull Request from develop to main
-#        id: create_pr
-#        uses: devops-infra/action-pull-request@a671d0a772ef71131f970e6f02f1e11334f99eab # commit hash = v0.5.0
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          source_branch: develop
-#          target_branch: main
-#          title: New version of scripts v${{ steps.version.outputs.prop }}
-#          body: New version of scripts v${{ steps.version.outputs.prop }}
-#
-#      - name: Check PR outputs
-#        if: ${{ steps.create_pr.outputs.url }}
-#        run: echo "Pull Request URL - ${{ steps.create_pr.outputs.url }}"
+          extra_plugins: |
+            @semantic-release/exec@6.0.3
+            conventional-changelog-conventionalcommits@5.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
+          HUSKY: 0
