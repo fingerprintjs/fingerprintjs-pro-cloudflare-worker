@@ -8,7 +8,7 @@ The `main` and `develop` branches are locked for the push action.
 
 `main` branch is always where we create releases. If you have CF Integration set up, the source code is from the `main` branch. 
 
-`develop` branch can be taught of as candidate for the next release. The code always passes the tests in `develop` branch. 
+`develop` branch can be thought of as candidate for the next release. The code always passes the tests in `develop` branch. 
 
 For proposing changes, use the standard [pull request approach](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request). It's recommended to discuss fixes or new functionality in the Issues, first.
 
