@@ -6,4 +6,7 @@ module.exports = {
   passWithNoTests: true,
   collectCoverageFrom: ['./src/**/*.ts'],
   coverageReporters: ['lcov', 'json-summary', ['text', { file: 'coverage.txt', path: './' }]],
+  transform: {
+    '^.+\\.ejs$': './plugins/ejs/jest',
+  },
 }

@@ -1,8 +1,3 @@
-<% /** @type {string} */ workerVersion _%>
-<% /** @type {boolean} */ isAllVarsAvailable _%>
-<% /** @type {boolean} */ isWorkerPathAvailable _%>
-<% /** @type {boolean} */ isScriptDownloadPathAvailable _%>
-<% /** @type {boolean} */ isGetResultPathAvailable _%>
 <html lang='en-US'>
 <head>
     <meta charset='utf-8' />
@@ -18,21 +13,21 @@
 </head>
 <body>
 <span>Your worker is deployed</span>
-<span>Worker version: <%= workerVersion %></span>
-<% if(isAllVarsAvailable) { _%>
+<span>Worker version: <%= locals.workerVersion %></span>
+<% if(locals.isAllVarsAvailable) { %>
     <span>All environment variables are set</span>
-<% } else { _%>
+<% } else { %>
     <span>The following environment variables are not defined. Please reach out our support team.</span>
-    <% if (!isWorkerPathAvailable) { _%>
+    <% if (!locals.isWorkerPathAvailable) { %>
         <span>WORKER_PATH variable is not defined</span>
-    <% } _%>
-    <% if (!isScriptDownloadPathAvailable) { _%>
+    <% } %>
+    <% if (!locals.isScriptDownloadPathAvailable) { %>
         <span>SCRIPT_DOWNLOAD_PATH variable is not defined</span>
-    <% } _%>
-    <% if (!isGetResultPathAvailable) { _%>
+    <% } %>
+    <% if (!locals.isGetResultPathAvailable) { %>
         <span>GET_RESULT_PATH variable is not defined</span>
-    <% } _%>
-<% } _%>
+    <% } %>
+<% } %>
 <span>Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues</span>
 </body>
 </html>

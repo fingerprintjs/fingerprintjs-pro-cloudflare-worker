@@ -6,6 +6,7 @@ import { join } from 'path'
 import replace from '@rollup/plugin-replace'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import ejs from './plugins/ejs/rollup'
 
 const packageJson = require('./package.json')
 
@@ -33,6 +34,7 @@ const commonInput = {
     commonBanner,
     nodeResolve({ preferBuiltins: false }),
     commonjs(),
+    ejs(),
   ],
 }
 

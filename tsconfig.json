@@ -22,7 +22,7 @@
       "node"
     ]
   },
-  "files": ["src/index.ts"],
+  "files": ["src/global.d.ts","src/index.ts"],
   "exclude": [
     "dist",
     "node_modules",
