@@ -32,7 +32,7 @@ test.describe('visitorId', () => {
     const res = await reqContext.get(statusEndpoint)
     try {
       const responseBody = await res.text()
-      if (responseBody.includes('Your worker is deployed')) {
+      if (responseBody.includes('Your Cloudflare worker is deployed')) {
         const matches = responseBody.match(/Worker version: ([\d.\-snaphot]+)/)
         if (matches && matches.length > 0) {
           const version = matches[1]
