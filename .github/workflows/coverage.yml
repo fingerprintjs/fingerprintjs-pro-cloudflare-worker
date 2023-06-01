@@ -38,7 +38,7 @@ jobs:
           output: coverage/lcov-report/badges.svg
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: JamesIves/github-pages-deploy-action@cd53a4b70a96f186f4f4ba6aa288f80e03cc8757 # v4.4.2
         with:
           branch: gh-pages
           folder: ./coverage/lcov-report/
