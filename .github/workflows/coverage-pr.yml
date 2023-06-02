@@ -18,7 +18,7 @@ jobs:
         run: yarn build
       - name: Jest coverage comment
         id: coverage
-        uses: ArtiomTr/jest-coverage-report-action@df2b025553c31d68f84be6337843e277e2576844
+        uses: ArtiomTr/jest-coverage-report-action@f1a1382101d9b92b38e3df05c9ed89a834af97c8
         with:
           package-manager: yarn
           output: report-markdown
