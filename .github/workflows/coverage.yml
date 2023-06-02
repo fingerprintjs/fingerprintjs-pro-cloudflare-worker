@@ -17,7 +17,7 @@ jobs:
         with:
           node-version-file: '.node-version'
       - name: Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: nodemodules-${{ hashFiles('yarn.lock') }}
@@ -32,13 +32,13 @@ jobs:
         run: yarn test
 
       - name: Create Coverage Badges
-        uses: jaywcjlove/coverage-badges-cli@e07f25709cd25486855c1ba1b26da53576ff3620
+        uses: jaywcjlove/coverage-badges-cli@f13e40c05984776612eb7ee8878a5e81233d7313 # v1.1.0
         with:
           source: coverage/coverage-summary.json
           output: coverage/lcov-report/badges.svg
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@8817a56e5bfec6e2b08345c81f4d422db53a2cdc
+        uses: JamesIves/github-pages-deploy-action@22a6ee251d6f13c6ab1ecb200d974f1a6feb1b8d # v4.4.2
         with:
           branch: gh-pages
           folder: ./coverage/lcov-report/
