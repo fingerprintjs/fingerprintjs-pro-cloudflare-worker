@@ -31,7 +31,7 @@ function buildHeaders(styleNonce: string): Headers {
 function createWorkerVersionElement(): string {
   return `
   <span>
-  Worker version: __current_worker_version__
+  ℹ️ Worker version: __current_worker_version__
   </span>
   `
 }
@@ -39,7 +39,7 @@ function createWorkerVersionElement(): string {
 function createContactInformationElement(): string {
   return `
   <span>
-  Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
+  ❓Please reach out our support via <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> if you have any issues
   </span>
   `
 }
@@ -60,28 +60,28 @@ function createEnvVarsInformationElement(env: WorkerEnv): string {
     if (!isScriptDownloadPathAvailable) {
       result += `
       <span>
-      ${agentScriptDownloadPathVarName} is not set
+      ⚠️ <strong>${agentScriptDownloadPathVarName} </strong> is not set
       </span>
       `
     }
     if (!isGetResultPathAvailable) {
       result += `
       <span>
-      ${getResultPathVarName} is not set
+      ⚠️ <strong>${getResultPathVarName} </strong> is not set
       </span>
       `
     }
     if (!isProxySecretAvailable) {
       result += `
       <span>
-      ${proxySecretVarName} is not set
+      ⚠️ <strong>${proxySecretVarName} </strong> is not set
       </span>
       `
     }
   } else {
     result += `
     <span>
-    All environment variables are set
+     ✅ All environment variables are set
     </span>
     `
   }
@@ -93,10 +93,10 @@ function buildBody(env: WorkerEnv, styleNonce: string): string {
   <html lang='en-US'>
   <head>
     <meta charset='utf-8'/>
-    <title>Fingerprint Cloudflare Worker</title>
+    <title>Fingerprint Pro Cloudflare Worker</title>
     <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
     <style nonce='${styleNonce}'>
-      span {
+      h1, span {
         display: block;
         padding-top: 1em;
         padding-bottom: 1em;
@@ -105,9 +105,10 @@ function buildBody(env: WorkerEnv, styleNonce: string): string {
     </style>
   </head>
   <body>
+    <h1>Fingerprint Pro Cloudflare Integration</h1>
   `
 
-  body += `<span>Your worker is deployed</span>`
+  body += `<span>🎉 Your Cloudflare worker is deployed</span>`
 
   body += createWorkerVersionElement()
   body += createEnvVarsInformationElement(env)
