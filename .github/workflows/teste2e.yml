@@ -2,6 +2,8 @@ name: Test e2e
 
 on:
   pull_request_target:
+    paths-ignore:
+      - '**/*.md'
   schedule:
     - cron: '30 1 * * *'
   workflow_dispatch:
