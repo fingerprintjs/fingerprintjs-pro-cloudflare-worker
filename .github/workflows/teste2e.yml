@@ -75,3 +75,11 @@ jobs:
       - name: Clean up worker
         run: |
           curl -i -X DELETE "https://api.cloudflare.com/client/v4/accounts/${{secrets.CF_ACCOUNT_ID}}/workers/scripts/${{steps.random-path-generator.outputs.WORKER_NAME}}" -H"Authorization: bearer ${{secrets.CF_API_TOKEN}}"
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@0d9c6ff1de9903da88d24c0564f6e83cb28faca9
+        with:
+          status: ${{ job.status }}
+          notification_title: "Cloudflare Worker E2E Test has {status_message}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
