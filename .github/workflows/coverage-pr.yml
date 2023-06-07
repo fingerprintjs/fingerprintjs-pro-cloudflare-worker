@@ -12,14 +12,12 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Install node
         uses: actions/setup-node@v3
         with:
           node-version-file: '.node-version'
-      - name: Install Node packages
-        run: yarn install
-      - name: Build
-        run: yarn build
       - name: Jest coverage comment
         id: coverage
         uses: ArtiomTr/jest-coverage-report-action@f1a1382101d9b92b38e3df05c9ed89a834af97c8
