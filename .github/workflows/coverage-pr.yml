@@ -18,6 +18,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version-file: '.node-version'
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: nodemodules-${{ hashFiles('yarn.lock') }}
+          restore-keys: nodemodules-
+      - name: Install Node packages
+        run: yarn install
       - name: Build
         run: yarn build
       - name: Jest coverage comment
