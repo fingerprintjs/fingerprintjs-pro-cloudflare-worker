@@ -7,7 +7,6 @@ const agentScriptDownloadPath = 'agent'
 const getResultPath = 'get-result'
 const proxySecret = 'proxySecret'
 const env: WorkerEnv = {
-  WORKER_PATH: workerPath,
   AGENT_SCRIPT_DOWNLOAD_PATH: agentScriptDownloadPath,
   GET_RESULT_PATH: getResultPath,
   PROXY_SECRET: proxySecret,
@@ -46,7 +45,7 @@ describe('download Pro Agent Script', () => {
     expect(mockAgentDownloadHandler).toHaveBeenCalledTimes(1)
   })
   test('incorrect path', async () => {
-    const request = new Request(`https://example.com/${agentScriptDownloadPath}`)
+    const request = new Request(`https://example.com/${agentScriptDownloadPath}/some-path`)
     await handleRequestWithRoutes(request, env, routes)
     expect(mockAgentDownloadHandler).not.toHaveBeenCalled()
   })
@@ -85,7 +84,7 @@ describe('get GetResult', () => {
     expect(mockIngressAPIHandler).toHaveBeenCalledTimes(1)
   })
   test('incorrect path', async () => {
-    const request = new Request(`https://example.com/${getResultPath}`)
+    const request = new Request(`https://example.com/${getResultPath}/some-path`)
     await handleRequestWithRoutes(request, env, routes)
     expect(mockIngressAPIHandler).not.toHaveBeenCalled()
   })
@@ -98,7 +97,7 @@ describe('status page', () => {
     mockStatusPageHandler = jest.fn()
     routes = [
       {
-        pathPattern: createRoute(getStatusPagePath(env)),
+        pathPattern: createRoute(getStatusPagePath()),
         handler: mockStatusPageHandler,
       },
     ]
@@ -124,7 +123,7 @@ describe('status page', () => {
     expect(mockStatusPageHandler).toHaveBeenCalledTimes(1)
   })
   test('incorrect path', async () => {
-    const request = new Request(`https://example.com/status`)
+    const request = new Request(`https://example.com/status/some-path`)
     await handleRequestWithRoutes(request, env, routes)
     expect(mockStatusPageHandler).not.toHaveBeenCalled()
   })
@@ -149,7 +148,7 @@ describe('no match paths', () => {
         handler: mockIngressAPIHandler,
       },
       {
-        pathPattern: createRoute(getStatusPagePath(env)),
+        pathPattern: createRoute(getStatusPagePath()),
         handler: mockStatusPageHandler,
       },
     ]

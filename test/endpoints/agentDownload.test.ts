@@ -2,7 +2,6 @@ import worker from '../../src/index'
 import { WorkerEnv } from '../../src/env'
 
 const workerEnv: WorkerEnv = {
-  WORKER_PATH: 'worker_path',
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',

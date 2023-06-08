@@ -19,7 +19,7 @@ function createRoutes(env: WorkerEnv): Route[] {
     handler: handleIngressAPI,
   }
   const statusRoute: Route = {
-    pathPattern: createRoute(getStatusPagePath(env)),
+    pathPattern: createRoute(getStatusPagePath()),
     handler: (request, env) => handleStatusPage(request, env),
   }
   routes.push(downloadScriptRoute)
