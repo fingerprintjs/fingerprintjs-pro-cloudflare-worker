@@ -18,14 +18,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version-file: '.node-version'
+      - name: Build
+        run: yarn build
       - name: Jest coverage comment
         id: coverage
         uses: ArtiomTr/jest-coverage-report-action@f1a1382101d9b92b38e3df05c9ed89a834af97c8
         with:
           package-manager: yarn
           output: report-markdown
-      - name: Build
-        run: yarn build
       - run: yarn test
       - name: Read coverage text report
         uses: fingerprintjs/action-coverage-report-md@v1
