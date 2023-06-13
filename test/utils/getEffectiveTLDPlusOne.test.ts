@@ -23,6 +23,11 @@ const cases = [
   ['b.example.uk.com', 'example.uk.com'],
   ['a.b.example.uk.com', 'example.uk.com'],
   ['test.ac', 'test.ac'],
+  // TLD with 1 rule that may resemble a 2-level rule
+  ['b.a-uk.uk.com', 'a-uk.uk.com'],
+  ['a-uk.uk.com', 'a-uk.uk.com'],
+  ['a-uk.com', 'a-uk.com'],
+  ['jurajuhlar.com', 'jurajuhlar.com'], // todo delete this example
   // TLD with only 1 (wildcard) rule.
   ['mm', ''],
   ['c.mm', ''],
