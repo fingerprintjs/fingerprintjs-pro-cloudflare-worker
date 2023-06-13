@@ -43,7 +43,7 @@ function createTrie(): TrieNode {
       if (!node.children.has(word[i])) {
         node.children.set(word[i], {
           key: word[i],
-          suffix: '',
+          suffix: node.suffix,
           parent: node,
           children: new Map(),
           end: false,
@@ -68,9 +68,18 @@ function search(domain: string): string | null {
     if (node.children.has(domain[i])) {
       node = node.children.get(domain[i])!
     } else {
-      return node.end ? node.suffix : null
+      if (node.end) {
+        if (domain[i - 1] != '.' || i != domain.length - 1) {
+          return node.parent != null ? node.parent.suffix : null
+        }
+        return node.suffix
+      } else if (node.parent) {
+        return node.parent.suffix
+      }
+      return null
     }
   }
+
   return node.end ? node.suffix : null
 }
 

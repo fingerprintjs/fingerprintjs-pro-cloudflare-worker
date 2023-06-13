@@ -27,7 +27,10 @@ const cases = [
   ['b.a-uk.uk.com', 'a-uk.uk.com'],
   ['a-uk.uk.com', 'a-uk.uk.com'],
   ['a-uk.com', 'a-uk.com'],
-  ['jurajuhlar.com', 'jurajuhlar.com'], // todo delete this example
+  ['lar.com', 'lar.com'], // should use com, but not ar.com
+  ['www.lar.com', 'lar.com'],
+  ['seed4u.com', 'seed4u.com'],
+  ['lasthome.co.uk', 'lasthome.co.uk'], // should use co.uk, but not wellbeingzone.co.uk
   // TLD with only 1 (wildcard) rule.
   ['mm', ''],
   ['c.mm', ''],
