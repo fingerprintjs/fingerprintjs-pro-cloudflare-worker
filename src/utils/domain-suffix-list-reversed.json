@@ -965,7 +965,7 @@
   },
   {
     "suffix": "*.bd",
-    "reversed": "db"
+    "reversed": "db.*"
   },
   {
     "suffix": "be",
@@ -1961,7 +1961,7 @@
   },
   {
     "suffix": "*.nom.br",
-    "reversed": "rb.mon"
+    "reversed": "rb.mon.*"
   },
   {
     "suffix": "not.br",
@@ -2425,11 +2425,12 @@
   },
   {
     "suffix": "*.ck",
-    "reversed": "kc"
+    "reversed": "kc.*"
   },
   {
     "suffix": "!www.ck",
-    "reversed": "kc.www"
+    "reversed": "kc.www",
+    "excluded": true
   },
   {
     "suffix": "cl",
@@ -6613,59 +6614,66 @@
   },
   {
     "suffix": "*.kawasaki.jp",
-    "reversed": "pj.ikasawak"
+    "reversed": "pj.ikasawak.*"
   },
   {
     "suffix": "*.kitakyushu.jp",
-    "reversed": "pj.uhsuykatik"
+    "reversed": "pj.uhsuykatik.*"
   },
   {
     "suffix": "*.kobe.jp",
-    "reversed": "pj.ebok"
+    "reversed": "pj.ebok.*"
   },
   {
     "suffix": "*.nagoya.jp",
-    "reversed": "pj.ayogan"
+    "reversed": "pj.ayogan.*"
   },
   {
     "suffix": "*.sapporo.jp",
-    "reversed": "pj.oroppas"
+    "reversed": "pj.oroppas.*"
   },
   {
     "suffix": "*.sendai.jp",
-    "reversed": "pj.iadnes"
+    "reversed": "pj.iadnes.*"
   },
   {
     "suffix": "*.yokohama.jp",
-    "reversed": "pj.amahokoy"
+    "reversed": "pj.amahokoy.*"
   },
   {
     "suffix": "!city.kawasaki.jp",
-    "reversed": "pj.ikasawak.ytic"
+    "reversed": "pj.ikasawak.ytic",
+    "excluded": true
   },
   {
     "suffix": "!city.kitakyushu.jp",
-    "reversed": "pj.uhsuykatik.ytic"
+    "reversed": "pj.uhsuykatik.ytic",
+    "excluded": true
   },
   {
     "suffix": "!city.kobe.jp",
-    "reversed": "pj.ebok.ytic"
+    "reversed": "pj.ebok.ytic",
+    "excluded": true
   },
   {
     "suffix": "!city.nagoya.jp",
-    "reversed": "pj.ayogan.ytic"
+    "reversed": "pj.ayogan.ytic",
+    "excluded": true
   },
   {
     "suffix": "!city.sapporo.jp",
-    "reversed": "pj.oroppas.ytic"
+    "reversed": "pj.oroppas.ytic",
+    "excluded": true
   },
   {
     "suffix": "!city.sendai.jp",
-    "reversed": "pj.iadnes.ytic"
+    "reversed": "pj.iadnes.ytic",
+    "excluded": true
   },
   {
     "suffix": "!city.yokohama.jp",
-    "reversed": "pj.amahokoy.ytic"
+    "reversed": "pj.amahokoy.ytic",
+    "excluded": true
   },
   {
     "suffix": "aisai.aichi.jp",
@@ -13429,7 +13437,7 @@
   },
   {
     "suffix": "*.kh",
-    "reversed": "hk"
+    "reversed": "hk.*"
   },
   {
     "suffix": "ki",
@@ -14289,7 +14297,7 @@
   },
   {
     "suffix": "*.mm",
-    "reversed": "mm"
+    "reversed": "mm.*"
   },
   {
     "suffix": "mn",
@@ -17901,7 +17909,7 @@
   },
   {
     "suffix": "*.np",
-    "reversed": "pn"
+    "reversed": "pn.*"
   },
   {
     "suffix": "nr",
@@ -18153,7 +18161,7 @@
   },
   {
     "suffix": "*.pg",
-    "reversed": "gp"
+    "reversed": "gp.*"
   },
   {
     "suffix": "ph",
@@ -21001,7 +21009,7 @@
   },
   {
     "suffix": "*.sch.uk",
-    "reversed": "ku.hcs"
+    "reversed": "ku.hcs.*"
   },
   {
     "suffix": "us",
@@ -27353,11 +27361,11 @@
   },
   {
     "suffix": "*.devcdnaccesso.com",
-    "reversed": "moc.osseccandcved"
+    "reversed": "moc.osseccandcved.*"
   },
   {
     "suffix": "*.on-acorn.io",
-    "reversed": "oi.nroca-no"
+    "reversed": "oi.nroca-no.*"
   },
   {
     "suffix": "activetrail.biz",
@@ -27369,7 +27377,7 @@
   },
   {
     "suffix": "*.dev.adobeaemcloud.com",
-    "reversed": "moc.duolcmeaeboda.ved"
+    "reversed": "moc.duolcmeaeboda.ved.*"
   },
   {
     "suffix": "hlx.live",
@@ -27481,11 +27489,11 @@
   },
   {
     "suffix": "*.compute.estate",
-    "reversed": "etatse.etupmoc"
+    "reversed": "etatse.etupmoc.*"
   },
   {
     "suffix": "*.alces.network",
-    "reversed": "krowten.secla"
+    "reversed": "krowten.secla.*"
   },
   {
     "suffix": "kasserver.com",
@@ -27509,15 +27517,15 @@
   },
   {
     "suffix": "*.compute.amazonaws.com",
-    "reversed": "moc.swanozama.etupmoc"
+    "reversed": "moc.swanozama.etupmoc.*"
   },
   {
     "suffix": "*.compute-1.amazonaws.com",
-    "reversed": "moc.swanozama.1-etupmoc"
+    "reversed": "moc.swanozama.1-etupmoc.*"
   },
   {
     "suffix": "*.compute.amazonaws.com.cn",
-    "reversed": "nc.moc.swanozama.etupmoc"
+    "reversed": "nc.moc.swanozama.etupmoc.*"
   },
   {
     "suffix": "us-east-1.amazonaws.com",
@@ -27989,11 +27997,11 @@
   },
   {
     "suffix": "*.elb.amazonaws.com.cn",
-    "reversed": "nc.moc.swanozama.ble"
+    "reversed": "nc.moc.swanozama.ble.*"
   },
   {
     "suffix": "*.elb.amazonaws.com",
-    "reversed": "moc.swanozama.ble"
+    "reversed": "moc.swanozama.ble.*"
   },
   {
     "suffix": "awsglobalaccelerator.com",
@@ -28097,11 +28105,11 @@
   },
   {
     "suffix": "*.awdev.ca",
-    "reversed": "ac.vedwa"
+    "reversed": "ac.vedwa.*"
   },
   {
     "suffix": "*.advisor.ws",
-    "reversed": "sw.rosivda"
+    "reversed": "sw.rosivda.*"
   },
   {
     "suffix": "ecommerce-shop.pl",
@@ -28125,7 +28133,7 @@
   },
   {
     "suffix": "*.banzai.cloud",
-    "reversed": "duolc.iaznab"
+    "reversed": "duolc.iaznab.*"
   },
   {
     "suffix": "app.banzaicloud.io",
@@ -28133,7 +28141,7 @@
   },
   {
     "suffix": "*.backyards.banzaicloud.io",
-    "reversed": "oi.duolciaznab.sdraykcab"
+    "reversed": "oi.duolciaznab.sdraykcab.*"
   },
   {
     "suffix": "base.ec",
@@ -28181,7 +28189,7 @@
   },
   {
     "suffix": "*.beget.app",
-    "reversed": "ppa.tegeb"
+    "reversed": "ppa.tegeb.*"
   },
   {
     "suffix": "betainabox.com",
@@ -28382,7 +28390,7 @@
   {
     "suffix": "ar.com",
     "reversed": "moc.ra"
-  },
+  },  
   {
     "suffix": "hu.com",
     "reversed": "moc.uh"
@@ -28477,19 +28485,19 @@
   },
   {
     "suffix": "*.lcl.dev",
-    "reversed": "ved.lcl"
+    "reversed": "ved.lcl.*"
   },
   {
     "suffix": "*.lclstage.dev",
-    "reversed": "ved.egatslcl"
+    "reversed": "ved.egatslcl.*"
   },
   {
     "suffix": "*.stg.dev",
-    "reversed": "ved.gts"
+    "reversed": "ved.gts.*"
   },
   {
     "suffix": "*.stgstage.dev",
-    "reversed": "ved.egatsgts"
+    "reversed": "ved.egatsgts.*"
   },
   {
     "suffix": "clickrising.net",
@@ -28537,7 +28545,7 @@
   },
   {
     "suffix": "*.cloudera.site",
-    "reversed": "etis.areduolc"
+    "reversed": "etis.areduolc.*"
   },
   {
     "suffix": "cf-ipfs.com",
@@ -28573,7 +28581,7 @@
   },
   {
     "suffix": "*.otap.co",
-    "reversed": "oc.pato"
+    "reversed": "oc.pato.*"
   },
   {
     "suffix": "co.cz",
@@ -28733,7 +28741,7 @@
   },
   {
     "suffix": "*.cryptonomic.net",
-    "reversed": "ten.cimonotpyrc"
+    "reversed": "ten.cimonotpyrc.*"
   },
   {
     "suffix": "cupcake.is",
@@ -28745,19 +28753,19 @@
   },
   {
     "suffix": "*.customer-oci.com",
-    "reversed": "moc.ico-remotsuc"
+    "reversed": "moc.ico-remotsuc.*"
   },
   {
     "suffix": "*.oci.customer-oci.com",
-    "reversed": "moc.ico-remotsuc.ico"
+    "reversed": "moc.ico-remotsuc.ico.*"
   },
   {
     "suffix": "*.ocp.customer-oci.com",
-    "reversed": "moc.ico-remotsuc.pco"
+    "reversed": "moc.ico-remotsuc.pco.*"
   },
   {
     "suffix": "*.ocs.customer-oci.com",
-    "reversed": "moc.ico-remotsuc.sco"
+    "reversed": "moc.ico-remotsuc.sco.*"
   },
   {
     "suffix": "cyon.link",
@@ -28837,11 +28845,11 @@
   },
   {
     "suffix": "*.dapps.earth",
-    "reversed": "htrae.sppad"
+    "reversed": "htrae.sppad.*"
   },
   {
     "suffix": "*.bzz.dapps.earth",
-    "reversed": "htrae.sppad.zzb"
+    "reversed": "htrae.sppad.zzb.*"
   },
   {
     "suffix": "builtwithdark.com",
@@ -28889,11 +28897,11 @@
   },
   {
     "suffix": "*.rss.my.id",
-    "reversed": "di.ym.ssr"
+    "reversed": "di.ym.ssr.*"
   },
   {
     "suffix": "*.diher.solutions",
-    "reversed": "snoitulos.rehid"
+    "reversed": "snoitulos.rehid.*"
   },
   {
     "suffix": "discordsays.com",
@@ -30129,7 +30137,7 @@
   },
   {
     "suffix": "*.digitaloceanspaces.com",
-    "reversed": "moc.secapsnaecolatigid"
+    "reversed": "moc.secapsnaecolatigid.*"
   },
   {
     "suffix": "bci.dnstrace.pro",
@@ -30893,7 +30901,7 @@
   },
   {
     "suffix": "*.user.fm",
-    "reversed": "mf.resu"
+    "reversed": "mf.resu.*"
   },
   {
     "suffix": "fastvps-server.com",
@@ -31053,7 +31061,7 @@
   },
   {
     "suffix": "*.frusky.de",
-    "reversed": "ed.yksurf"
+    "reversed": "ed.yksurf.*"
   },
   {
     "suffix": "ravpage.co.il",
@@ -31101,15 +31109,15 @@
   },
   {
     "suffix": "*.futurecms.at",
-    "reversed": "ta.smcerutuf"
+    "reversed": "ta.smcerutuf.*"
   },
   {
     "suffix": "*.ex.futurecms.at",
-    "reversed": "ta.smcerutuf.xe"
+    "reversed": "ta.smcerutuf.xe.*"
   },
   {
     "suffix": "*.in.futurecms.at",
-    "reversed": "ta.smcerutuf.ni"
+    "reversed": "ta.smcerutuf.ni.*"
   },
   {
     "suffix": "futurehosting.at",
@@ -31121,15 +31129,15 @@
   },
   {
     "suffix": "*.ex.ortsinfo.at",
-    "reversed": "ta.ofnistro.xe"
+    "reversed": "ta.ofnistro.xe.*"
   },
   {
     "suffix": "*.kunden.ortsinfo.at",
-    "reversed": "ta.ofnistro.nednuk"
+    "reversed": "ta.ofnistro.nednuk.*"
   },
   {
     "suffix": "*.statics.cloud",
-    "reversed": "duolc.scitats"
+    "reversed": "duolc.scitats.*"
   },
   {
     "suffix": "independent-commission.uk",
@@ -31709,7 +31717,7 @@
   },
   {
     "suffix": "*.0emm.com",
-    "reversed": "moc.mme0"
+    "reversed": "moc.mme0.*"
   },
   {
     "suffix": "appspot.com",
@@ -31717,7 +31725,7 @@
   },
   {
     "suffix": "*.r.appspot.com",
-    "reversed": "moc.topsppa.r"
+    "reversed": "moc.topsppa.r.*"
   },
   {
     "suffix": "codespot.com",
@@ -31749,7 +31757,7 @@
   },
   {
     "suffix": "*.gateway.dev",
-    "reversed": "ved.yawetag"
+    "reversed": "ved.yawetag.*"
   },
   {
     "suffix": "cloud.goog",
@@ -31761,7 +31769,7 @@
   },
   {
     "suffix": "*.usercontent.goog",
-    "reversed": "goog.tnetnocresu"
+    "reversed": "goog.tnetnocresu.*"
   },
   {
     "suffix": "cloudfunctions.net",
@@ -32221,7 +32229,7 @@
   },
   {
     "suffix": "*.moonscale.io",
-    "reversed": "oi.elacsnoom"
+    "reversed": "oi.elacsnoom.*"
   },
   {
     "suffix": "moonscale.net",
@@ -32809,19 +32817,19 @@
   },
   {
     "suffix": "*.hosting.myjino.ru",
-    "reversed": "ur.onijym.gnitsoh"
+    "reversed": "ur.onijym.gnitsoh.*"
   },
   {
     "suffix": "*.landing.myjino.ru",
-    "reversed": "ur.onijym.gnidnal"
+    "reversed": "ur.onijym.gnidnal.*"
   },
   {
     "suffix": "*.spectrum.myjino.ru",
-    "reversed": "ur.onijym.murtceps"
+    "reversed": "ur.onijym.murtceps.*"
   },
   {
     "suffix": "*.vps.myjino.ru",
-    "reversed": "ur.onijym.spv"
+    "reversed": "ur.onijym.spv.*"
   },
   {
     "suffix": "jotelulu.cloud",
@@ -32829,11 +32837,11 @@
   },
   {
     "suffix": "*.triton.zone",
-    "reversed": "enoz.notirt"
+    "reversed": "enoz.notirt.*"
   },
   {
     "suffix": "*.cns.joyent.com",
-    "reversed": "moc.tneyoj.snc"
+    "reversed": "moc.tneyoj.snc.*"
   },
   {
     "suffix": "js.org",
@@ -32977,11 +32985,11 @@
   },
   {
     "suffix": "*.nodebalancer.linode.com",
-    "reversed": "moc.edonil.recnalabedon"
+    "reversed": "moc.edonil.recnalabedon.*"
   },
   {
     "suffix": "*.linodeobjects.com",
-    "reversed": "moc.stcejboedonil"
+    "reversed": "moc.stcejboedonil.*"
   },
   {
     "suffix": "ip.linodeusercontent.com",
@@ -32993,7 +33001,7 @@
   },
   {
     "suffix": "*.user.localcert.dev",
-    "reversed": "ved.treclacol.resu"
+    "reversed": "ved.treclacol.resu.*"
   },
   {
     "suffix": "localzone.xyz",
@@ -33161,7 +33169,7 @@
   },
   {
     "suffix": "*.magentosite.cloud",
-    "reversed": "duolc.etisotnegam"
+    "reversed": "duolc.etisotnegam.*"
   },
   {
     "suffix": "mayfirst.info",
@@ -33229,7 +33237,7 @@
   },
   {
     "suffix": "*.cloud.metacentrum.cz",
-    "reversed": "zc.murtnecatem.duolc"
+    "reversed": "zc.murtnecatem.duolc.*"
   },
   {
     "suffix": "custom.metacentrum.cz",
@@ -33257,7 +33265,7 @@
   },
   {
     "suffix": "*.azurecontainer.io",
-    "reversed": "oi.reniatnoceruza"
+    "reversed": "oi.reniatnoceruza.*"
   },
   {
     "suffix": "azurewebsites.net",
@@ -33469,7 +33477,7 @@
   },
   {
     "suffix": "*.developer.app",
-    "reversed": "ppa.repoleved"
+    "reversed": "ppa.repoleved.*"
   },
   {
     "suffix": "noop.app",
@@ -33477,23 +33485,23 @@
   },
   {
     "suffix": "*.northflank.app",
-    "reversed": "ppa.knalfhtron"
+    "reversed": "ppa.knalfhtron.*"
   },
   {
     "suffix": "*.build.run",
-    "reversed": "nur.dliub"
+    "reversed": "nur.dliub.*"
   },
   {
     "suffix": "*.code.run",
-    "reversed": "nur.edoc"
+    "reversed": "nur.edoc.*"
   },
   {
     "suffix": "*.database.run",
-    "reversed": "nur.esabatad"
+    "reversed": "nur.esabatad.*"
   },
   {
     "suffix": "*.migration.run",
-    "reversed": "nur.noitargim"
+    "reversed": "nur.noitargim.*"
   },
   {
     "suffix": "noticeable.news",
@@ -34101,11 +34109,11 @@
   },
   {
     "suffix": "*.webpaas.ovh.net",
-    "reversed": "ten.hvo.saapbew"
+    "reversed": "ten.hvo.saapbew.*"
   },
   {
     "suffix": "*.hosting.ovh.net",
-    "reversed": "ten.hvo.gnitsoh"
+    "reversed": "ten.hvo.gnitsoh.*"
   },
   {
     "suffix": "ownprovider.com",
@@ -34117,7 +34125,7 @@
   },
   {
     "suffix": "*.owo.codes",
-    "reversed": "sedoc.owo"
+    "reversed": "sedoc.owo.*"
   },
   {
     "suffix": "ox.rs",
@@ -34141,7 +34149,7 @@
   },
   {
     "suffix": "*.paywhirl.com",
-    "reversed": "moc.lrihwyap"
+    "reversed": "moc.lrihwyap.*"
   },
   {
     "suffix": "bar0.net",
@@ -34225,11 +34233,11 @@
   },
   {
     "suffix": "*.platformsh.site",
-    "reversed": "etis.hsmroftalp"
+    "reversed": "etis.hsmroftalp.*"
   },
   {
     "suffix": "*.tst.site",
-    "reversed": "etis.tst"
+    "reversed": "etis.tst.*"
   },
   {
     "suffix": "platter-app.com",
@@ -34301,7 +34309,7 @@
   },
   {
     "suffix": "*.dweb.link",
-    "reversed": "knil.bewd"
+    "reversed": "knil.bewd.*"
   },
   {
     "suffix": "protonet.io",
@@ -34369,7 +34377,7 @@
   },
   {
     "suffix": "*.sys.qcx.io",
-    "reversed": "oi.xcq.sys"
+    "reversed": "oi.xcq.sys.*"
   },
   {
     "suffix": "dev-myqnapcloud.com",
@@ -34385,7 +34393,7 @@
   },
   {
     "suffix": "*.quipelements.com",
-    "reversed": "moc.stnemelepiuq"
+    "reversed": "moc.stnemelepiuq.*"
   },
   {
     "suffix": "vapor.cloud",
@@ -34409,15 +34417,15 @@
   },
   {
     "suffix": "*.on-k3s.io",
-    "reversed": "oi.s3k-no"
+    "reversed": "oi.s3k-no.*"
   },
   {
     "suffix": "*.on-rancher.cloud",
-    "reversed": "duolc.rehcnar-no"
+    "reversed": "duolc.rehcnar-no.*"
   },
   {
     "suffix": "*.on-rio.io",
-    "reversed": "oi.oir-no"
+    "reversed": "oi.oir-no.*"
   },
   {
     "suffix": "readthedocs.io",
@@ -34721,15 +34729,15 @@
   },
   {
     "suffix": "*.builder.code.com",
-    "reversed": "moc.edoc.redliub"
+    "reversed": "moc.edoc.redliub.*"
   },
   {
     "suffix": "*.dev-builder.code.com",
-    "reversed": "moc.edoc.redliub-ved"
+    "reversed": "moc.edoc.redliub-ved.*"
   },
   {
     "suffix": "*.stg-builder.code.com",
-    "reversed": "moc.edoc.redliub-gts"
+    "reversed": "moc.edoc.redliub-gts.*"
   },
   {
     "suffix": "sandcats.io",
@@ -35085,7 +35093,7 @@
   },
   {
     "suffix": "*.stolos.io",
-    "reversed": "oi.solots"
+    "reversed": "oi.solots.*"
   },
   {
     "suffix": "spacekit.io",
@@ -35213,11 +35221,11 @@
   },
   {
     "suffix": "*.s5y.io",
-    "reversed": "oi.y5s"
+    "reversed": "oi.y5s.*"
   },
   {
     "suffix": "*.sensiosite.cloud",
-    "reversed": "duolc.etisoisnes"
+    "reversed": "duolc.etisoisnes.*"
   },
   {
     "suffix": "syncloud.it",
@@ -35353,15 +35361,15 @@
   },
   {
     "suffix": "*.telebit.xyz",
-    "reversed": "zyx.tibelet"
+    "reversed": "zyx.tibelet.*"
   },
   {
     "suffix": "*.firenet.ch",
-    "reversed": "hc.tenerif"
+    "reversed": "hc.tenerif.*"
   },
   {
     "suffix": "*.svc.firenet.ch",
-    "reversed": "hc.tenerif.cvs"
+    "reversed": "hc.tenerif.cvs.*"
   },
   {
     "suffix": "reservd.com",
@@ -35509,15 +35517,15 @@
   },
   {
     "suffix": "*.transurl.be",
-    "reversed": "eb.lrusnart"
+    "reversed": "eb.lrusnart.*"
   },
   {
     "suffix": "*.transurl.eu",
-    "reversed": "ue.lrusnart"
+    "reversed": "ue.lrusnart.*"
   },
   {
     "suffix": "*.transurl.nl",
-    "reversed": "ln.lrusnart"
+    "reversed": "ln.lrusnart.*"
   },
   {
     "suffix": "site.transip.me",
@@ -35593,7 +35601,7 @@
   },
   {
     "suffix": "*.uberspace.de",
-    "reversed": "ed.ecapsrebu"
+    "reversed": "ed.ecapsrebu.*"
   },
   {
     "suffix": "hk.com",
@@ -35849,7 +35857,7 @@
   },
   {
     "suffix": "*.vultrobjects.com",
-    "reversed": "moc.stcejbortluv"
+    "reversed": "moc.stcejbortluv.*"
   },
   {
     "suffix": "wafflecell.com",
@@ -35857,7 +35865,7 @@
   },
   {
     "suffix": "*.webhare.dev",
-    "reversed": "ved.erahbew"
+    "reversed": "ved.erahbew.*"
   },
   {
     "suffix": "reserve-online.net",
