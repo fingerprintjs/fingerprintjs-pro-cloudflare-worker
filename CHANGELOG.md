@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.3.0...v1.3.1) (2023-06-15)
+
+
+### Bug Fixes
+
+* **cookies:** fixed a case where TLD+1 cookies are not calculated correctly ([#170](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/issues/170)) ([64ba2a4](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/commit/64ba2a41baad77a9d2949e1e964f5f872dc6400f))
+
 ## [1.3.0](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.2.0...v1.3.0) (2023-06-08)
 
 
