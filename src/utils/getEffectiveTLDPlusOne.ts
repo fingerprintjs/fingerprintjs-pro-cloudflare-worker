@@ -126,11 +126,7 @@ function search(domain: string): string | null {
     }
   }
 
-  if (currNode != null) {
-    return currNode.suffix
-  } else {
-    return null
-  }
+  return currNode.suffix
 }
 
 function compare(value1: string, value2: string): boolean {
@@ -151,10 +147,7 @@ function compare(value1: string, value2: string): boolean {
   const s1 = v1.substring(i)
   const s2 = v2.substring(i)
 
-  if (s1 === '.*' || s1 === '*' || s2 === '.*' || s2 === '*') {
-    return true
-  }
-  return false
+  return s1 === '.*' || s1 === '*' || s2 === '.*' || s2 === '*'
 }
 
 function reverse(str: string): string {
