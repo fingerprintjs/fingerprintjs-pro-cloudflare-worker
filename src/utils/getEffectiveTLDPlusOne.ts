@@ -23,6 +23,7 @@ type TrieNode = {
   children: Map<string, TrieNode>
   suffix: string
   end: boolean
+  excluded: boolean
 }
 
 const trie = createTrie()
@@ -35,6 +36,7 @@ function createTrie(): TrieNode {
     children: new Map(),
     suffix: '',
     end: false,
+    excluded: false,
   }
   for (const rule of domainSuffixListReversed) {
     const word = rule.reversed + '.'
@@ -47,14 +49,16 @@ function createTrie(): TrieNode {
           parent: node,
           children: new Map(),
           end: false,
+          excluded: false,
         })
       }
 
       node = node.children.get(word[i])!
 
-      if (i === word.length - 1 || i === word.length - 2) {
-        node.suffix = rule.suffix
+      if (i === word.length - 1 || i === word.length - 2 || word[i] == '.') {
+        node.suffix = Punycode.toASCII(rule.suffix)
         node.end = true
+        node.excluded = rule.excluded ? rule.excluded : false
       }
     }
   }
@@ -64,14 +68,86 @@ function createTrie(): TrieNode {
 function search(domain: string): string | null {
   let node = trie
 
-  for (let i = 0; i < domain.length; i++) {
+  let i
+  for (i = 0; i < domain.length; i++) {
     if (node.children.has(domain[i])) {
       node = node.children.get(domain[i])!
+    } else if (node.children.has('*')) {
+      node = node.children.get('*')!
     } else {
-      return node.end ? node.suffix : null
+      break
     }
   }
-  return node.end ? node.suffix : null
+
+  // PSL has rules like *.kobe.jp which covers all third-level domains,
+  // but also has a rule !city.kobe.jp which means exclusion from the previous one
+  if (node.excluded) {
+    let currNode = node
+    while (currNode.parent != null) {
+      currNode = currNode.parent
+      if (currNode.end) {
+        return currNode.suffix
+      }
+    }
+    return null
+  }
+
+  // whole domain string processed
+  if (i == domain.length) {
+    if (node.end) {
+      if (!node.excluded) {
+        return node.suffix
+      } else if (node.parent) {
+        return node.parent.suffix
+      }
+      return node.suffix
+    } else {
+      return null
+    }
+  }
+
+  // part of domain string was processed, but some rule found
+  // so need to find previous matching rule
+  // for example, the loop find node `ar.com` for `fdsaar.com`,
+  // so need to proceed with `.com` here
+  let j
+  for (j = i; j > 0; j--) {
+    if (domain[j] == '.') {
+      break
+    }
+  }
+  const sub = reverse(domain.substring(0, j))
+  let currNode = node
+  while (currNode.parent != null) {
+    if (compare(currNode.suffix, sub)) {
+      return currNode.suffix
+    } else {
+      currNode = currNode.parent
+    }
+  }
+
+  return currNode.suffix
+}
+
+function compare(value1: string, value2: string): boolean {
+  const v1 = reverse(value1)
+  const v2 = reverse(value2)
+
+  let i
+  for (i = 0; i < Math.min(v1.length, v2.length); i++) {
+    if (v1[i] !== v2[i]) {
+      break
+    }
+  }
+
+  if (v1.length === v2.length && v1.length === i) {
+    return true
+  }
+
+  const s1 = v1.substring(i)
+  const s2 = v2.substring(i)
+
+  return s1 === '.*' || s1 === '*' || s2 === '.*' || s2 === '*'
 }
 
 function reverse(str: string): string {
