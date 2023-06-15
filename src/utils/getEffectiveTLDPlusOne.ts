@@ -68,7 +68,7 @@ function createTrie(): TrieNode {
 function search(domain: string): string | null {
   let node = trie
 
-  let i = 0
+  let i
   for (i = 0; i < domain.length; i++) {
     if (node.children.has(domain[i])) {
       node = node.children.get(domain[i])!
