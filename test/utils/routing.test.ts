@@ -79,7 +79,7 @@ describe('addPathnameMatchBeforeRoute', () => {
   })
 })
 
-describe('createRoute', () => {
+describe('createRoute prefix', () => {
   const matchingRouteCases = [
     '/fpjs-worker-path-0123456789/status',
     '/fpjsworker/status',
@@ -98,5 +98,18 @@ describe('createRoute', () => {
   const unMatchingRouteCases = ['/status/some-path']
   it.each(unMatchingRouteCases)("%s doesn't match /status", (route) => {
     expect(createRoute('/status').test(route)).toBe(false)
+  })
+})
+
+describe('createRoute suffix', () => {
+  const suffixPath = '/ingress(/.*)?'
+  const toBeMatched = ['/ingress', '/ingress/', '/ingress/foo', '/ingress/foo/bar', '/ingress/foo/bar/baz']
+  const toBeFail = ['/ingressfoo', '/ingressfoo/', '/ingressfoo/bar']
+
+  it.each(toBeMatched)('should match with suffix', (suffix) => {
+    expect(createRoute(suffixPath).test(suffix)).toBe(true)
+  })
+  it.each(toBeFail)('should not match with suffix', (suffix) => {
+    expect(createRoute(suffixPath).test(suffix)).toBe(false)
   })
 })
