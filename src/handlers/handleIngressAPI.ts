@@ -46,9 +46,10 @@ function createResponseWithFirstPartyCookies(request: Request, response: Respons
   })
 }
 
-async function makeIngressAPIRequest(request: Request, env: WorkerEnv) {
+async function makeIngressAPIRequest(request: Request, env: WorkerEnv, routeMatches: RegExpMatchArray | undefined) {
+  const routeSuffix = routeMatches ? routeMatches[1] : undefined
   const oldURL = new URL(request.url)
-  const endpoint = getVisitorIdEndpoint(oldURL.searchParams)
+  const endpoint = getVisitorIdEndpoint(oldURL.searchParams, routeSuffix)
   const newURL = new URL(endpoint)
   copySearchParams(oldURL, newURL)
   addTrafficMonitoringSearchParamsForVisitorIdRequest(newURL)
@@ -63,9 +64,9 @@ async function makeIngressAPIRequest(request: Request, env: WorkerEnv) {
   return fetch(newRequest).then((response) => createResponseWithFirstPartyCookies(request, response))
 }
 
-export async function handleIngressAPI(request: Request, env: WorkerEnv) {
+export async function handleIngressAPI(request: Request, env: WorkerEnv, routeMatches: RegExpMatchArray | undefined) {
   try {
-    return await makeIngressAPIRequest(request, env)
+    return await makeIngressAPIRequest(request, env, routeMatches)
   } catch (e) {
     return createErrorResponseForIngress(request, e)
   }
