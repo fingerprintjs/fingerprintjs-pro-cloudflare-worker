@@ -93,6 +93,11 @@ describe('get GetResult', () => {
     await handleRequestWithRoutes(request, env, routes)
     expect(mockIngressAPIHandler).toHaveBeenCalled()
   })
+  test('with suffix', async () => {
+    const request = new Request(`https://example.com/${getResultPath}/some-path`)
+    await handleRequestWithRoutes(request, env, routes)
+    expect(mockIngressAPIHandler).toHaveBeenCalled()
+  })
   test('incorrect path', async () => {
     const request = new Request(`https://example.com/${getResultPath}foobar`)
     await handleRequestWithRoutes(request, env, routes)
