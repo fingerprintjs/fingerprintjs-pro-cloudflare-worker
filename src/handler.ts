@@ -5,7 +5,11 @@ import { createRoute } from './utils'
 
 export type Route = {
   pathPattern: RegExp
-  handler: (request: Request, env: WorkerEnv) => Response | Promise<Response>
+  handler: (
+    request: Request,
+    env: WorkerEnv,
+    routeMatchArray: RegExpMatchArray | undefined,
+  ) => Response | Promise<Response>
 }
 
 function createRoutes(env: WorkerEnv): Route[] {
@@ -47,8 +51,9 @@ export function handleRequestWithRoutes(
 ): Promise<Response> | Response {
   const url = new URL(request.url)
   for (const route of routes) {
-    if (url.pathname.match(route.pathPattern)) {
-      return route.handler(request, env)
+    const matches = url.pathname.match(route.pathPattern)
+    if (matches) {
+      return route.handler(request, env, matches)
     }
   }
 
