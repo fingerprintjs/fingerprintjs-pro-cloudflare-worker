@@ -79,7 +79,7 @@ describe('ingress API request proxy URL with suffix', () => {
   })
 
   beforeEach(() => {
-    reqURL = new URL('https://example.com/worker_path/get_result/suffix')
+    reqURL = new URL('https://example.com/worker_path/get_result/suffix/more/path')
 
     receivedReqURL = ''
   })
@@ -93,7 +93,7 @@ describe('ingress API request proxy URL with suffix', () => {
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
     expect(receivedURL.origin).toBe('https://api.fpjs.io')
-    expect(receivedURL.pathname).toBe('/suffix')
+    expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 
   test('us region', async () => {
@@ -102,7 +102,7 @@ describe('ingress API request proxy URL with suffix', () => {
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
     expect(receivedURL.origin).toBe('https://api.fpjs.io')
-    expect(receivedURL.pathname).toBe('/suffix')
+    expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 
   test('eu region', async () => {
@@ -111,7 +111,7 @@ describe('ingress API request proxy URL with suffix', () => {
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
     expect(receivedURL.origin).toBe('https://eu.api.fpjs.io')
-    expect(receivedURL.pathname).toBe('/suffix')
+    expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 
   test('ap region', async () => {
@@ -120,7 +120,7 @@ describe('ingress API request proxy URL with suffix', () => {
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
     expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
-    expect(receivedURL.pathname).toBe('/suffix')
+    expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 })
 
