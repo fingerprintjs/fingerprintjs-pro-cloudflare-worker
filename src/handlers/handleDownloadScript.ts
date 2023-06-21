@@ -4,7 +4,7 @@ import {
   createErrorResponseForProCDN,
   getAgentScriptEndpoint,
 } from '../utils'
-import { createResponseWithMaxAge } from '../utils/createResponseWithMaxAge'
+import { createResponseWithMaxAge } from '../utils'
 
 function copySearchParams(oldURL: URL, newURL: URL): void {
   newURL.search = new URLSearchParams(oldURL.search).toString()

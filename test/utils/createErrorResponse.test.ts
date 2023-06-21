@@ -1,5 +1,5 @@
 import { createErrorResponseForIngress, createErrorResponseForProCDN } from '../../src/utils'
-import { FPJSResponse } from '../../src/utils/createErrorResponse'
+import { FPJSResponse } from '../../src/utils'
 
 describe('createErrorResponseForIngress', () => {
   let response: Response

@@ -1,5 +1,5 @@
 import { removeTrailingSlashesAndMultiSlashes, addTrailingWildcard, replaceDot, createRoute } from '../../src/utils'
-import { addEndingTrailingSlashToRoute, addPathnameMatchBeforeRoute } from '../../src/utils/routing'
+import { addEndingTrailingSlashToRoute, addPathnameMatchBeforeRoute } from '../../src/utils'
 
 describe('removeTrailingSlashesAndMultiSlashes', () => {
   it('returns /path for /path', () => {

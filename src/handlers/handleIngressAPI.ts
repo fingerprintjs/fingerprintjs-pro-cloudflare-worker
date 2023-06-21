@@ -10,7 +10,7 @@ import {
   getVisitorIdEndpoint,
   fetchCacheable,
 } from '../utils'
-import { createResponseWithMaxAge } from '../utils/createResponseWithMaxAge'
+import { createResponseWithMaxAge } from '../utils'
 
 declare global {
   interface Headers {

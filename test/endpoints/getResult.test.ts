@@ -1,6 +1,6 @@
 import { WorkerEnv } from '../../src/env'
 import worker from '../../src'
-import { FPJSResponse } from '../../src/utils/createErrorResponse'
+import { FPJSResponse } from '../../src/utils'
 
 const workerEnv: WorkerEnv = {
   PROXY_SECRET: 'proxy_secret',
