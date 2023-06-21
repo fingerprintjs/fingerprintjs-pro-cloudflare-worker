@@ -254,7 +254,7 @@ describe('agent download request cache durations', () => {
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=10')
   })
-  test('cloudflare network cache is set to 5 mins', async () => {
+  test('cloudflare network cache is set to 1 min', async () => {
     fetchSpy.mockImplementation(async (_, init) => {
       receivedCfObject = (init as RequestInit).cf
       const responseHeaders = new Headers({
