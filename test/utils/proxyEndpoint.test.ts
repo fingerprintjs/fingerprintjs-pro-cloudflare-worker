@@ -52,4 +52,9 @@ describe('getVisitorIdEndpoint', () => {
     urlSearchParams.set('region', 'ap')
     expect(getVisitorIdEndpoint(urlSearchParams)).toBe('https://ap.api.fpjs.io')
   })
+  test('no region with suffix', () => {
+    const urlSearchParams = new URLSearchParams()
+    const pathName = '/suffix/more/path'
+    expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://api.fpjs.io/suffix/more/path')
+  })
 })
