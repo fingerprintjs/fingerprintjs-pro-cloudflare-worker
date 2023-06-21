@@ -18,6 +18,6 @@ export function getVisitorIdEndpoint(
 ): string {
   const region = searchParams.get('region') || 'us'
   const prefix = region === DEFAULT_REGION ? '' : `${region}.`
-  const suffix = pathSuffix ? pathSuffix : ''
+  const suffix = pathSuffix ?? ''
   return `https://${prefix}api.fpjs.io${suffix}`
 }
