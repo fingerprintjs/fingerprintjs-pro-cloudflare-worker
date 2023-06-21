@@ -265,8 +265,8 @@ describe('agent download request cache durations', () => {
     })
     const req = new Request(reqURL.toString())
     await worker.fetch(req, workerEnv)
-    expect(receivedCfObject).toMatchObject({ cacheTtl: 300 })
-    expect({ cacheTtl: 300 }).toMatchObject(receivedCfObject!)
+    expect(receivedCfObject).toMatchObject({ cacheTtl: 60 })
+    expect({ cacheTtl: 60 }).toMatchObject(receivedCfObject!)
   })
 })
 

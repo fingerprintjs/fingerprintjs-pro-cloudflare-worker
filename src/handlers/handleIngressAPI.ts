@@ -8,7 +8,9 @@ import {
   filterCookies,
   getEffectiveTLDPlusOne,
   getVisitorIdEndpoint,
+  fetchCacheable,
 } from '../utils'
+import { createResponseWithMaxAge } from '../utils/createResponseWithMaxAge'
 
 declare global {
   interface Headers {
@@ -61,7 +63,13 @@ async function makeIngressAPIRequest(request: Request, env: WorkerEnv, routeMatc
   console.log(`sending ingress api to ${newURL}...`)
   const body = await (request.headers.get('Content-Type') ? request.blob() : Promise.resolve(null))
   const newRequest = new Request(newURL.toString(), new Request(request, { headers, body }))
-  return fetch(newRequest).then((response) => createResponseWithFirstPartyCookies(request, response))
+  const workerCacheTtl = 60
+  const maxMaxAge = 60 * 60
+  const maxSMaxAge = 60
+
+  return fetchCacheable(newRequest, workerCacheTtl)
+    .then((response) => createResponseWithFirstPartyCookies(request, response))
+    .then((response) => createResponseWithMaxAge(response, maxMaxAge, maxSMaxAge))
 }
 
 export async function handleIngressAPI(request: Request, env: WorkerEnv, routeMatches: RegExpMatchArray | undefined) {
