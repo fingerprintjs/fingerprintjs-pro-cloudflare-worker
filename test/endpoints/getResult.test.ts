@@ -64,6 +64,66 @@ describe('ingress API request proxy URL', () => {
   })
 })
 
+describe('ingress API request proxy URL with suffix', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let reqURL: URL
+  let receivedReqURL = ''
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy.mockImplementation(async (input, init) => {
+      const req = new Request(input, init)
+      receivedReqURL = req.url
+      return new Response()
+    })
+  })
+
+  beforeEach(() => {
+    reqURL = new URL('https://example.com/worker_path/get_result/suffix')
+
+    receivedReqURL = ''
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('no region', async () => {
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/suffix')
+  })
+
+  test('us region', async () => {
+    reqURL.searchParams.append('region', 'us')
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/suffix')
+  })
+
+  test('eu region', async () => {
+    reqURL.searchParams.append('region', 'eu')
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://eu.api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/suffix')
+  })
+
+  test('ap region', async () => {
+    reqURL.searchParams.append('region', 'ap')
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/suffix')
+  })
+})
+
 describe('ingress API request query parameters', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
   let reqURL: URL
