@@ -1,7 +1,7 @@
 export { getCacheControlHeaderWithMaxAgeIfLower } from './getCacheControlHeaderWithMaxAgeIfLower'
 export {
   createErrorResponseForIngress,
-  createErrorResponseForProCDN,
+  createFallbackErrorResponse,
   ErrorData,
   FPJSResponse,
   Notification,

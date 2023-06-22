@@ -1,7 +1,7 @@
 import {
   fetchCacheable,
   addTrafficMonitoringSearchParamsForProCDN,
-  createErrorResponseForProCDN,
+  createFallbackErrorResponse,
   getAgentScriptEndpoint,
   createResponseWithMaxAge,
 } from '../utils'
@@ -33,6 +33,6 @@ export async function handleDownloadScript(request: Request): Promise<Response> 
   try {
     return await makeDownloadScriptRequest(request)
   } catch (e) {
-    return createErrorResponseForProCDN(e)
+    return createFallbackErrorResponse(e)
   }
 }

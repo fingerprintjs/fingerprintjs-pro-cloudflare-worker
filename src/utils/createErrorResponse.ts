@@ -64,7 +64,7 @@ export function createErrorResponseForIngress(request: Request, error: string | 
   return new Response(JSON.stringify(responseBody), { status: 500, headers: responseHeaders })
 }
 
-export function createErrorResponseForProCDN(error: string | Error | unknown): Response {
+export function createFallbackErrorResponse(error: string | Error | unknown): Response {
   const responseBody = { error: errorToString(error) }
   return new Response(JSON.stringify(responseBody), { status: 500, headers: { 'content-type': 'application/json' } })
 }

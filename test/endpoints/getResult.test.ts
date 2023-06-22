@@ -305,10 +305,6 @@ describe('ingress API request body', () => {
     })
   })
 
-  beforeEach(() => {
-    receivedBody = ''
-  })
-
   afterAll(() => {
     fetchSpy.mockRestore()
   })
@@ -763,7 +759,6 @@ describe('POST request cache durations', () => {
     })
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
-    expect(receivedCfObject).toMatchObject({ cacheTtl: undefined })
-    expect({ cacheTtl: undefined }).toMatchObject(receivedCfObject!)
+    expect(receivedCfObject).toBe(null)
   })
 })
