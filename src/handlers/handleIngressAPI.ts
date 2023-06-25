@@ -76,7 +76,7 @@ async function makeIngressRequest(
   return fetch(request).then((response) => createResponseWithFirstPartyCookies(receivedRequest, response))
 }
 
-function makeCacheRequest(receivedRequest: Request, routeMatches: RegExpMatchArray | undefined) {
+function makeCacheEndpointRequest(receivedRequest: Request, routeMatches: RegExpMatchArray | undefined) {
   const requestURL = createRequestURL(receivedRequest.url, routeMatches)
   const headers = new Headers(receivedRequest.headers)
   headers.delete('Cookie')
@@ -96,7 +96,7 @@ function makeCacheRequest(receivedRequest: Request, routeMatches: RegExpMatchArr
 export async function handleIngressAPI(request: Request, env: WorkerEnv, routeMatches: RegExpMatchArray | undefined) {
   if (request.method === 'GET') {
     try {
-      return await makeCacheRequest(request, routeMatches)
+      return await makeCacheEndpointRequest(request, routeMatches)
     } catch (e) {
       return createFallbackErrorResponse(e)
     }
