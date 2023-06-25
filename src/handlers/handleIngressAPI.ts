@@ -70,7 +70,9 @@ async function makeIngressRequest(
   headers = filterCookies(headers, (key) => key === '_iidt')
   addProxyIntegrationHeaders(headers, env)
   const body = await (receivedRequest.headers.get('Content-Type') ? receivedRequest.blob() : Promise.resolve(null))
+  console.log(`sending ingress request to ${requestURL}...`)
   const request = new Request(requestURL, new Request(receivedRequest, { headers, body }))
+
   return fetch(request).then((response) => createResponseWithFirstPartyCookies(receivedRequest, response))
 }
 
@@ -79,6 +81,7 @@ function makeCacheRequest(receivedRequest: Request, routeMatches: RegExpMatchArr
   const headers = new Headers(receivedRequest.headers)
   headers.delete('Cookie')
 
+  console.log(`sending cache request to ${requestURL}...`)
   const request = new Request(requestURL, new Request(receivedRequest, { headers }))
 
   const workerCacheTtl = 60
