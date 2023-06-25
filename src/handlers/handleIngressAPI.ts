@@ -49,9 +49,9 @@ function createResponseWithFirstPartyCookies(request: Request, response: Respons
   })
 }
 
-function getNewURL(request: Request, routeMatches: RegExpMatchArray | undefined) {
+function createRequestURL(receivedRequestURL: string, routeMatches: RegExpMatchArray | undefined) {
   const routeSuffix = routeMatches ? routeMatches[1] : undefined
-  const oldURL = new URL(request.url)
+  const oldURL = new URL(receivedRequestURL)
   const endpoint = getVisitorIdEndpoint(oldURL.searchParams, routeSuffix)
   const newURL = new URL(endpoint)
   copySearchParams(oldURL, newURL)
@@ -59,35 +59,28 @@ function getNewURL(request: Request, routeMatches: RegExpMatchArray | undefined)
   return newURL
 }
 
-function generateNewRequest(request: Request, routeMatches: RegExpMatchArray | undefined) {
-  const newURL = getNewURL(request, routeMatches)
-  const headers = new Headers(request.headers)
-  headers.delete('Cookie')
-
-  return new Request(newURL.toString(), new Request(request, { headers }))
-}
-
-async function addBodyToProxyRequest(request: Request, env: WorkerEnv, routeMatches: RegExpMatchArray | undefined) {
-  const newURL = getNewURL(request, routeMatches)
-  addTrafficMonitoringSearchParamsForVisitorIdRequest(newURL)
-  let headers = new Headers(request.headers)
-  addProxyIntegrationHeaders(headers, env)
-  headers = filterCookies(headers, (key) => key === '_iidt')
-  const body = await (request.headers.get('Content-Type') ? request.blob() : Promise.resolve(null))
-
-  return new Request(newURL.toString(), new Request(request, { headers, body }))
-}
-
-async function makeIngressRequestWithBody(
-  request: Request,
+async function makeIngressRequest(
+  receivedRequest: Request,
   env: WorkerEnv,
   routeMatches: RegExpMatchArray | undefined,
 ) {
-  const requestWithBody = await addBodyToProxyRequest(request, env, routeMatches)
-  return fetch(requestWithBody).then((response) => createResponseWithFirstPartyCookies(request, response))
+  const requestURL = createRequestURL(receivedRequest.url, routeMatches)
+  addTrafficMonitoringSearchParamsForVisitorIdRequest(requestURL)
+  let headers = new Headers(receivedRequest.headers)
+  headers = filterCookies(headers, (key) => key === '_iidt')
+  addProxyIntegrationHeaders(headers, env)
+  const body = await (receivedRequest.headers.get('Content-Type') ? receivedRequest.blob() : Promise.resolve(null))
+  const request = new Request(requestURL, new Request(receivedRequest, { headers, body }))
+  return fetch(request).then((response) => createResponseWithFirstPartyCookies(receivedRequest, response))
 }
 
-async function makeIngressRequestWithoutBody(request: Request) {
+function makeCacheRequest(receivedRequest: Request, routeMatches: RegExpMatchArray | undefined) {
+  const requestURL = createRequestURL(receivedRequest.url, routeMatches)
+  const headers = new Headers(receivedRequest.headers)
+  headers.delete('Cookie')
+
+  const request = new Request(requestURL, new Request(receivedRequest, { headers }))
+
   const workerCacheTtl = 60
   const maxMaxAge = 60 * 60
   const maxSMaxAge = 60
@@ -98,24 +91,17 @@ async function makeIngressRequestWithoutBody(request: Request) {
 }
 
 export async function handleIngressAPI(request: Request, env: WorkerEnv, routeMatches: RegExpMatchArray | undefined) {
-  const ingressMethods = [
-    'POST',
-    // 'PUT',
-    // PATCH
-  ]
-
-  if (ingressMethods.includes(request.method)) {
+  if (request.method === 'GET') {
     try {
-      return await makeIngressRequestWithBody(request, env, routeMatches)
+      return await makeCacheRequest(request, routeMatches)
     } catch (e) {
-      return createErrorResponseForIngress(request, e)
+      return createFallbackErrorResponse(e)
     }
   }
 
-  const newRequest = generateNewRequest(request, routeMatches)
   try {
-    return await makeIngressRequestWithoutBody(newRequest)
+    return await makeIngressRequest(request, env, routeMatches)
   } catch (e) {
-    return createFallbackErrorResponse(e)
+    return createErrorResponseForIngress(request, e)
   }
 }
