@@ -12,8 +12,12 @@ export function getAgentScriptEndpoint(searchParams: URLSearchParams): string {
   return `${base}${lv}`
 }
 
-export function getVisitorIdEndpoint(searchParams: URLSearchParams): string {
+export function getVisitorIdEndpoint(
+  searchParams: URLSearchParams,
+  pathSuffix: string | undefined = undefined,
+): string {
   const region = searchParams.get('region') || 'us'
   const prefix = region === DEFAULT_REGION ? '' : `${region}.`
-  return `https://${prefix}api.fpjs.io`
+  const suffix = pathSuffix ?? ''
+  return `https://${prefix}api.fpjs.io${suffix}`
 }

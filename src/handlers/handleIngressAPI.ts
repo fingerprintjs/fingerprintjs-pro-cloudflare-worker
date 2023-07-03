@@ -8,7 +8,10 @@ import {
   filterCookies,
   getEffectiveTLDPlusOne,
   getVisitorIdEndpoint,
+  fetchCacheable,
+  createFallbackErrorResponse,
 } from '../utils'
+import { createResponseWithMaxAge } from '../utils'
 
 declare global {
   interface Headers {
@@ -46,26 +49,61 @@ function createResponseWithFirstPartyCookies(request: Request, response: Respons
   })
 }
 
-async function makeIngressAPIRequest(request: Request, env: WorkerEnv) {
-  const oldURL = new URL(request.url)
-  const endpoint = getVisitorIdEndpoint(oldURL.searchParams)
+function createRequestURL(receivedRequestURL: string, routeMatches: RegExpMatchArray | undefined) {
+  const routeSuffix = routeMatches ? routeMatches[1] : undefined
+  const oldURL = new URL(receivedRequestURL)
+  const endpoint = getVisitorIdEndpoint(oldURL.searchParams, routeSuffix)
   const newURL = new URL(endpoint)
   copySearchParams(oldURL, newURL)
-  addTrafficMonitoringSearchParamsForVisitorIdRequest(newURL)
 
-  let headers = new Headers(request.headers)
-  addProxyIntegrationHeaders(headers, env)
-  headers = filterCookies(headers, (key) => key === '_iidt')
-
-  console.log(`sending ingress api to ${newURL}...`)
-  const body = await (request.headers.get('Content-Type') ? request.blob() : Promise.resolve(null))
-  const newRequest = new Request(newURL.toString(), new Request(request, { headers, body }))
-  return fetch(newRequest).then((response) => createResponseWithFirstPartyCookies(request, response))
+  return newURL
 }
 
-export async function handleIngressAPI(request: Request, env: WorkerEnv) {
+async function makeIngressRequest(
+  receivedRequest: Request,
+  env: WorkerEnv,
+  routeMatches: RegExpMatchArray | undefined,
+) {
+  const requestURL = createRequestURL(receivedRequest.url, routeMatches)
+  addTrafficMonitoringSearchParamsForVisitorIdRequest(requestURL)
+  let headers = new Headers(receivedRequest.headers)
+  headers = filterCookies(headers, (key) => key === '_iidt')
+  addProxyIntegrationHeaders(headers, env)
+  const body = await (receivedRequest.headers.get('Content-Type') ? receivedRequest.blob() : Promise.resolve(null))
+  console.log(`sending ingress request to ${requestURL}...`)
+  const request = new Request(requestURL, new Request(receivedRequest, { headers, body }))
+
+  return fetch(request).then((response) => createResponseWithFirstPartyCookies(receivedRequest, response))
+}
+
+function makeCacheEndpointRequest(receivedRequest: Request, routeMatches: RegExpMatchArray | undefined) {
+  const requestURL = createRequestURL(receivedRequest.url, routeMatches)
+  const headers = new Headers(receivedRequest.headers)
+  headers.delete('Cookie')
+
+  console.log(`sending cache request to ${requestURL}...`)
+  const request = new Request(requestURL, new Request(receivedRequest, { headers }))
+
+  const workerCacheTtl = 60
+  const maxMaxAge = 60 * 60
+  const maxSMaxAge = 60
+
+  return fetchCacheable(request, workerCacheTtl).then((response) =>
+    createResponseWithMaxAge(response, maxMaxAge, maxSMaxAge),
+  )
+}
+
+export async function handleIngressAPI(request: Request, env: WorkerEnv, routeMatches: RegExpMatchArray | undefined) {
+  if (request.method === 'GET') {
+    try {
+      return await makeCacheEndpointRequest(request, routeMatches)
+    } catch (e) {
+      return createFallbackErrorResponse(e)
+    }
+  }
+
   try {
-    return await makeIngressAPIRequest(request, env)
+    return await makeIngressRequest(request, env, routeMatches)
   } catch (e) {
     return createErrorResponseForIngress(request, e)
   }

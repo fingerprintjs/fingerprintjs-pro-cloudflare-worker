@@ -1,5 +1,5 @@
-import { createErrorResponseForIngress, createErrorResponseForProCDN } from '../../src/utils'
-import { FPJSResponse } from '../../src/utils/createErrorResponse'
+import { createErrorResponseForIngress, createFallbackErrorResponse } from '../../src/utils'
+import { FPJSResponse } from '../../src/utils'
 
 describe('createErrorResponseForIngress', () => {
   let response: Response
@@ -87,11 +87,11 @@ describe('createErrorResponseForIngress', () => {
   })
 })
 
-describe('createErrorResponseForProCDN', () => {
+describe('createFallbackErrorResponse', () => {
   let response: Response
   beforeEach(() => {
     const errorReason = 'some error message'
-    response = createErrorResponseForProCDN(errorReason)
+    response = createFallbackErrorResponse(errorReason)
   })
   test('response body is as expected', async () => {
     expect(response.body).not.toBeNull()

@@ -1,35 +1,27 @@
-import { getCacheControlHeaderWithMaxAgeIfLower } from './getCacheControlHeaderWithMaxAgeIfLower'
-import { createErrorResponseForIngress, createErrorResponseForProCDN } from './createErrorResponse'
-import { fetchCacheable } from './fetchCacheable'
-import {
+export { getCacheControlHeaderWithMaxAgeIfLower } from './getCacheControlHeaderWithMaxAgeIfLower'
+export {
+  createErrorResponseForIngress,
+  createFallbackErrorResponse,
+  ErrorData,
+  FPJSResponse,
+  Notification,
+} from './createErrorResponse'
+export { fetchCacheable } from './fetchCacheable'
+export {
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
   addTrafficMonitoringSearchParamsForProCDN,
 } from './addTrafficMonitoring'
-import { returnHttpResponse } from './returnHttpResponse'
-import { addProxyIntegrationHeaders } from './addProxyIntegrationHeaders'
-import { getEffectiveTLDPlusOne } from './getEffectiveTLDPlusOne'
-import { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue, filterCookies } from './cookie'
-import { createRoute, addTrailingWildcard, removeTrailingSlashesAndMultiSlashes, replaceDot } from './routing'
-import { getAgentScriptEndpoint, getVisitorIdEndpoint } from './proxyEndpoint'
-
+export { returnHttpResponse } from './returnHttpResponse'
+export { addProxyIntegrationHeaders } from './addProxyIntegrationHeaders'
+export { getEffectiveTLDPlusOne } from './getEffectiveTLDPlusOne'
+export { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue, filterCookies } from './cookie'
 export {
-  createCookieStringFromObject,
-  getCacheControlHeaderWithMaxAgeIfLower,
-  addTrafficMonitoringSearchParamsForVisitorIdRequest,
-  addTrafficMonitoringSearchParamsForProCDN,
-  createCookieObjectFromHeaderValue,
-  createErrorResponseForIngress,
-  createErrorResponseForProCDN,
-  addProxyIntegrationHeaders,
+  createRoute,
   addTrailingWildcard,
   removeTrailingSlashesAndMultiSlashes,
   replaceDot,
-  getEffectiveTLDPlusOne,
-  returnHttpResponse,
-  filterCookies,
-  fetchCacheable,
-  createRoute,
-  getAgentScriptEndpoint,
-  getVisitorIdEndpoint,
-  Cookie,
-}
+  addPathnameMatchBeforeRoute,
+  addEndingTrailingSlashToRoute,
+} from './routing'
+export { getAgentScriptEndpoint, getVisitorIdEndpoint } from './proxyEndpoint'
+export { createResponseWithMaxAge } from './createResponseWithMaxAge'

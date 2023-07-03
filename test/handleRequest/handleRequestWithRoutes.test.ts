@@ -44,6 +44,11 @@ describe('download Pro Agent Script', () => {
     await handleRequestWithRoutes(request, env, routes)
     expect(mockAgentDownloadHandler).toHaveBeenCalledTimes(1)
   })
+  test('with prefix', async () => {
+    const request = new Request(`https://example.com/foobar/${agentScriptDownloadPath}`)
+    await handleRequestWithRoutes(request, env, routes)
+    expect(mockAgentDownloadHandler).toHaveBeenCalled()
+  })
   test('incorrect path', async () => {
     const request = new Request(`https://example.com/${agentScriptDownloadPath}/some-path`)
     await handleRequestWithRoutes(request, env, routes)
@@ -83,8 +88,18 @@ describe('get GetResult', () => {
     await handleRequestWithRoutes(request, env, routes)
     expect(mockIngressAPIHandler).toHaveBeenCalledTimes(1)
   })
-  test('incorrect path', async () => {
+  test('with prefix', async () => {
+    const request = new Request(`https://example.com/foobar/${getResultPath}`)
+    await handleRequestWithRoutes(request, env, routes)
+    expect(mockIngressAPIHandler).toHaveBeenCalled()
+  })
+  test('with suffix', async () => {
     const request = new Request(`https://example.com/${getResultPath}/some-path`)
+    await handleRequestWithRoutes(request, env, routes)
+    expect(mockIngressAPIHandler).toHaveBeenCalled()
+  })
+  test('incorrect path', async () => {
+    const request = new Request(`https://example.com/${getResultPath}foobar`)
     await handleRequestWithRoutes(request, env, routes)
     expect(mockIngressAPIHandler).not.toHaveBeenCalled()
   })
@@ -121,6 +136,11 @@ describe('status page', () => {
     const request = new Request(`https://example.com/${workerPath}/status`, { method: 'POST' })
     await handleRequestWithRoutes(request, env, routes)
     expect(mockStatusPageHandler).toHaveBeenCalledTimes(1)
+  })
+  test('with prefix', async () => {
+    const request = new Request(`https://example.com/foobar/status`)
+    await handleRequestWithRoutes(request, env, routes)
+    expect(mockStatusPageHandler).toHaveBeenCalled()
   })
   test('incorrect path', async () => {
     const request = new Request(`https://example.com/status/some-path`)

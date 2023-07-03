@@ -1,6 +1,6 @@
 import { WorkerEnv } from '../../src/env'
 import worker from '../../src'
-import { FPJSResponse } from '../../src/utils/createErrorResponse'
+import { FPJSResponse } from '../../src/utils'
 
 const workerEnv: WorkerEnv = {
   PROXY_SECRET: 'proxy_secret',
@@ -61,6 +61,66 @@ describe('ingress API request proxy URL', () => {
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
     expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
+  })
+})
+
+describe('ingress API request proxy URL with suffix', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let reqURL: URL
+  let receivedReqURL = ''
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy.mockImplementation(async (input, init) => {
+      const req = new Request(input, init)
+      receivedReqURL = req.url
+      return new Response()
+    })
+  })
+
+  beforeEach(() => {
+    reqURL = new URL('https://example.com/worker_path/get_result/suffix/more/path')
+
+    receivedReqURL = ''
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('no region', async () => {
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/suffix/more/path')
+  })
+
+  test('us region', async () => {
+    reqURL.searchParams.append('region', 'us')
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/suffix/more/path')
+  })
+
+  test('eu region', async () => {
+    reqURL.searchParams.append('region', 'eu')
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://eu.api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/suffix/more/path')
+  })
+
+  test('ap region', async () => {
+    reqURL.searchParams.append('region', 'ap')
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 })
 
@@ -198,7 +258,7 @@ describe('ingress API request headers', () => {
       expect(receivedHeaders.get(key)).toBe(value)
     })
   })
-  test('req headers do not have cookies except _iidt', async () => {
+  test('POST req headers do not have cookies except _iidt', async () => {
     const reqHeaders = new Headers({
       accept: '*/*',
       'cache-control': 'no-cache',
@@ -213,6 +273,20 @@ describe('ingress API request headers', () => {
     expect(receivedHeaders.get('cookie')).toBe(
       '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==',
     )
+  })
+  test('GET req headers do not have cookies (including _iidt)', async () => {
+    const reqHeaders = new Headers({
+      accept: '*/*',
+      'cache-control': 'no-cache',
+      'accept-language': 'en-US',
+      'user-agent': 'Mozilla/5.0',
+      'x-some-header': 'some value',
+      cookie:
+        '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; auth_token=123456',
+    })
+    const req = new Request(reqURL.toString(), { headers: reqHeaders, method: 'GET' })
+    await worker.fetch(req, workerEnv)
+    expect(receivedHeaders.get('cookie')).toBe(null)
   })
 })
 
@@ -231,10 +305,6 @@ describe('ingress API request body', () => {
     })
   })
 
-  beforeEach(() => {
-    receivedBody = ''
-  })
-
   afterAll(() => {
     fetchSpy.mockRestore()
   })
@@ -247,7 +317,7 @@ describe('ingress API request body', () => {
   })
 })
 
-describe('agent download request HTTP method', () => {
+describe('ingress API request HTTP method', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
   const reqURL = new URL('https://example.com/worker_path/get_result')
   let requestMethod: string
@@ -281,9 +351,57 @@ describe('agent download request HTTP method', () => {
     await worker.fetch(req, workerEnv)
     expect(requestMethod).toBe('POST')
   })
+
+  test('when method is PUT', async () => {
+    const req = new Request(reqURL.toString(), { method: 'PUT' })
+    await worker.fetch(req, workerEnv)
+    expect(requestMethod).toBe('PUT')
+  })
 })
 
-describe('ingress API response headers', () => {
+describe('ingress API response headers for GET req', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('response headers are the same (except HSTS)', async () => {
+    const responseHeaders = new Headers({
+      'access-control-allow-credentials': 'true',
+      'access-control-expose-headers': 'Retry-After',
+      'content-type': 'text/plain',
+    })
+    fetchSpy.mockImplementation(async () => {
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'GET' })
+    const response = await worker.fetch(req, workerEnv)
+    response.headers.forEach((value, key) => {
+      expect(responseHeaders.get(key)).toBe(value)
+    })
+    responseHeaders.forEach((value, key) => {
+      expect(response.headers.get(key)).toBe(value)
+    })
+  })
+  test('strict-transport-security is removed', async () => {
+    fetchSpy.mockImplementation(async () => {
+      const headers = new Headers({
+        'strict-transport-security': 'max-age=63072000',
+      })
+      return new Response('', { headers })
+    })
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'GET' })
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('strict-transport-security')).toBe(null)
+  })
+})
+
+describe('ingress API response headers for POST req', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
 
   beforeAll(() => {
@@ -302,7 +420,7 @@ describe('ingress API response headers', () => {
       })
       return new Response('', { headers })
     })
-    const req = new Request('https://example.com/worker_path/get_result')
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'POST' })
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('set-cookie')).toBe(
       '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=example.com; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=example.com',
@@ -317,7 +435,7 @@ describe('ingress API response headers', () => {
       })
       return new Response('', { headers })
     })
-    const req = new Request('https://example.com/worker_path/get_result')
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'POST' })
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('set-cookie')).toBe(
       '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=example.com; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=example.com',
@@ -332,7 +450,7 @@ describe('ingress API response headers', () => {
       })
       return new Response('', { headers })
     })
-    const req = new Request('https://sub2.sub1.some.alces.network/worker_path/get_result')
+    const req = new Request('https://sub2.sub1.some.alces.network/worker_path/get_result', { method: 'POST' })
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('set-cookie')).toBe(
       '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=sub1.some.alces.network; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=sub1.some.alces.network',
@@ -347,7 +465,7 @@ describe('ingress API response headers', () => {
       })
       return new Response('', { headers })
     })
-    const req = new Request('https://city.kawasaki.jp/worker_path/get_result')
+    const req = new Request('https://city.kawasaki.jp/worker_path/get_result', { method: 'POST' })
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('set-cookie')).toBe(
       '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=city.kawasaki.jp; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=city.kawasaki.jp',
@@ -362,7 +480,7 @@ describe('ingress API response headers', () => {
     fetchSpy.mockImplementation(async () => {
       return new Response('', { headers: responseHeaders })
     })
-    const req = new Request('https://example.com/worker_path/get_result')
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'POST' })
     const response = await worker.fetch(req, workerEnv)
     response.headers.forEach((value, key) => {
       expect(responseHeaders.get(key)).toBe(value)
@@ -378,7 +496,7 @@ describe('ingress API response headers', () => {
       })
       return new Response('', { headers })
     })
-    const req = new Request('https://example.com/worker_path/get_result')
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'POST' })
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('strict-transport-security')).toBe(null)
   })
@@ -399,9 +517,55 @@ describe('ingress API response body when successful', () => {
     fetchSpy.mockImplementation(async () => {
       return new Response('some text')
     })
-    const req = new Request('https://example.com/worker_path/get_result')
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'POST' })
     const response = await worker.fetch(req, workerEnv)
     expect(await response.text()).toBe('some text')
+  })
+})
+
+describe('GET req response when failure', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('body and headers are unchanged when ingress API fails', async () => {
+    const responseHeaders = new Headers({
+      'access-control-allow-credentials': 'true',
+      'access-control-expose-headers': 'Retry-After',
+      'content-type': 'text/plain',
+    })
+    fetchSpy.mockImplementation(async () => {
+      return new Response('some error', { status: 500, headers: responseHeaders })
+    })
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'GET' })
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.status).toBe(500)
+    expect(await response.text()).toBe('some error')
+    response.headers.forEach((value, key) => {
+      expect(responseHeaders.get(key)).toBe(value)
+    })
+    responseHeaders.forEach((value, key) => {
+      expect(response.headers.get(key)).toBe(value)
+    })
+  })
+  test('error response when error inside the worker', async () => {
+    fetchSpy.mockImplementation(async () => {
+      throw new Error('some error')
+    })
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'GET' })
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('content-type')).toBe('application/json')
+    expect(response.status).toBe(500)
+    const responseBody = await response.json()
+    // Note: toStrictEqual does not work for some reason, using double toMatchObject instead
+    expect(responseBody).toMatchObject({ error: 'some error' })
+    expect({ error: 'some error' }).toMatchObject(responseBody as any)
   })
 })
 
@@ -425,7 +589,7 @@ describe('ingress API response when failure', () => {
     fetchSpy.mockImplementation(async () => {
       return new Response('some error', { status: 500, headers: responseHeaders })
     })
-    const req = new Request('https://example.com/worker_path/get_result')
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'POST' })
     const response = await worker.fetch(req, workerEnv)
     expect(response.status).toBe(500)
     expect(await response.text()).toBe('some error')
@@ -440,7 +604,7 @@ describe('ingress API response when failure', () => {
     fetchSpy.mockImplementation(async () => {
       throw new Error('some error')
     })
-    const req = new Request('https://example.com/worker_path/get_result')
+    const req = new Request('https://example.com/worker_path/get_result', { method: 'POST' })
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('content-type')).toBe('application/json')
     expect(response.status).toBe(500)
@@ -462,5 +626,139 @@ describe('ingress API response when failure', () => {
     // Note: toStrictEqual does not work for some reason, using double toMatchObject instead
     expect(modifiedResponseBody).toMatchObject(expectedResponseBody)
     expect(expectedResponseBody).toMatchObject(modifiedResponseBody)
+  })
+})
+
+describe('GET request cache durations', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  const reqURL = new URL('https://example.com/worker_path/get_result')
+  let receivedCfObject: IncomingRequestCfProperties | RequestInitCfProperties | null | undefined = null
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+  })
+
+  beforeEach(() => {
+    receivedCfObject = null
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('browser cache set to an hour when original value is higher', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'cache-control': 'public, max-age=3613',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString(), { method: 'GET' })
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=60')
+  })
+  test('browser cache is the same when original value is lower than an hour', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'cache-control': 'public, max-age=100',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString(), { method: 'GET' })
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=100, s-maxage=60')
+  })
+  test('proxy cache set to a minute when original value is higher', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'cache-control': 'public, max-age=3613, s-maxage=575500',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString(), { method: 'GET' })
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=60')
+  })
+  test('proxy cache is the same when original value is lower than a minute', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'cache-control': 'public, max-age=3613, s-maxage=10',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString(), { method: 'GET' })
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=10')
+  })
+  test('cloudflare network cache is set to 1 min', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'cache-control': 'public, max-age=3613, s-maxage=575500',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString(), { method: 'GET' })
+    await worker.fetch(req, workerEnv)
+    expect(receivedCfObject).toMatchObject({ cacheTtl: 60 })
+    expect({ cacheTtl: 60 }).toMatchObject(receivedCfObject!)
+  })
+})
+
+describe('POST request cache durations', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  const reqURL = new URL('https://example.com/worker_path/get_result')
+  let receivedCfObject: IncomingRequestCfProperties | RequestInitCfProperties | null | undefined = null
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+  })
+
+  beforeEach(() => {
+    receivedCfObject = null
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('cache-control is not added', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'access-control-allow-credentials': 'true',
+        'access-control-expose-headers': 'Retry-After',
+        'content-type': 'text/plain',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    const response = await worker.fetch(req, workerEnv)
+    expect(response.headers.get('cache-control')).toBe(null)
+  })
+  test('cloudflare network cache is not set', async () => {
+    fetchSpy.mockImplementation(async (_, init) => {
+      receivedCfObject = (init as RequestInit).cf
+      const responseHeaders = new Headers({
+        'access-control-allow-credentials': 'true',
+        'access-control-expose-headers': 'Retry-After',
+        'content-type': 'text/plain',
+      })
+
+      return new Response('', { headers: responseHeaders })
+    })
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    expect(receivedCfObject).toBe(null)
   })
 })

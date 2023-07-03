@@ -37,7 +37,7 @@ export const isGetResultPathSet = isVarSet(getResultPathVarName)
 
 export function getGetResultPath(env: WorkerEnv): string {
   const getResultPathVar = getGetResultPathVar(env)
-  return `/${getResultPathVar}`
+  return `/${getResultPathVar}(/.*)?`
 }
 
 export const proxySecretVarName = 'PROXY_SECRET'
