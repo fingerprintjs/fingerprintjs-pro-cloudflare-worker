@@ -8,10 +8,8 @@ import {
   filterCookies,
   getEffectiveTLDPlusOne,
   getVisitorIdEndpoint,
-  fetchCacheable,
   createFallbackErrorResponse,
 } from '../utils'
-import { createResponseWithMaxAge } from '../utils'
 
 declare global {
   interface Headers {
@@ -84,13 +82,7 @@ function makeCacheEndpointRequest(receivedRequest: Request, routeMatches: RegExp
   console.log(`sending cache request to ${requestURL}...`)
   const request = new Request(requestURL, new Request(receivedRequest, { headers }))
 
-  const workerCacheTtl = 60
-  const maxMaxAge = 60 * 60
-  const maxSMaxAge = 60
-
-  return fetchCacheable(request, workerCacheTtl).then((response) =>
-    createResponseWithMaxAge(response, maxMaxAge, maxSMaxAge),
-  )
+  return fetch(request).then((oldResponse) => new Response(oldResponse.body, oldResponse))
 }
 
 export async function handleIngressAPI(request: Request, env: WorkerEnv, routeMatches: RegExpMatchArray | undefined) {
