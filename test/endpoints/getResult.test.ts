@@ -646,59 +646,19 @@ describe('GET request cache durations', () => {
     fetchSpy.mockRestore()
   })
 
-  test('browser cache set to an hour when original value is higher', async () => {
-    fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
+  test('browser cache is the same as the subrequest response', async () => {
+    fetchSpy.mockImplementation(async () => {
       const responseHeaders = new Headers({
-        'cache-control': 'public, max-age=3613',
+        'cache-control': 'max-age=2592000, immutable, private',
       })
 
       return new Response('', { headers: responseHeaders })
     })
     const req = new Request(reqURL.toString(), { method: 'GET' })
     const response = await worker.fetch(req, workerEnv)
-    expect(response.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=60')
+    expect(response.headers.get('cache-control')).toBe('max-age=2592000, immutable, private')
   })
-  test('browser cache is the same when original value is lower than an hour', async () => {
-    fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
-      const responseHeaders = new Headers({
-        'cache-control': 'public, max-age=100',
-      })
-
-      return new Response('', { headers: responseHeaders })
-    })
-    const req = new Request(reqURL.toString(), { method: 'GET' })
-    const response = await worker.fetch(req, workerEnv)
-    expect(response.headers.get('cache-control')).toBe('public, max-age=100, s-maxage=60')
-  })
-  test('proxy cache set to a minute when original value is higher', async () => {
-    fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
-      const responseHeaders = new Headers({
-        'cache-control': 'public, max-age=3613, s-maxage=575500',
-      })
-
-      return new Response('', { headers: responseHeaders })
-    })
-    const req = new Request(reqURL.toString(), { method: 'GET' })
-    const response = await worker.fetch(req, workerEnv)
-    expect(response.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=60')
-  })
-  test('proxy cache is the same when original value is lower than a minute', async () => {
-    fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
-      const responseHeaders = new Headers({
-        'cache-control': 'public, max-age=3613, s-maxage=10',
-      })
-
-      return new Response('', { headers: responseHeaders })
-    })
-    const req = new Request(reqURL.toString(), { method: 'GET' })
-    const response = await worker.fetch(req, workerEnv)
-    expect(response.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=10')
-  })
-  test('cloudflare network cache is set to 1 min', async () => {
+  test('cloudflare network cache is not set', async () => {
     fetchSpy.mockImplementation(async (_, init) => {
       receivedCfObject = (init as RequestInit).cf
       const responseHeaders = new Headers({
@@ -709,8 +669,7 @@ describe('GET request cache durations', () => {
     })
     const req = new Request(reqURL.toString(), { method: 'GET' })
     await worker.fetch(req, workerEnv)
-    expect(receivedCfObject).toMatchObject({ cacheTtl: 60 })
-    expect({ cacheTtl: 60 }).toMatchObject(receivedCfObject!)
+    expect(receivedCfObject).toBe(null)
   })
 })
 
