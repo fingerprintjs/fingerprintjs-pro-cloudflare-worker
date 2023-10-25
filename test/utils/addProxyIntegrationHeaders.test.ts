@@ -15,21 +15,21 @@ describe('addProxyIntegrationHeaders', () => {
     }
   })
   test('when PROXY_SECRET is set', () => {
-    addProxyIntegrationHeaders(headers, env)
+    addProxyIntegrationHeaders(headers, 'https://example.com/worker/result', env)
     expect(headers.get('FPJS-Proxy-Secret')).toBe('secret_value')
     expect(headers.get('FPJS-Proxy-Client-IP')).toBe('19.117.63.126')
     expect(headers.get('x-custom-header')).toBe('custom-value')
   })
   test('when PROXY_SECRET is not set', () => {
     env.PROXY_SECRET = null
-    addProxyIntegrationHeaders(headers, env)
+    addProxyIntegrationHeaders(headers, 'https://example.com/worker/result', env)
     expect(headers.get('FPJS-Proxy-Secret')).toBe(null)
     expect(headers.get('FPJS-Proxy-Client-IP')).toBe(null)
     expect(headers.get('x-custom-header')).toBe('custom-value')
   })
   test('ipv6', () => {
     headers.set('CF-Connecting-IP', '84D:1111:222:3333:4444:5555:6:77')
-    addProxyIntegrationHeaders(headers, env)
+    addProxyIntegrationHeaders(headers, 'https://example.com/worker/result', env)
     expect(headers.get('FPJS-Proxy-Secret')).toBe('secret_value')
     expect(headers.get('FPJS-Proxy-Client-IP')).toBe('84D:1111:222:3333:4444:5555:6:77')
     expect(headers.get('x-custom-header')).toBe('custom-value')

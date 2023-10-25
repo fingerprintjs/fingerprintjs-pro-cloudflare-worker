@@ -251,6 +251,7 @@ describe('ingress API request headers', () => {
     const expectedHeaders = new Headers(reqHeaders)
     expectedHeaders.set('FPJS-Proxy-Secret', 'proxy_secret')
     expectedHeaders.set('FPJS-Proxy-Client-IP', '203.0.113.195')
+    expectedHeaders.set('FPJS-Proxy-Forwarded-Host', 'example.com')
     receivedHeaders.forEach((value, key) => {
       expect(expectedHeaders.get(key)).toBe(value)
     })
@@ -412,65 +413,6 @@ describe('ingress API response headers for POST req', () => {
     fetchSpy.mockRestore()
   })
 
-  test('cookies are the same except domain', async () => {
-    fetchSpy.mockImplementation(async () => {
-      const headers = new Headers({
-        'set-cookie':
-          '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=fpjs.io; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=fpjs.io;',
-      })
-      return new Response('', { headers })
-    })
-    const req = new Request('https://example.com/worker_path/get_result', { method: 'POST' })
-    const response = await worker.fetch(req, workerEnv)
-    expect(response.headers.get('set-cookie')).toBe(
-      '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=example.com; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=example.com',
-    )
-  })
-  test('cookies are first party for the req url whose TLD is a regular TLD, the domain is derived from the req url (not origin header)', async () => {
-    fetchSpy.mockImplementation(async () => {
-      const headers = new Headers({
-        origin: 'https://some-other.com',
-        'set-cookie':
-          '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=fpjs.io; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=fpjs.io;',
-      })
-      return new Response('', { headers })
-    })
-    const req = new Request('https://example.com/worker_path/get_result', { method: 'POST' })
-    const response = await worker.fetch(req, workerEnv)
-    expect(response.headers.get('set-cookie')).toBe(
-      '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=example.com; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=example.com',
-    )
-  })
-  test('cookies are first party for the req url whose TLD has wildcard, the domain is derived from the req url (not origin header)', async () => {
-    fetchSpy.mockImplementation(async () => {
-      const headers = new Headers({
-        origin: 'https://some-other.com',
-        'set-cookie':
-          '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=fpjs.io; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=fpjs.io;',
-      })
-      return new Response('', { headers })
-    })
-    const req = new Request('https://sub2.sub1.some.alces.network/worker_path/get_result', { method: 'POST' })
-    const response = await worker.fetch(req, workerEnv)
-    expect(response.headers.get('set-cookie')).toBe(
-      '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=sub1.some.alces.network; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=sub1.some.alces.network',
-    )
-  })
-  test('cookies are first party for the req url whose TLD has exception, the domain is derived from the req url (not origin header)', async () => {
-    fetchSpy.mockImplementation(async () => {
-      const headers = new Headers({
-        origin: 'https://some-other.com',
-        'set-cookie':
-          '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=fpjs.io; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=fpjs.io;',
-      })
-      return new Response('', { headers })
-    })
-    const req = new Request('https://city.kawasaki.jp/worker_path/get_result', { method: 'POST' })
-    const response = await worker.fetch(req, workerEnv)
-    expect(response.headers.get('set-cookie')).toBe(
-      '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=city.kawasaki.jp; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=city.kawasaki.jp',
-    )
-  })
   test('response headers are the same (except HSTS and set-cookie)', async () => {
     const responseHeaders = new Headers({
       'access-control-allow-credentials': 'true',

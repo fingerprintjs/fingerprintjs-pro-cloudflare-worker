@@ -13,8 +13,7 @@ export {
 } from './addTrafficMonitoring'
 export { returnHttpResponse } from './returnHttpResponse'
 export { addProxyIntegrationHeaders } from './addProxyIntegrationHeaders'
-export { getEffectiveTLDPlusOne } from './getEffectiveTLDPlusOne'
-export { Cookie, createCookieStringFromObject, createCookieObjectFromHeaderValue, filterCookies } from './cookie'
+export { Cookie, filterCookies } from './cookie'
 export {
   createRoute,
   addTrailingWildcard,
