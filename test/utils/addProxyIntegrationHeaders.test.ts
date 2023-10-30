@@ -18,6 +18,7 @@ describe('addProxyIntegrationHeaders', () => {
     addProxyIntegrationHeaders(headers, 'https://example.com/worker/result', env)
     expect(headers.get('FPJS-Proxy-Secret')).toBe('secret_value')
     expect(headers.get('FPJS-Proxy-Client-IP')).toBe('19.117.63.126')
+    expect(headers.get('FPJS-Proxy-Forwarded-Host')).toBe('example.com')
     expect(headers.get('x-custom-header')).toBe('custom-value')
   })
   test('when PROXY_SECRET is not set', () => {
