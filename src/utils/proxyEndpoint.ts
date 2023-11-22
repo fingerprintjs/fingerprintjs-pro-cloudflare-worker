@@ -1,10 +1,12 @@
+import { config } from '../config'
+
 export const DEFAULT_AGENT_VERSION = '3'
 
 export function getAgentScriptEndpoint(searchParams: URLSearchParams): string {
   const apiKey = searchParams.get('apiKey')
   const apiVersion = searchParams.get('version') || DEFAULT_AGENT_VERSION
 
-  const base = `https://fpcdn.io/v${apiVersion}/${apiKey}`
+  const base = `https://${config.fpcdn}/v${apiVersion}/${apiKey}`
   const loaderVersion = searchParams.get('loaderVersion')
   const lv = loaderVersion ? `/loader_v${loaderVersion}.js` : ''
 
@@ -32,5 +34,5 @@ export function getVisitorIdEndpoint(
   if (suffix.length > 0 && !suffix.startsWith('/')) {
     suffix = '/' + suffix
   }
-  return `https://${prefix}api.fpjs.io${suffix}`
+  return `https://${prefix}${config.ingressApi}${suffix}`
 }
