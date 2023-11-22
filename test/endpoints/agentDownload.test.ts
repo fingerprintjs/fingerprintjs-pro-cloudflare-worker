@@ -1,5 +1,6 @@
 import worker from '../../src/index'
 import { WorkerEnv } from '../../src/env'
+import { config } from '../../src/config'
 
 const workerEnv: WorkerEnv = {
   PROXY_SECRET: 'proxy_secret',
@@ -36,7 +37,7 @@ describe('agent download request proxy URL', () => {
     const req = new Request(reqURL.toString())
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://fpcdn.io')
+    expect(receivedURL.origin).toBe(`https://${config.fpcdn}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/v3/someApiKey')
   })
 
@@ -45,7 +46,7 @@ describe('agent download request proxy URL', () => {
     const req = new Request(reqURL.toString())
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://fpcdn.io')
+    expect(receivedURL.origin).toBe(`https://${config.fpcdn}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/v4/someApiKey')
   })
 
@@ -55,7 +56,7 @@ describe('agent download request proxy URL', () => {
     const req = new Request(reqURL.toString())
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://fpcdn.io')
+    expect(receivedURL.origin).toBe(`https://${config.fpcdn}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/v5/someApiKey/loader_v1.2.3.js')
   })
 })
