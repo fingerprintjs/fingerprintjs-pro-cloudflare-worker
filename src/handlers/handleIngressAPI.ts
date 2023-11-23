@@ -8,12 +8,6 @@ import {
   createFallbackErrorResponse,
 } from '../utils'
 
-declare global {
-  interface Headers {
-    getAll: (headerName: string) => string[]
-  }
-}
-
 function copySearchParams(oldURL: URL, newURL: URL): void {
   newURL.search = new URLSearchParams(oldURL.search).toString()
 }
