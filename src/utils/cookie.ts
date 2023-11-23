@@ -1,10 +1,5 @@
 import { parse } from 'cookie'
 
-export type Cookie = {
-  value: string
-  [key: string]: string | undefined
-}
-
 export function filterCookies(headers: Headers, filterFunc: (key: string) => boolean): Headers {
   const newHeaders = new Headers(headers)
   const cookie = parse(headers.get('cookie') || '')
