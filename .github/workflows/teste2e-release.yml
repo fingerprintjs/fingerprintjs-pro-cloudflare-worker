@@ -11,8 +11,6 @@ jobs:
     name: Test release
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: test
 
       - name: Install node
         uses: actions/setup-node@v3
