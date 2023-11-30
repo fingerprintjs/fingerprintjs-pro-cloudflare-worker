@@ -19,6 +19,9 @@ jobs:
         with:
           node-version-file: '.node-version'
 
+      - name: Install dependencies
+        run: yarn install
+
       - name: Download release asset
         run: node scripts/downloadGithubRelease.mjs
         env:
