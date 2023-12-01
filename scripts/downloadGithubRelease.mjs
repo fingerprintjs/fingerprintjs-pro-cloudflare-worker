@@ -34,7 +34,7 @@ async function main() {
 
   const distPath = path.resolve(dirname, '../dist')
 
-  if(fs.existsSync(distPath)) {
+  if (fs.existsSync(distPath)) {
     fs.rmSync(distPath, { recursive: true })
   }
 
@@ -96,7 +96,7 @@ async function downloadReleaseAsset(url, token) {
   return Buffer.from(arrayBuffer)
 }
 
-export async function findReleaseAssets(assets) {
+async function findReleaseAssets(assets) {
   const targetAssets = [
     'fingerprintjs-pro-cloudflare-worker.d.ts',
     'fingerprintjs-pro-cloudflare-worker.esm.js',
