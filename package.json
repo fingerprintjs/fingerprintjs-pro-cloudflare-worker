@@ -33,7 +33,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">16"
+    "node": ">=16"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.4.0",
