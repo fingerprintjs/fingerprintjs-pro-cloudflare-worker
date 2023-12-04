@@ -19,7 +19,7 @@ async function main() {
     throw new Error('TAG env variable is required')
   }
 
-  const release = await getGithubReleaseByTag(tag)
+  const release = await getGitHubReleaseByTag(tag)
 
   if (!release) {
     console.warn('No release found')
@@ -55,15 +55,15 @@ function bearer(token) {
   return `Bearer ${token}`
 }
 
-async function getGithubReleaseByTag(tag) {
+async function getGitHubReleaseByTag(tag) {
   const url = `https://api.github.com/repos/${config.owner}/${config.repo}/releases/tags/${tag}`
 
-  console.debug('getGithubReleaseByTag url', url)
+  console.debug('getGitHubReleaseByTag url', url)
 
-  return await doGithubGetRequest(url)
+  return await doGitHubGetRequest(url)
 }
 
-async function doGithubGetRequest(url) {
+async function doGitHubGetRequest(url) {
   const response = await fetch(url, {
     headers: config.token
       ? {
