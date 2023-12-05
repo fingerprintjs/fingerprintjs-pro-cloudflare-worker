@@ -31,12 +31,18 @@ async function main() {
 
   const assets = await findReleaseAssets(release.assets)
 
+  const distPath = path.resolve(dirname, '../')
+
   await Promise.all(
     assets.map(async asset => {
       const file = await downloadReleaseAsset(asset.url, config.token)
 
+      const filePath = path.join(distPath, asset.name)
+
+      console.info('Writing file', filePath)
+
       await fs.writeFileSync(
-        path.join(dirname, asset.name),
+        filePath,
         file,
       )
     }),
