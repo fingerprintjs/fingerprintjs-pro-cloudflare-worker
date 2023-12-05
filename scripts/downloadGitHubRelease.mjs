@@ -29,23 +29,18 @@ async function main() {
 
   console.info('Release', release.tag_name)
 
-  const assets = await findReleaseAssets(release.assets)
+  const asset = await findReleaseAsset(release.assets)
 
   const distPath = path.resolve(dirname, '../')
+  const assetPath = path.join(distPath, asset.name)
 
-  await Promise.all(
-    assets.map(async asset => {
-      const file = await downloadReleaseAsset(asset.url, config.token)
+  const file = await downloadReleaseAsset(asset.url, config.token)
 
-      const filePath = path.join(distPath, asset.name)
+  console.info('Writing file', assetPath)
 
-      console.info('Writing file', filePath)
-
-      await fs.writeFileSync(
-        filePath,
-        file,
-      )
-    }),
+  await fs.writeFileSync(
+    assetPath,
+    file,
   )
 }
 
@@ -93,20 +88,20 @@ async function downloadReleaseAsset(url, token) {
   return Buffer.from(arrayBuffer)
 }
 
-async function findReleaseAssets(assets) {
-  const targetAssetsNames = [
+async function findReleaseAsset(assets) {
+  const targetAssetsName = [
     'fingerprintjs-pro-cloudflare-worker.esm.js',
   ]
 
-  const targetAssets = targetAssetsNames.map(assetName =>
+  const targetAsset = targetAssetsName.find(assetName =>
     assets.find(asset => asset.name === assetName && asset.state === 'uploaded'),
   )
 
-  if (targetAssets.length !== targetAssetsNames.length) {
-    throw new Error('Not all assets found')
+  if (!targetAsset) {
+    throw new Error('Release asset not found')
   }
 
-  return targetAssets
+  return targetAsset
 }
 
 main().catch((err) => {
