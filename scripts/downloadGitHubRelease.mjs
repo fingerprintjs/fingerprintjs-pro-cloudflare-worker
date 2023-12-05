@@ -88,19 +88,19 @@ async function downloadReleaseAsset(url, token) {
 }
 
 async function findReleaseAssets(assets) {
-  const targetAssets = [
+  const targetAssetsNames = [
     'fingerprintjs-pro-cloudflare-worker.esm.js',
   ]
 
-  const result = targetAssets.map(assetName =>
+  const targetAssets = targetAssetsNames.map(assetName =>
     assets.find(asset => asset.name === assetName && asset.state === 'uploaded'),
   )
 
-  if (result.length !== targetAssets.length) {
+  if (targetAssets.length !== targetAssetsNames.length) {
     throw new Error('Not all assets found')
   }
 
-  return result
+  return targetAssets
 }
 
 main().catch((err) => {
