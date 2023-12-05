@@ -31,20 +31,12 @@ async function main() {
 
   const assets = await findReleaseAssets(release.assets)
 
-  const distPath = path.resolve(dirname, '../dist')
-
-  if (fs.existsSync(distPath)) {
-    fs.rmSync(distPath, { recursive: true })
-  }
-
-  fs.mkdirSync(distPath, { recursive: true })
-
   await Promise.all(
     assets.map(async asset => {
       const file = await downloadReleaseAsset(asset.url, config.token)
 
       await fs.writeFileSync(
-        path.join(distPath, asset.name),
+        path.join(dirname, asset.name),
         file,
       )
     }),
@@ -97,7 +89,6 @@ async function downloadReleaseAsset(url, token) {
 
 async function findReleaseAssets(assets) {
   const targetAssets = [
-    'fingerprintjs-pro-cloudflare-worker.d.ts',
     'fingerprintjs-pro-cloudflare-worker.esm.js',
   ]
 

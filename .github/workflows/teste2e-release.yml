@@ -41,8 +41,10 @@ jobs:
            echo GET_RESULT_PATH = \"${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}\" >> wrangler.toml
            echo AGENT_SCRIPT_DOWNLOAD_PATH = \"${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}\" >> wrangler.toml
            echo PROXY_SECRET = \"${{secrets.PROXY_SECRET}}\" >> wrangler.toml
-           sed -i '/\[build\]/,+1d' wrangler.toml        
-           cat wrangler.toml
+           sed -i '/\[build\]/,+1d' wrangler.toml    
+           sed -i 's/main = "\.\/dist\/fingerprintjs-pro-cloudflare-worker\.esm\.js"/main = "\.\/fingerprintjs-pro-cloudflare-worker\.esm\.js"/' wrangler.toml
+          
+          cat wrangler.toml
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
