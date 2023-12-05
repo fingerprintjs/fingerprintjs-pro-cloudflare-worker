@@ -4,6 +4,8 @@ on:
   release:
     types:
       - published
+      # TODO Remove
+      - edited
 
 jobs:
   test-release:
