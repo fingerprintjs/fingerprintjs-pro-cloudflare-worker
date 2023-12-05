@@ -44,7 +44,7 @@ jobs:
            sed -i '/\[build\]/,+1d' wrangler.toml    
            sed -i 's/main = "\.\/dist\/fingerprintjs-pro-cloudflare-worker\.esm\.js"/main = "\.\/fingerprintjs-pro-cloudflare-worker\.esm\.js"/' wrangler.toml
           
-          cat wrangler.toml
+           cat wrangler.toml
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
