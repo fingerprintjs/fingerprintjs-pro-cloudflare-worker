@@ -89,13 +89,10 @@ async function downloadReleaseAsset(url, token) {
 }
 
 async function findReleaseAsset(assets) {
-  const targetAssetsName = [
-    'fingerprintjs-pro-cloudflare-worker.esm.js',
-  ]
+  const targetAssetsName =
+    'fingerprintjs-pro-cloudflare-worker.esm.js'
 
-  const targetAsset = targetAssetsName.find(assetName =>
-    assets.find(asset => asset.name === assetName && asset.state === 'uploaded'),
-  )
+  const targetAsset = assets.find(asset => asset.name === targetAssetsName && asset.state === 'uploaded')
 
   if (!targetAsset) {
     throw new Error('Release asset not found')
