@@ -71,7 +71,7 @@ async function doGitHubGetRequest(url) {
 async function downloadReleaseAsset(url, token) {
   const headers = {
     Accept: 'application/octet-stream',
-    'User-Agent': 'fingerprint-pro-azure-integration',
+    'User-Agent': 'fingerprint-pro-cloudflare-integration',
   }
   if (token) {
     headers['Authorization'] = bearer(token)
