@@ -27,7 +27,7 @@ The Cloudflare worker is responsible for delivering the latest fingerprinting cl
 
 This library needs these to be in order to build and run:
 
-- Node 16
+- Node 16 or Node 18
 - Typescript 4
 - Playwright (with a headless browser preferably chromium)
 - [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/)
