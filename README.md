@@ -39,7 +39,7 @@ You can find the full documentation at [https://dev.fingerprint.com/docs/cloudfl
 
 ## Support
 
-To report problems, ask questions or provide feedback, please use [Issues](). If you need private support, you can email us at [oss-support@fingerprint.com](mailto:oss-support@fingerprint.com).
+To report problems, ask questions or provide feedback, please use [Issues](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/issues). If you need private support, you can email us at [oss-support@fingerprint.com](mailto:oss-support@fingerprint.com).
 
 ## License
 
