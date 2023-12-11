@@ -1,3 +1,15 @@
+## [1.5.0-rc.1](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.4.0...v1.5.0-rc.1) (2023-12-11)
+
+
+### Features
+
+* **proxy-host-header:** add proxy host header ([5022e7d](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/commit/5022e7d6403044567f2e3a56adc141fa2c7fe42e))
+
+
+### Build System
+
+* **deps:** remove punycode & suffix list ([67d0e5a](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/commit/67d0e5a27b964bc793320212fe90147c2dae620b))
+
 ## [1.4.0](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.3.1...v1.4.0) (2023-07-04)
 
 
