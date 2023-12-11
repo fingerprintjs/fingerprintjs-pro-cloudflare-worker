@@ -33,7 +33,7 @@ test.describe('visitorId', () => {
     try {
       const responseBody = await res.text()
       if (responseBody.includes('Your Cloudflare worker is deployed')) {
-        const matches = responseBody.match(/Worker version: ([\d.\-snaphot]+)/)
+        const matches = responseBody.match(/Worker version: (.+)/)
         if (matches && matches.length > 0) {
           const version = matches[1]
           if (version === expectedVersion) {
