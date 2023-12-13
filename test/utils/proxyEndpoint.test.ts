@@ -100,4 +100,10 @@ describe('getVisitorIdEndpoint', () => {
     urlSearchParams.set('region', 'ap')
     expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://ap.api.fpjs.io/suffix/more/path')
   })
+  test('invalid suffix starts from dot', () => {
+    const urlSearchParams = new URLSearchParams()
+    const pathName = '.suffix/more/path'
+    urlSearchParams.set('region', 'ap')
+    expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://ap.api.fpjs.io/.suffix/more/path')
+  })
 })
