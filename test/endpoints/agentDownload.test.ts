@@ -67,7 +67,6 @@ describe('agent download request proxy URL', () => {
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
     expect(receivedURL.origin).toBe('https://fpcdn.io')
-    // expect(receivedURL.pathname).toBe('/vbar.foo%2Fbaz/foo.bar%2Fbaz/loader_vbaz.bar%2Ffoo')
   })
 })
 
