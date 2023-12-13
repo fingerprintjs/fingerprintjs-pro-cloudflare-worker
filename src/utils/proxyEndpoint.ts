@@ -1,5 +1,4 @@
 export const DEFAULT_AGENT_VERSION = '3'
-export const DEFAULT_REGION = 'us'
 
 export function getAgentScriptEndpoint(searchParams: URLSearchParams): string {
   const apiKey = searchParams.get('apiKey')
@@ -17,7 +16,21 @@ export function getVisitorIdEndpoint(
   pathSuffix: string | undefined = undefined,
 ): string {
   const region = searchParams.get('region') || 'us'
-  const prefix = region === DEFAULT_REGION ? '' : `${region}.`
-  const suffix = pathSuffix ?? ''
+  let prefix = ''
+  switch (region) {
+    case 'eu':
+      prefix = 'eu.'
+      break
+    case 'ap':
+      prefix = 'ap.'
+      break
+    default:
+      prefix = ''
+      break
+  }
+  let suffix = pathSuffix ?? ''
+  if (suffix.length > 0 && !suffix.startsWith('/')) {
+    suffix = '/' + suffix
+  }
   return `https://${prefix}api.fpjs.io${suffix}`
 }

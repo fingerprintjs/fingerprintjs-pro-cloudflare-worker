@@ -62,6 +62,14 @@ describe('ingress API request proxy URL', () => {
     const receivedURL = new URL(receivedReqURL)
     expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
   })
+
+  test('invalid region', async () => {
+    reqURL.searchParams.append('region', 'foo.bar/baz')
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+  })
 })
 
 describe('ingress API request proxy URL with suffix', () => {
@@ -121,6 +129,44 @@ describe('ingress API request proxy URL with suffix', () => {
     const receivedURL = new URL(receivedReqURL)
     expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
     expect(receivedURL.pathname).toBe('/suffix/more/path')
+  })
+
+  test('invalid region', async () => {
+    reqURL.searchParams.append('region', 'foo.bar/baz')
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/suffix/more/path')
+  })
+
+  test('suffix with dot', async () => {
+    reqURL = new URL('https://example.com/worker_path/get_result/.suffix/more/path')
+    reqURL.searchParams.append('region', 'ap')
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/.suffix/more/path')
+  })
+
+  test('invalid region GET req', async () => {
+    reqURL.searchParams.append('region', 'foo.bar/baz')
+    const req = new Request(reqURL.toString(), { method: 'GET' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/suffix/more/path')
+  })
+
+  test('suffix with dot GET req', async () => {
+    reqURL = new URL('https://example.com/worker_path/get_result/.suffix/more/path')
+    reqURL.searchParams.append('region', 'ap')
+    const req = new Request(reqURL.toString(), { method: 'GET' })
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
+    expect(receivedURL.pathname).toBe('/.suffix/more/path')
   })
 })
 
