@@ -1,6 +1,6 @@
 {
   "name": "@fingerprintjs/cloudflare-worker-typescript",
-  "version": "1.4.0",
+  "version": "1.5.0-rc.2",
   "description": "FingerprintJS Pro Cloudflare Worker",
   "author": "FingerprintJS, Inc (https://fingerprintjs.com)",
   "license": "MIT",
@@ -33,7 +33,7 @@
     "dist"
   ],
   "engines": {
-    "node": "~16 || ~18"
+    "node": ">=16"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.4.0",

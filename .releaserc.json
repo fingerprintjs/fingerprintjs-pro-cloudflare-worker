@@ -1,6 +1,10 @@
 {
-   "branches":[
-      "main"
+   "branches": [
+      "main",
+      {
+         "name": "rc",
+         "prerelease": true
+      }
    ],
    "plugins":[
       [
@@ -111,6 +115,7 @@
       [
          "@semantic-release/git",
          {
+            "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}",
             "assets":[
                "CHANGELOG.md",
                "package.json"
