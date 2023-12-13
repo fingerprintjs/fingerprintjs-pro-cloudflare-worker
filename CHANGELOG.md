@@ -1,3 +1,10 @@
+## [1.5.0-rc.2](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.5.0-rc.1...v1.5.0-rc.2) (2023-12-13)
+
+
+### Bug Fixes
+
+* improve endpoint creation ([5414d7f](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/commit/5414d7fa58be67689e194c39460afbefd08ae0fa))
+
 ## [1.5.0-rc.1](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.4.0...v1.5.0-rc.1) (2023-12-11)
 
 
