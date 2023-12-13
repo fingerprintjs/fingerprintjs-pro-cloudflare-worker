@@ -58,6 +58,16 @@ describe('agent download request proxy URL', () => {
     expect(receivedURL.origin).toBe('https://fpcdn.io')
     expect(receivedURL.pathname).toBe('/v5/someApiKey/loader_v1.2.3.js')
   })
+
+  test('invalid apiKey, version and loaderVersion', async () => {
+    reqURL.searchParams.set('apiKey', 'foo.bar/baz')
+    reqURL.searchParams.set('version', 'bar.foo/baz')
+    reqURL.searchParams.set('loaderVersion', 'baz.bar/foo')
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, workerEnv)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe('https://fpcdn.io')
+  })
 })
 
 describe('agent download request query parameters', () => {

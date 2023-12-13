@@ -35,10 +35,12 @@ describe('getAgentScriptEndpoint', () => {
 })
 
 describe('getVisitorIdEndpoint', () => {
-  test('us region', () => {
-    let urlSearchParams = new URLSearchParams()
+  test('no region', () => {
+    const urlSearchParams = new URLSearchParams()
     expect(getVisitorIdEndpoint(urlSearchParams)).toBe('https://api.fpjs.io')
-    urlSearchParams = new URLSearchParams()
+  })
+  test('us region', () => {
+    const urlSearchParams = new URLSearchParams()
     urlSearchParams.set('region', 'us')
     expect(getVisitorIdEndpoint(urlSearchParams)).toBe('https://api.fpjs.io')
   })
@@ -52,9 +54,56 @@ describe('getVisitorIdEndpoint', () => {
     urlSearchParams.set('region', 'ap')
     expect(getVisitorIdEndpoint(urlSearchParams)).toBe('https://ap.api.fpjs.io')
   })
+  test('invalid region', () => {
+    const urlSearchParams = new URLSearchParams()
+    urlSearchParams.set('region', 'foo.bar/baz')
+    expect(getVisitorIdEndpoint(urlSearchParams)).toBe('https://api.fpjs.io')
+  })
   test('no region with suffix', () => {
     const urlSearchParams = new URLSearchParams()
     const pathName = '/suffix/more/path'
     expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://api.fpjs.io/suffix/more/path')
+  })
+  test('us region with suffix', () => {
+    const urlSearchParams = new URLSearchParams()
+    const pathName = '/suffix/more/path'
+    urlSearchParams.set('region', 'us')
+    expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://api.fpjs.io/suffix/more/path')
+  })
+  test('eu region with suffix', () => {
+    const urlSearchParams = new URLSearchParams()
+    const pathName = '/suffix/more/path'
+    urlSearchParams.set('region', 'eu')
+    expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://eu.api.fpjs.io/suffix/more/path')
+  })
+  test('ap region with suffix', () => {
+    const urlSearchParams = new URLSearchParams()
+    const pathName = '/suffix/more/path'
+    urlSearchParams.set('region', 'ap')
+    expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://ap.api.fpjs.io/suffix/more/path')
+  })
+  test('invalid region with suffix', () => {
+    const urlSearchParams = new URLSearchParams()
+    const pathName = '/suffix/more/path'
+    urlSearchParams.set('region', 'foo.bar/baz')
+    expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://api.fpjs.io/suffix/more/path')
+  })
+  test('ap region with suffix with dot', () => {
+    const urlSearchParams = new URLSearchParams()
+    const pathName = '/.suffix/more/path'
+    urlSearchParams.set('region', 'ap')
+    expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://ap.api.fpjs.io/.suffix/more/path')
+  })
+  test('invalid suffix', () => {
+    const urlSearchParams = new URLSearchParams()
+    const pathName = 'suffix/more/path'
+    urlSearchParams.set('region', 'ap')
+    expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://ap.api.fpjs.io/suffix/more/path')
+  })
+  test('invalid suffix starts from dot', () => {
+    const urlSearchParams = new URLSearchParams()
+    const pathName = '.suffix/more/path'
+    urlSearchParams.set('region', 'ap')
+    expect(getVisitorIdEndpoint(urlSearchParams, pathName)).toBe('https://ap.api.fpjs.io/.suffix/more/path')
   })
 })
