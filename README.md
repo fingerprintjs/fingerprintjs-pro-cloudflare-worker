@@ -30,7 +30,7 @@ This library needs these to be in order to build and run:
 - Node 16 or Node 18
 - Typescript 4
 - Playwright (with a headless browser preferably chromium)
-- [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/)
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) v3
 
 ## Setup process
 The process consists of two steps. One needs to set up worker creation together with our support at [support@fingerprint.com](mailto:support@fingerprint.com). Afterwards, the Fingerprint Pro JS agent on the site needs to be configured to communicate with the worker.
