@@ -41,8 +41,9 @@ See the [Cloudflare integration guide](https://dev.fingerprint.com/docs/cloudfla
 
 ## Setup process
 
-Setup process is simple enough. You just follow a setup wizard and it's ready to use.
-You can find the full documentation at [https://dev.fingerprint.com/docs/cloudflare-integration](https://dev.fingerprint.com/docs/cloudflare-integration).
+You can install the Cloudflare integration using an [installation wizard](https://dashboard.fingerprint.com/integrations) in the Fingerprint dashboard. 
+
+See the [Cloudflare integration guide](https://dev.fingerprint.com/docs/cloudflare-integration#setup) for more details.
 
 ## Support
 
