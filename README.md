@@ -33,14 +33,11 @@ This [improves](https://dev.fingerprint.com/docs/cloudflare-integration#the-bene
 
 ## Requirements
 
-### Usage Requirements
+* [Fingerprint Pro account](https://dashboard.fingerprint.com/signup) with the _Owner_ role assigned.
+* A website served by Cloudflare. For maximum accuracy benefits, your website should be [proxied by Cloudflare](https://developers.cloudflare.com/dns/manage-dns-records/reference/proxied-dns-records/) (not DNS-only). 
 
-- Credentials from Cloudflare
-  - [Cloudflare Account ID](https://dev.fingerprint.com/docs/cloudflare-integration#cloudflare-account-id)
-  - [Cloudflare API Token](https://dev.fingerprint.com/docs/cloudflare-integration#cloudflare-api-token)
-- FingerprintPro Account
+See the [Cloudflare integration guide](https://dev.fingerprint.com/docs/cloudflare-integration#setup) for more details. 
 
-By just following the wizard with your credentials it's easy to setup. Please see the [Setup Process](#setup-process) section
 
 ## Setup process
 
