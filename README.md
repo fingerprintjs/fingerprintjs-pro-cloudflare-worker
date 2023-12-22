@@ -39,8 +39,8 @@ This library needs these to be in order to build and run:
 - [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) v3+
 
 ## Setup process
-The process consists of two steps. One needs to set up worker creation together with our support at [support@fingerprint.com](mailto:support@fingerprint.com). Afterwards, the Fingerprint Pro JS agent on the site needs to be configured to communicate with the worker.
 
+Setup process is simple enough. You just follow a setup wizard and it's ready to use.
 You can find the full documentation at [https://dev.fingerprint.com/docs/cloudflare-integration](https://dev.fingerprint.com/docs/cloudflare-integration).
 
 ## Support
