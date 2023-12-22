@@ -21,7 +21,15 @@
 </a>
 
 # Fingerprint Pro Cloudflare worker
-The Cloudflare worker is responsible for delivering the latest fingerprinting client-side logic and proxying identification requests and responses between your site and Fingerprint Pro's APIs.
+
+[Fingerprint](https://fingerprint.com/) is a device intelligence platform offering 99.5% accurate visitor identification.
+
+Fingerprint Pro Cloudflare Integration is responsible for
+
+- Proxying download requests of the latest Fingerprint Pro JS Agent between your site and Fingerprint CDN.
+- Proxying identification requests and responses between your site and Fingerprint Pro's APIs.
+
+This [improves](https://dev.fingerprint.com/docs/cloudfront-proxy-integration#the-benefits-of-using-the-cloudfront-integration) both accuracy and reliability of visitor identification and bot detection on your site.
 
 ## Requirements
 
