@@ -39,7 +39,7 @@ This [improves](https://dev.fingerprint.com/docs/cloudflare-integration#the-bene
 See the [Cloudflare integration guide](https://dev.fingerprint.com/docs/cloudflare-integration#setup) for more details. 
 
 
-## Setup process
+## How to install
 
 You can install the Cloudflare integration using an [installation wizard](https://dashboard.fingerprint.com/integrations) in the Fingerprint dashboard. 
 
