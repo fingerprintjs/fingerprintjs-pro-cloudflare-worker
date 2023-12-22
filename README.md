@@ -27,7 +27,12 @@ The Cloudflare worker is responsible for delivering the latest fingerprinting cl
 
 ### Usage Requirements
 
-Please see the [Setup Process](#setup-process) section
+- Credentials from Cloudflare
+  - [Cloudflare Account ID](https://dev.fingerprint.com/docs/cloudflare-integration#cloudflare-account-id)
+  - [Cloudflare API Token](https://dev.fingerprint.com/docs/cloudflare-integration#cloudflare-api-token)
+- FingerprintPro Account
+
+By just following the wizard with your credentials it's easy to setup. Please see the [Setup Process](#setup-process) section
 
 ### Development Requirements
 
