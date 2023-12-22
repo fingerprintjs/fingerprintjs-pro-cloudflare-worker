@@ -34,15 +34,6 @@ The Cloudflare worker is responsible for delivering the latest fingerprinting cl
 
 By just following the wizard with your credentials it's easy to setup. Please see the [Setup Process](#setup-process) section
 
-### Development Requirements
-
-This library needs these to be in order to build and run:
-
-- Node 20
-- Typescript 4+
-- Playwright
-- [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) v3+
-
 ## Setup process
 
 Setup process is simple enough. You just follow a setup wizard and it's ready to use.
