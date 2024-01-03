@@ -52,7 +52,7 @@ jobs:
            echo PROXY_SECRET = \"${{secrets.PROXY_SECRET}}\" >> wrangler.toml
            cat wrangler.toml
       - name: Publish
-        uses: cloudflare/wrangler-action@3
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
