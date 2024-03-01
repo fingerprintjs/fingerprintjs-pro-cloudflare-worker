@@ -1,7 +1,8 @@
 name: Test e2e
 
 on:
-  pull_request_target:
+  # TODO change to pull_request_target
+  pull_request:
     paths-ignore:
       - '**/*.md'
   schedule:
@@ -19,6 +20,74 @@ on:
           - patch
 
 jobs:
+  build-and-deploy-and-test-e2e-mock:
+    runs-on: ubuntu-20.04
+    name: Build & Deploy & Test e2e using mock app
+    env:
+      FPCDN: ${{ secrets.MOCK_FPCDN }}
+      INGRESS_API: ${{ secrets.MOCK_INGRESS_API }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.node-version'
+
+      - name: Upgrade version
+        run: yarn version --pre${{ github.event.inputs.version_bump || 'patch' }} --preid snapshot --no-git-tag-version
+      - name: Generate random paths
+        run: |
+          postfix=$(date +%s)
+          echo WORKER_NAME=automated-test-$postfix >> $GITHUB_OUTPUT
+          echo WORKER_PATH=fpjs-worker-$postfix >> $GITHUB_OUTPUT
+          echo GET_RESULT_PATH=get-result-$postfix >> $GITHUB_OUTPUT
+          echo AGENT_DOWNLOAD_PATH=agent-download-$postfix >> $GITHUB_OUTPUT
+        id: random-path-generator
+      - name: Modify wrangler.toml
+        run: |
+          sed -i 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
+          sed -i 's/route = .*/route = "${{ secrets.TEST_CLIENT_DOMAIN }}\/${{steps.random-path-generator.outputs.WORKER_PATH}}\/*"/' wrangler.toml
+          echo [vars] >> wrangler.toml
+          echo GET_RESULT_PATH = \"${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}\" >> wrangler.toml
+          echo AGENT_SCRIPT_DOWNLOAD_PATH = \"${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}\" >> wrangler.toml
+          echo PROXY_SECRET = \"secret\" >> wrangler.toml
+          cat wrangler.toml
+      - name: Publish
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+      - name: Get version
+        id: version
+        uses: notiz-dev/github-action-json-property@a5a9c668b16513c737c3e1f8956772c99c73f6e8 # commit hash = v0.2.0
+        with:
+          path: 'package.json'
+          prop_path: 'version'
+      - name: Run test
+        run: |
+          npm exec -y "git+https://github.com/fingerprintjs/dx-team-mock-for-proxy-integrations-e2e-tests.git" -- --api-url="${{env.api_url}}" --host="https://${{env.test_client_domain}}" --cdn-proxy-path="${{env.worker_path}}/${{env.agent_download_path}}" --ingress-proxy-path="${{env.worker_path}}/${{env.get_result_path}}"
+        env:
+          test_client_domain: ${{secrets.TEST_CLIENT_DOMAIN}}
+          worker_version: ${{steps.version.outputs.prop}}
+          worker_path: ${{steps.random-path-generator.outputs.WORKER_PATH}}
+          get_result_path: ${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}
+          agent_download_path: ${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}
+          api_url: https://${{ secrets.MOCK_FPCDN }}
+      - name: Clean up worker
+        run: |
+          curl -i -X DELETE "https://api.cloudflare.com/client/v4/accounts/${{secrets.CF_ACCOUNT_ID}}/workers/scripts/${{steps.random-path-generator.outputs.WORKER_NAME}}" -H"Authorization: bearer ${{secrets.CF_API_TOKEN}}"
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@0d9c6ff1de9903da88d24c0564f6e83cb28faca9
+        with:
+          status: ${{ job.status }}
+          notification_title: "Cloudflare Worker E2E Test using mock app has {status_message}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
   build-and-deploy-and-test-e2e:
     runs-on: ubuntu-20.04
     name: Build & Deploy & Test e2e
