@@ -1,5 +1,12 @@
 # Contributing to FingerprintJS Pro Cloudflare Worker
 
+## Requirements
+
+- Node 20
+- Typescript 4+
+- Playwright
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) v3+
+
 ## Working with code
 
 We prefer using [yarn](https://yarnpkg.com/) for installing dependencies and running scripts.

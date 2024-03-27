@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - rc
 
 jobs:
   build-and-run-tests:
