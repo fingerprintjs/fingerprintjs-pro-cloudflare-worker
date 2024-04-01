@@ -7,39 +7,10 @@ on:
       - rc
 
 jobs:
-  build-and-run-tests:
-    runs-on: ubuntu-20.04
-    name: Build & run tests & publish coverage
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.node-version'
-      - name: Cache
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: nodemodules-${{ hashFiles('yarn.lock') }}
-          restore-keys: nodemodules-
-      - name: Install Dependencies and prepare packages
-        run: yarn install
-        env:
-          CI: true
-      - name: Build
-        run: yarn build
-      - name: Run test
-        run: yarn test
-
-      - name: Create Coverage Badges
-        uses: jaywcjlove/coverage-badges-cli@f13e40c05984776612eb7ee8878a5e81233d7313 # v1.1.0
-        with:
-          source: coverage/coverage-summary.json
-          output: coverage/lcov-report/badges.svg
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@22a6ee251d6f13c6ab1ecb200d974f1a6feb1b8d # v4.4.2
-        with:
-          branch: gh-pages
-          folder: ./coverage/lcov-report/
+  coverage-report:
+    name: Coverage report
+    uses: fingerprintjs/dx-team-toolkit/.github/workflows/docs-and-coverage.yml@v1
+    with:
+      skip-docs-step: true
+      prepare-gh-pages-commands: |
+        mv coverage/lcov-report/* ./gh-pages

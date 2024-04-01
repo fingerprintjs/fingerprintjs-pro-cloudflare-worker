@@ -1,8 +1,7 @@
 name: Test e2e
 
 on:
-  # TODO change to pull_request_target
-  pull_request:
+  pull_request_target:
     paths-ignore:
       - '**/*.md'
   schedule:
