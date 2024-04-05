@@ -15,7 +15,7 @@ describe('addTrafficMonitoringSearchParamsForProCDN', () => {
     const url = new URL('https://fingerprint.com')
     addTrafficMonitoringSearchParamsForProCDN(url)
     expect(url.searchParams.get(SEARCH_PARAM_NAME)).toBe(
-      'fingerprintjs-pro-cloudflare/__current_worker_version__/procdn',
+      'fingerprintjs-pro-cloudflare/__current_worker_version__/procdn'
     )
   })
   test('works with other query parameters', () => {
@@ -37,7 +37,7 @@ describe('addTrafficMonitoringSearchParamsForVisitorIdRequest', () => {
     const url = new URL('https://fingerprint.com')
     addTrafficMonitoringSearchParamsForVisitorIdRequest(url)
     expect(url.searchParams.get(SEARCH_PARAM_NAME)).toBe(
-      'fingerprintjs-pro-cloudflare/__current_worker_version__/ingress',
+      'fingerprintjs-pro-cloudflare/__current_worker_version__/ingress'
     )
   })
   test('works with other query parameters', () => {

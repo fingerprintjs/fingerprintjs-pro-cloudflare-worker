@@ -1,0 +1,15 @@
+name: Coverage report
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  coverage-report:
+    name: Coverage report
+    uses: fingerprintjs/dx-team-toolkit/.github/workflows/docs-and-coverage.yml@v1
+    with:
+      skip-docs-step: true
+      prepare-gh-pages-commands: |
+        mv coverage/lcov-report/* ./gh-pages

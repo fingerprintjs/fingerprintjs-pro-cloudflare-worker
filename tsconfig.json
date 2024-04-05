@@ -1,4 +1,5 @@
 {
+  "extends": "@fingerprintjs/tsconfig-dx-team/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist/src",
     "module": "es6",

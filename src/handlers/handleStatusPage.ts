@@ -23,7 +23,7 @@ function buildHeaders(styleNonce: string): Headers {
   headers.append('Content-Type', 'text/html')
   headers.append(
     'Content-Security-Policy',
-    `default-src 'none'; img-src https://fingerprint.com; style-src 'nonce-${styleNonce}'`,
+    `default-src 'none'; img-src https://fingerprint.com; style-src 'nonce-${styleNonce}'`
   )
   return headers
 }

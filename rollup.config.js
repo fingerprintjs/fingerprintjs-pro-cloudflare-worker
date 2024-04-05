@@ -1,6 +1,6 @@
 import typescript from '@rollup/plugin-typescript'
 import jsonPlugin from '@rollup/plugin-json'
-import dtsPlugin from 'rollup-plugin-dts'
+import { dts } from 'rollup-plugin-dts'
 import licensePlugin from 'rollup-plugin-license'
 import { join } from 'path'
 import replace from '@rollup/plugin-replace'
@@ -56,7 +56,7 @@ export default [
   // TypeScript definition
   {
     ...commonInput,
-    plugins: [dtsPlugin(), commonBanner],
+    plugins: [dts(), commonBanner],
     output: {
       file: `${outputDirectory}/${artifactName}.d.ts`,
       format: 'es',

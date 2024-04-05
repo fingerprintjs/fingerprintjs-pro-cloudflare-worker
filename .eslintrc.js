@@ -4,7 +4,7 @@ module.exports = {
     es6: true,
     node: true,
   },
-  extends: ['plugin:@typescript-eslint/eslint-recommended'],
+  extends: ['@fingerprintjs/eslint-config-dx-team'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
