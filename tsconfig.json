@@ -1,21 +1,13 @@
 {
+  "extends": "./node_modules/@fingerprintjs/tsconfig-dx-team/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist/src",
     "module": "es6",
     "moduleResolution": "node",
     "target": "es2020",
-    "resolveJsonModule": true,
-    "importHelpers": true,
     "noEmitOnError": true,
-    "allowSyntheticDefaultImports": true,
-    "noErrorTruncation": true,
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noImplicitAny": true,
     "esModuleInterop": true,
-    "exactOptionalPropertyTypes": true,
     "types": [
       "@cloudflare/workers-types",
       "@types/jest",
