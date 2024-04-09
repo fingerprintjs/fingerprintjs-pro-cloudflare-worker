@@ -1,6 +1,6 @@
 function setDirective(directives: string[], directive: 'max-age' | 's-maxage', maxMaxAge: number) {
   const directiveIndex = directives.findIndex(
-    (directivePair) => directivePair.split('=')[0].trim().toLowerCase() === directive,
+    (directivePair) => directivePair.split('=')[0].trim().toLowerCase() === directive
   )
   if (directiveIndex === -1) {
     directives.push(`${directive}=${maxMaxAge}`)
@@ -14,7 +14,7 @@ function setDirective(directives: string[], directive: 'max-age' | 's-maxage', m
 export function getCacheControlHeaderWithMaxAgeIfLower(
   cacheControlHeaderValue: string,
   maxMaxAge: number,
-  maxSMaxAge: number,
+  maxSMaxAge: number
 ): string {
   const cacheControlDirectives = cacheControlHeaderValue.split(', ')
 

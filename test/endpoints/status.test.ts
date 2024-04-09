@@ -71,7 +71,7 @@ describe('status page response headers', () => {
     const req = new Request('http://localhost/worker_path/status')
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('content-security-policy')).toMatch(
-      /^default-src 'none'; img-src https:\/\/fingerprint\.com; style-src 'nonce-[\w=]+'$/,
+      /^default-src 'none'; img-src https:\/\/fingerprint\.com; style-src 'nonce-[\w=]+'$/
     )
   })
 })

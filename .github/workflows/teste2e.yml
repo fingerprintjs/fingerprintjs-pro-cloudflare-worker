@@ -35,8 +35,16 @@ jobs:
         with:
           node-version-file: '.node-version'
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@129abb77bf5884e578fcaf1f37628e41622cc371
+        with:
+          version: 8
+
       - name: Upgrade version
-        run: yarn version --pre${{ github.event.inputs.version_bump || 'patch' }} --preid snapshot --no-git-tag-version
+        run: |
+          version_bump=${{ github.event.inputs.version_bump || 'patch' }}
+          pnpm version $version_bump --preid snapshot --no-git-tag
+
       - name: Generate random paths
         run: |
           postfix=$(date +%s)
@@ -100,8 +108,15 @@ jobs:
         with:
           node-version-file: '.node-version'
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@129abb77bf5884e578fcaf1f37628e41622cc371
+        with:
+          version: 8
+
       - name: Upgrade version
-        run: yarn version --pre${{ github.event.inputs.version_bump || 'patch' }} --preid snapshot --no-git-tag-version
+        run: |
+          version_bump=${{ github.event.inputs.version_bump || 'patch' }}
+          pnpm version $version_bump --preid snapshot --no-git-tag
       - name: Generate random paths
         run: |
           postfix=$(date +%s)
@@ -131,9 +146,9 @@ jobs:
           path: 'package.json'
           prop_path: 'version'
       - name: Install dependencies
-        run: npx playwright install
+        run: pnpm exec playwright install
       - name: Run test
-        run:  yarn test:e2e
+        run:  pnpm test:e2e
         env:
           test_client_domain: ${{secrets.TEST_CLIENT_DOMAIN}}
           worker_version: ${{steps.version.outputs.prop}}

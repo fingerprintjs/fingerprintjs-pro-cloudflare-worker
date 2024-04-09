@@ -8,7 +8,7 @@ export type Route = {
   handler: (
     request: Request,
     env: WorkerEnv,
-    routeMatchArray: RegExpMatchArray | undefined,
+    routeMatchArray: RegExpMatchArray | undefined
   ) => Response | Promise<Response>
 }
 
@@ -47,7 +47,7 @@ function handleNoMatch(urlPathname: string): Response {
 export function handleRequestWithRoutes(
   request: Request,
   env: WorkerEnv,
-  routes: Route[],
+  routes: Route[]
 ): Promise<Response> | Response {
   const url = new URL(request.url)
   for (const route of routes) {

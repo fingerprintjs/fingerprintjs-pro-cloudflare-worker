@@ -123,7 +123,7 @@ describe('agent download request query parameters', () => {
     expect(url.search).toBe(
       '?apiKey=someApiKey' +
         '&someKey=someValue' +
-        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn',
+        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn'
     )
   })
   test('whole query string when there is ii parameter before', async () => {
@@ -135,7 +135,7 @@ describe('agent download request query parameters', () => {
       '?apiKey=someApiKey' +
         '&someKey=someValue' +
         '&ii=fingerprintjs-pro-react%2Fv1.2.3' +
-        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn',
+        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn'
     )
   })
 })
