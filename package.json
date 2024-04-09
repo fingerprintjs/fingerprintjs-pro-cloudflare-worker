@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "rimraf dist && rollup -c rollup.config.js --bundleConfigAsCjs",
-    "lint": "eslint --ext .js,.ts --ignore-path .gitignore --max-warnings 0 src/ test/",
+    "lint": "eslint --ext .js,.ts,.mjs --ignore-path .gitignore --max-warnings 0 src/ test/ scripts/",
     "lint:fix": "pnpm lint --fix",
     "test": "jest --coverage",
     "test:coverage": "jest --coverage",
@@ -19,7 +19,7 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "*.{js,ts}": "pnpm lint:fix"
+    "*.{js,ts,mjs}": "pnpm lint:fix"
   },
   "config": {
     "commitizen": {

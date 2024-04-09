@@ -38,10 +38,7 @@ async function main() {
 
   console.info('Writing file', assetPath)
 
-  await fs.writeFileSync(
-    assetPath,
-    file,
-  )
+  await fs.writeFileSync(assetPath, file)
 }
 
 function bearer(token) {
@@ -60,8 +57,8 @@ async function doGitHubGetRequest(url) {
   const response = await fetch(url, {
     headers: config.token
       ? {
-        Authorization: bearer(config.token),
-      }
+          Authorization: bearer(config.token),
+        }
       : undefined,
   })
 
@@ -89,10 +86,9 @@ async function downloadReleaseAsset(url, token) {
 }
 
 async function findReleaseAsset(assets) {
-  const targetAssetsName =
-    'fingerprintjs-pro-cloudflare-worker.esm.js'
+  const targetAssetsName = 'fingerprintjs-pro-cloudflare-worker.esm.js'
 
-  const targetAsset = assets.find(asset => asset.name === targetAssetsName && asset.state === 'uploaded')
+  const targetAsset = assets.find((asset) => asset.name === targetAssetsName && asset.state === 'uploaded')
 
   if (!targetAsset) {
     throw new Error('Release asset not found')

@@ -25,7 +25,7 @@ function createRequestURL(receivedRequestURL: string, routeMatches: RegExpMatchA
 async function makeIngressRequest(
   receivedRequest: Request,
   env: WorkerEnv,
-  routeMatches: RegExpMatchArray | undefined,
+  routeMatches: RegExpMatchArray | undefined
 ) {
   const requestURL = createRequestURL(receivedRequest.url, routeMatches)
   addTrafficMonitoringSearchParamsForVisitorIdRequest(requestURL)

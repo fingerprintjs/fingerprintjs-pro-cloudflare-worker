@@ -15,7 +15,7 @@ export function getAgentScriptEndpoint(searchParams: URLSearchParams): string {
 
 export function getVisitorIdEndpoint(
   searchParams: URLSearchParams,
-  pathSuffix: string | undefined = undefined,
+  pathSuffix: string | undefined = undefined
 ): string {
   const region = searchParams.get('region') || 'us'
   let prefix = ''

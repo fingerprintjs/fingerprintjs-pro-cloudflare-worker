@@ -25,7 +25,7 @@ test.describe('visitorId', () => {
     reqContext: APIRequestContext,
     expectedVersion: string,
     retryCounter = 0,
-    maxRetries = 10,
+    maxRetries = 10
   ): Promise<boolean> {
     const statusEndpoint = `https://${workerDomain}/${WORKER_PATH}/status`
     console.log({ statusEndpoint })
