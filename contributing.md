@@ -9,7 +9,7 @@
 
 ## Working with code
 
-We prefer using [yarn](https://yarnpkg.com/) for installing dependencies and running scripts.
+We prefer using [pnpm](https://pnpm.io/) for installing dependencies and running scripts.
 
 The `main` is locked for the push action. 
 
@@ -20,9 +20,9 @@ For proposing changes, use the standard [pull request approach](https://docs.git
 Create pull requests for the `main` branch.
 
 ### How to build
-After cloning the repo, run `yarn install` to install packages.
+After cloning the repo, run `pnpm install` to install packages.
 
-Run `yarn build` for creating a build in `dist` folder. After building, `dist/fingerprintjs-pro-cloudflare-worker.esm.js` file is created, and it is used to deploy to CF.
+Run `pnpm build` for creating a build in `dist` folder. After building, `dist/fingerprintjs-pro-cloudflare-worker.esm.js` file is created, and it is used to deploy to CF.
 
 ### How to run locally
 
@@ -60,12 +60,12 @@ You can use the worker locally with a client like the example below:
 
 The code style is controlled by [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/). Run to check that the code style is ok:
 ```shell
-yarn lint
+pnpm lint
 ```
 
 You aren't required to run the check manually, the CI will do it. Run the following command to fix style issues (not all issues can be fixed automatically):
 ```shell
-yarn lint:fix
+pnpm lint:fix
 ```
 
 ### Commit style
@@ -76,7 +76,7 @@ You are required to follow [conventional commits](https://www.conventionalcommit
 
 #### Unit tests
 
-Run `yarn test`.
+Run `pnpm test`.
 
 #### e2e tests
 
@@ -89,13 +89,13 @@ The `teste2e.yml` workflow is responsible for deploying a new Cloudflare worker,
 3. Generate environment variables, such as `WORKER_NAME` and `GET_RESULT_PATH`. Put them inside `wranger.toml`.
 4. Publish the worker using `cloudfare/wrangler-action` to the designated Cloudflare account.
 5. Install `playwright`.
-6. Run `yarn test:e2e` with env variables `test_client_domain`, `worker_version`, `worker_path`, `get_result_path`, and `agent_download_path`.
+6. Run `pnpm test:e2e` with env variables `test_client_domain`, `worker_version`, `worker_path`, `get_result_path`, and `agent_download_path`.
 7. Delete the published Cloudflare worker from the Cloudflare account.
 
 If tests fail, the last step (cleaning up the worker) is never executed by design, so that there is opportunity to inspect the worker to understand what went wrong.
 Do not forget to delete the worker manually after using the Cloudflare dashboard. You can find the name of the worker in the workflow logs.
 
-If the required environment variables are supplied, `yarn test:e2e` can be run locally without needing `teste2e.yml`. For example, the command `worker_version=1.2.3 yarn test:e2e` sets `worker_version` as a temporary env variable on *nix systems.
+If the required environment variables are supplied, `pnpm test:e2e` can be run locally without needing `teste2e.yml`. For example, the command `worker_version=1.2.3 pnpm test:e2e` sets `worker_version` as a temporary env variable on *nix systems.
 
 ### How to release a new version
 

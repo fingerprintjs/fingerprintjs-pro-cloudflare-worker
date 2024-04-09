@@ -11,15 +11,15 @@
   "scripts": {
     "build": "rimraf dist && rollup -c rollup.config.js",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore --max-warnings 0 src/ test/",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "pnpm lint --fix",
     "test": "jest --coverage",
     "test:coverage": "jest --coverage",
     "test:dts": "tsc --noEmit --isolatedModules dist/fingerprintjs-pro-cloudflare-worker.d.ts",
-    "test:e2e": "npx playwright test",
+    "test:e2e": "pnpm exec playwright test",
     "prepare": "husky install"
   },
   "lint-staged": {
-    "*.{js,ts}": "yarn run lint:fix"
+    "*.{js,ts}": "pnpm lint:fix"
   },
   "config": {
     "commitizen": {
