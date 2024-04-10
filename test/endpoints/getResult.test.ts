@@ -1,6 +1,7 @@
 import { WorkerEnv } from '../../src/env'
 import worker from '../../src'
 import { FPJSResponse } from '../../src/utils'
+import { config } from '../../src/config'
 
 const workerEnv: WorkerEnv = {
   PROXY_SECRET: 'proxy_secret',
@@ -36,7 +37,7 @@ describe('ingress API request proxy URL', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://${config.ingressApi}`.toLowerCase())
   })
 
   test('us region', async () => {
@@ -44,7 +45,7 @@ describe('ingress API request proxy URL', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://${config.ingressApi}`.toLowerCase())
   })
 
   test('eu region', async () => {
@@ -52,7 +53,7 @@ describe('ingress API request proxy URL', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://eu.api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://eu.${config.ingressApi}`.toLowerCase())
   })
 
   test('ap region', async () => {
@@ -60,7 +61,7 @@ describe('ingress API request proxy URL', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://ap.${config.ingressApi}`.toLowerCase())
   })
 
   test('invalid region', async () => {
@@ -68,7 +69,7 @@ describe('ingress API request proxy URL', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://${config.ingressApi}`.toLowerCase())
   })
 })
 
@@ -100,7 +101,7 @@ describe('ingress API request proxy URL with suffix', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://${config.ingressApi}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 
@@ -109,7 +110,7 @@ describe('ingress API request proxy URL with suffix', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://${config.ingressApi}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 
@@ -118,7 +119,7 @@ describe('ingress API request proxy URL with suffix', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://eu.api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://eu.${config.ingressApi}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 
@@ -127,7 +128,7 @@ describe('ingress API request proxy URL with suffix', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://ap.${config.ingressApi}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 
@@ -136,7 +137,7 @@ describe('ingress API request proxy URL with suffix', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://${config.ingressApi}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 
@@ -146,7 +147,7 @@ describe('ingress API request proxy URL with suffix', () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://ap.${config.ingressApi}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/.suffix/more/path')
   })
 
@@ -155,7 +156,7 @@ describe('ingress API request proxy URL with suffix', () => {
     const req = new Request(reqURL.toString(), { method: 'GET' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://${config.ingressApi}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/suffix/more/path')
   })
 
@@ -165,7 +166,7 @@ describe('ingress API request proxy URL with suffix', () => {
     const req = new Request(reqURL.toString(), { method: 'GET' })
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://ap.api.fpjs.io')
+    expect(receivedURL.origin).toBe(`https://ap.${config.ingressApi}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/.suffix/more/path')
   })
 })
@@ -219,7 +220,7 @@ describe('ingress API request query parameters', () => {
     await worker.fetch(req, workerEnv)
     const url = new URL(receivedReqURL)
     expect(url.search).toBe(
-      '?someKey=someValue' + '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fingress',
+      '?someKey=someValue' + '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fingress'
     )
   })
   test('whole query string when there is ii parameter before', async () => {
@@ -230,7 +231,7 @@ describe('ingress API request query parameters', () => {
     expect(url.search).toBe(
       '?someKey=someValue' +
         '&ii=fingerprintjs-pro-react%2Fv1.2.3' +
-        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fingress',
+        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fingress'
     )
   })
 })
@@ -318,7 +319,7 @@ describe('ingress API request headers', () => {
     const req = new Request(reqURL.toString(), { headers: reqHeaders, method: 'POST' })
     await worker.fetch(req, workerEnv)
     expect(receivedHeaders.get('cookie')).toBe(
-      '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==',
+      '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow=='
     )
   })
   test('GET req headers do not have cookies (including _iidt)', async () => {
@@ -609,7 +610,7 @@ describe('ingress API response when failure', () => {
     expect(requestId).toMatch(/^\d{13}\.[a-zA-Z\d]{6}$/)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const modifiedResponseBody: Omit<FPJSResponse, 'requestId'> = (({ requestId, ...rest }) => ({ ...rest }))(
-      responseBody,
+      responseBody
     )
     // Note: toStrictEqual does not work for some reason, using double toMatchObject instead
     expect(modifiedResponseBody).toMatchObject(expectedResponseBody)

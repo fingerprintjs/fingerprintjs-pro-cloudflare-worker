@@ -1,5 +1,6 @@
 import worker from '../../src/index'
 import { WorkerEnv } from '../../src/env'
+import { config } from '../../src/config'
 
 const workerEnv: WorkerEnv = {
   PROXY_SECRET: 'proxy_secret',
@@ -36,7 +37,7 @@ describe('agent download request proxy URL', () => {
     const req = new Request(reqURL.toString())
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://fpcdn.io')
+    expect(receivedURL.origin).toBe(`https://${config.fpcdn}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/v3/someApiKey')
   })
 
@@ -45,7 +46,7 @@ describe('agent download request proxy URL', () => {
     const req = new Request(reqURL.toString())
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://fpcdn.io')
+    expect(receivedURL.origin).toBe(`https://${config.fpcdn}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/v4/someApiKey')
   })
 
@@ -55,7 +56,7 @@ describe('agent download request proxy URL', () => {
     const req = new Request(reqURL.toString())
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://fpcdn.io')
+    expect(receivedURL.origin).toBe(`https://${config.fpcdn}`.toLowerCase())
     expect(receivedURL.pathname).toBe('/v5/someApiKey/loader_v1.2.3.js')
   })
 
@@ -66,7 +67,7 @@ describe('agent download request proxy URL', () => {
     const req = new Request(reqURL.toString())
     await worker.fetch(req, workerEnv)
     const receivedURL = new URL(receivedReqURL)
-    expect(receivedURL.origin).toBe('https://fpcdn.io')
+    expect(receivedURL.origin).toBe(`https://${config.fpcdn}`.toLowerCase())
   })
 })
 
@@ -122,7 +123,7 @@ describe('agent download request query parameters', () => {
     expect(url.search).toBe(
       '?apiKey=someApiKey' +
         '&someKey=someValue' +
-        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn',
+        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn'
     )
   })
   test('whole query string when there is ii parameter before', async () => {
@@ -134,7 +135,7 @@ describe('agent download request query parameters', () => {
       '?apiKey=someApiKey' +
         '&someKey=someValue' +
         '&ii=fingerprintjs-pro-react%2Fv1.2.3' +
-        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn',
+        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fprocdn'
     )
   })
 })

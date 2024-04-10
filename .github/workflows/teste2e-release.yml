@@ -10,15 +10,20 @@ jobs:
     runs-on: ubuntu-20.04
     name: Test release
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.node-version'
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@129abb77bf5884e578fcaf1f37628e41622cc371
+        with:
+          version: 8
+
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
 
       - name: Download release asset
         run: node scripts/downloadGitHubRelease.mjs
@@ -58,9 +63,9 @@ jobs:
           path: 'package.json'
           prop_path: 'version'
       - name: Install dependencies
-        run: npx playwright install
+        run: pnpm exec playwright install
       - name: Run test
-        run:  yarn test:e2e
+        run:  pnpm test:e2e
         env:
           test_client_domain: ${{secrets.TEST_CLIENT_DOMAIN}}
           worker_version: ${{steps.version.outputs.prop}}
