@@ -1,3 +1,15 @@
+## [1.6.0-rc.1](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.5.0...v1.6.0-rc.1) (2024-04-10)
+
+
+### Features
+
+* remove hard-coded proxy endpoints, introduce config in build ([f5e91c2](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/commit/f5e91c247c74f08662c34a60efa9681d784fb38c))
+
+
+### Performance Improvements
+
+* updated Cloudflare worker runtime compabilitiy date ([07eaaba](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/commit/07eaabaed1be610074b7e68827f8e19a6834de46))
+
 ## [1.6.0-rc.1](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.5.0...v1.6.0-rc.1) (2024-02-21)
 
 
