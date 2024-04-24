@@ -73,7 +73,7 @@ jobs:
         with:
           path: 'package.json'
           prop_path: 'version'
-      - name: Sleep for 3 minutes
+      - name: Wait for some time for the worker to come online
         run: sleep 180
         shell: bash
       - name: Run test
