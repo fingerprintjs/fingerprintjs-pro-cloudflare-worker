@@ -12,6 +12,8 @@ describe('addProxyIntegrationHeaders', () => {
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent-path',
       GET_RESULT_PATH: 'result-path',
       PROXY_SECRET: 'secret_value',
+      FPJS_CDN_URL: null,
+      FPJS_INGRESS_BASE_HOST: null,
     }
   })
   test('when PROXY_SECRET is set', () => {

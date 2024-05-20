@@ -1,5 +1,5 @@
 import worker from '../../src'
-import { WorkerEnv } from '../../src/env'
+import { Defaults, WorkerEnv } from '../../src/env'
 
 describe('status page content', () => {
   beforeEach(() => {
@@ -11,6 +11,7 @@ describe('status page content', () => {
   })
   test('when all variables are set', async () => {
     const workerEnv: WorkerEnv = {
+      ...Defaults,
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
@@ -21,6 +22,7 @@ describe('status page content', () => {
   })
   test('when proxy secret is not set', async () => {
     const workerEnv: WorkerEnv = {
+      ...Defaults,
       PROXY_SECRET: null,
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
@@ -31,6 +33,7 @@ describe('status page content', () => {
   })
   test('when get result path is not set', async () => {
     const workerEnv: WorkerEnv = {
+      ...Defaults,
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: null,
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
@@ -41,6 +44,7 @@ describe('status page content', () => {
   })
   test('when agent script download path is not set', async () => {
     const workerEnv: WorkerEnv = {
+      ...Defaults,
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: null,
@@ -51,6 +55,7 @@ describe('status page content', () => {
   })
   test('when agent script download path and proxy secret are not set', async () => {
     const workerEnv: WorkerEnv = {
+      ...Defaults,
       PROXY_SECRET: null,
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: null,
@@ -64,6 +69,7 @@ describe('status page content', () => {
 describe('status page response headers', () => {
   test('CSP is set', async () => {
     const workerEnv: WorkerEnv = {
+      ...Defaults,
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
@@ -79,6 +85,7 @@ describe('status page response headers', () => {
 describe('status page other HTTP methods than GET', () => {
   test('returns 405 when method is POST', async () => {
     const workerEnv: WorkerEnv = {
+      ...Defaults,
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',

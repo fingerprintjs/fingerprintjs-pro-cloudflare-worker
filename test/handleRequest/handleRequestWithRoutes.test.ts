@@ -1,5 +1,5 @@
 import { handleRequestWithRoutes, Route } from '../../src/handler'
-import { getGetResultPath, getScriptDownloadPath, getStatusPagePath, WorkerEnv } from '../../src/env'
+import { Defaults, getGetResultPath, getScriptDownloadPath, getStatusPagePath, WorkerEnv } from '../../src/env'
 import { createRoute } from '../../src/utils'
 
 const workerPath = 'worker'
@@ -7,6 +7,7 @@ const agentScriptDownloadPath = 'agent'
 const getResultPath = 'get-result'
 const proxySecret = 'proxySecret'
 const env: WorkerEnv = {
+  ...Defaults,
   AGENT_SCRIPT_DOWNLOAD_PATH: agentScriptDownloadPath,
   GET_RESULT_PATH: getResultPath,
   PROXY_SECRET: proxySecret,
