@@ -1,10 +1,10 @@
 export const DEFAULT_AGENT_VERSION = '3'
 
-export function getAgentScriptEndpoint(baseUrl: string, searchParams: URLSearchParams): string {
+export function getAgentScriptEndpoint(baseCdnUrl: string, searchParams: URLSearchParams): string {
   const apiKey = searchParams.get('apiKey')
   const apiVersion = searchParams.get('version') || DEFAULT_AGENT_VERSION
 
-  const base = `https://${baseUrl}/v${apiVersion}/${apiKey}`
+  const base = `https://${baseCdnUrl}/v${apiVersion}/${apiKey}`
   const loaderVersion = searchParams.get('loaderVersion')
   const lv = loaderVersion ? `/loader_v${loaderVersion}.js` : ''
 
@@ -12,7 +12,7 @@ export function getAgentScriptEndpoint(baseUrl: string, searchParams: URLSearchP
 }
 
 export function getVisitorIdEndpoint(
-  baseUrl: string,
+  baseIngressUrl: string,
   searchParams: URLSearchParams,
   pathSuffix: string | undefined = undefined
 ): string {
@@ -33,5 +33,5 @@ export function getVisitorIdEndpoint(
   if (suffix.length > 0 && !suffix.startsWith('/')) {
     suffix = '/' + suffix
   }
-  return `https://${prefix}${baseUrl}${suffix}`
+  return `https://${prefix}${baseIngressUrl}${suffix}`
 }

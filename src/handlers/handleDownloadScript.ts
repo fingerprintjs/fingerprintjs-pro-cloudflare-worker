@@ -11,9 +11,11 @@ function copySearchParams(oldURL: URL, newURL: URL): void {
   newURL.search = new URLSearchParams(oldURL.search).toString()
 }
 
-function makeDownloadScriptRequest(request: Request, baseUrl: string): Promise<Response> {
+function makeDownloadScriptRequest(request: Request, env: WorkerEnv): Promise<Response> {
+  const cdnUrl = getCdnUrl(env)!
+
   const oldURL = new URL(request.url)
-  const agentScriptEndpoint = getAgentScriptEndpoint(baseUrl, oldURL.searchParams)
+  const agentScriptEndpoint = getAgentScriptEndpoint(cdnUrl, oldURL.searchParams)
   const newURL = new URL(agentScriptEndpoint)
   copySearchParams(oldURL, newURL)
   addTrafficMonitoringSearchParamsForProCDN(newURL)
@@ -31,10 +33,8 @@ function makeDownloadScriptRequest(request: Request, baseUrl: string): Promise<R
 }
 
 export async function handleDownloadScript(request: Request, env: WorkerEnv): Promise<Response> {
-  const cdnUrl = getCdnUrl(env)!
-
   try {
-    return await makeDownloadScriptRequest(request, cdnUrl)
+    return await makeDownloadScriptRequest(request, env)
   } catch (e) {
     return createFallbackErrorResponse(e)
   }
