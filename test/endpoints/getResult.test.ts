@@ -1,10 +1,11 @@
-import { Defaults, WorkerEnv } from '../../src/env'
+import { WorkerEnv } from '../../src/env'
 import worker from '../../src'
 import { FPJSResponse } from '../../src/utils'
 import { config } from '../../src/config'
 
 const workerEnv: WorkerEnv = {
-  ...Defaults,
+  FPJS_CDN_URL: config.fpcdn,
+  FPJS_INGRESS_BASE_HOST: config.ingressApi,
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
@@ -311,7 +312,8 @@ describe('ingress API request headers', () => {
 
   test('req headers are the same (except Cookie) when no proxy secret', async () => {
     const workerEnv: WorkerEnv = {
-      ...Defaults,
+      FPJS_CDN_URL: config.fpcdn,
+      FPJS_INGRESS_BASE_HOST: config.ingressApi,
       PROXY_SECRET: null,
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',

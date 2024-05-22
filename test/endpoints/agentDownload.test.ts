@@ -1,9 +1,10 @@
 import worker from '../../src/index'
-import { Defaults, WorkerEnv } from '../../src/env'
+import { WorkerEnv } from '../../src/env'
 import { config } from '../../src/config'
 
 const workerEnv: WorkerEnv = {
-  ...Defaults,
+  FPJS_CDN_URL: config.fpcdn,
+  FPJS_INGRESS_BASE_HOST: config.ingressApi,
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
