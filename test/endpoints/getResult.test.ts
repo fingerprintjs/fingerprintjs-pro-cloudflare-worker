@@ -4,10 +4,61 @@ import { FPJSResponse } from '../../src/utils'
 import { config } from '../../src/config'
 
 const workerEnv: WorkerEnv = {
+  FPJS_CDN_URL: config.fpcdn,
+  FPJS_INGRESS_BASE_HOST: config.ingressApi,
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
 }
+
+describe('ingress API url from worker env', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let reqURL: URL
+  let receivedReqURL = ''
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy.mockImplementation(async (input, init) => {
+      const req = new Request(input, init)
+      receivedReqURL = req.url
+      return new Response()
+    })
+  })
+
+  beforeEach(() => {
+    reqURL = new URL('https://example.com/worker_path/get_result')
+
+    receivedReqURL = ''
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('custom ingress url', async () => {
+    const env = {
+      ...workerEnv,
+      FPJS_INGRESS_BASE_HOST: 'ingress.test.com',
+    } satisfies WorkerEnv
+
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, env)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe(`https://ingress.test.com`)
+  })
+
+  test('null ingress url', async () => {
+    const env = {
+      ...workerEnv,
+      FPJS_INGRESS_BASE_HOST: null,
+    } satisfies WorkerEnv
+
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, env)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe(`https://${config.ingressApi}`.toLowerCase())
+  })
+})
 
 describe('ingress API request proxy URL', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
@@ -261,6 +312,8 @@ describe('ingress API request headers', () => {
 
   test('req headers are the same (except Cookie) when no proxy secret', async () => {
     const workerEnv: WorkerEnv = {
+      FPJS_CDN_URL: config.fpcdn,
+      FPJS_INGRESS_BASE_HOST: config.ingressApi,
       PROXY_SECRET: null,
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',

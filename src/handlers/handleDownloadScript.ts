@@ -5,14 +5,17 @@ import {
   getAgentScriptEndpoint,
   createResponseWithMaxAge,
 } from '../utils'
+import { getCdnUrl, WorkerEnv } from '../env'
 
 function copySearchParams(oldURL: URL, newURL: URL): void {
   newURL.search = new URLSearchParams(oldURL.search).toString()
 }
 
-function makeDownloadScriptRequest(request: Request): Promise<Response> {
+function makeDownloadScriptRequest(request: Request, env: WorkerEnv): Promise<Response> {
+  const cdnUrl = getCdnUrl(env)!
+
   const oldURL = new URL(request.url)
-  const agentScriptEndpoint = getAgentScriptEndpoint(oldURL.searchParams)
+  const agentScriptEndpoint = getAgentScriptEndpoint(cdnUrl, oldURL.searchParams)
   const newURL = new URL(agentScriptEndpoint)
   copySearchParams(oldURL, newURL)
   addTrafficMonitoringSearchParamsForProCDN(newURL)
@@ -29,9 +32,9 @@ function makeDownloadScriptRequest(request: Request): Promise<Response> {
   return fetchCacheable(newRequest, workerCacheTtl).then((res) => createResponseWithMaxAge(res, maxMaxAge, maxSMaxAge))
 }
 
-export async function handleDownloadScript(request: Request): Promise<Response> {
+export async function handleDownloadScript(request: Request, env: WorkerEnv): Promise<Response> {
   try {
-    return await makeDownloadScriptRequest(request)
+    return await makeDownloadScriptRequest(request, env)
   } catch (e) {
     return createFallbackErrorResponse(e)
   }

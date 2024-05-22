@@ -3,10 +3,64 @@ import { WorkerEnv } from '../../src/env'
 import { config } from '../../src/config'
 
 const workerEnv: WorkerEnv = {
+  FPJS_CDN_URL: config.fpcdn,
+  FPJS_INGRESS_BASE_HOST: config.ingressApi,
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
 }
+
+describe('agent download cdn url from worker env', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let reqURL: URL
+  let receivedReqURL = ''
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy.mockImplementation(async (input, init) => {
+      const req = new Request(input, init)
+      receivedReqURL = req.url
+      return new Response()
+    })
+  })
+
+  beforeEach(() => {
+    reqURL = new URL('https://example.com/worker_path/agent_download')
+    reqURL.searchParams.append('apiKey', 'someApiKey')
+
+    receivedReqURL = ''
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('custom cdn url', async () => {
+    const env = {
+      ...workerEnv,
+      FPJS_CDN_URL: 'cdn.test.com',
+    } satisfies WorkerEnv
+
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, env)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe(`https://cdn.test.com`)
+    expect(receivedURL.pathname).toBe('/v3/someApiKey')
+  })
+
+  test('null cdn url', async () => {
+    const env = {
+      ...workerEnv,
+      FPJS_CDN_URL: null,
+    } satisfies WorkerEnv
+
+    const req = new Request(reqURL.toString())
+    await worker.fetch(req, env)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe(`https://${config.fpcdn}`.toLowerCase())
+    expect(receivedURL.pathname).toBe('/v3/someApiKey')
+  })
+})
 
 describe('agent download request proxy URL', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
