@@ -70,6 +70,13 @@ describe('getIPFromHeaders', () => {
     expect(getIPFromHeaders(headers)).toEqual(ipv6)
   })
 
+  it('returns an empty string when CF-Connecting-IP header is set to an empty string', () => {
+    const headers = new Headers()
+    headers.set('CF-Connecting-IP', '')
+
+    expect(getIPFromHeaders(headers)).toEqual('')
+  })
+
   it('returns an empty string when no headers are set', () => {
     expect(getIPFromHeaders(new Headers())).toEqual('')
   })
