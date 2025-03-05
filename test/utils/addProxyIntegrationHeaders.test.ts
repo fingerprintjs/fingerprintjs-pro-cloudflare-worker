@@ -1,5 +1,6 @@
 import { addProxyIntegrationHeaders } from '../../src/utils'
 import { WorkerEnv } from '../../src/env'
+import { getIPFromHeaders } from '../../src/utils/addProxyIntegrationHeaders'
 
 describe('addProxyIntegrationHeaders', () => {
   let headers: Headers
@@ -38,5 +39,38 @@ describe('addProxyIntegrationHeaders', () => {
     expect(headers.get('FPJS-Proxy-Client-IP')).toBe('84D:1111:222:3333:4444:5555:6:77')
     expect(headers.get('FPJS-Proxy-Forwarded-Host')).toBe('example.com')
     expect(headers.get('x-custom-header')).toBe('custom-value')
+  })
+})
+
+describe('getIPFromHeaders', () => {
+  const ipv6 = '2001:67c:198c:906:3b::3c2'
+  const ipv4 = '19.117.63.126'
+
+  it('returns CF-Connecting-IP when only CF-Connecting-IP is set', () => {
+    const headers = new Headers()
+    headers.set('CF-Connecting-IP', ipv4)
+
+    expect(getIPFromHeaders(headers)).toEqual(ipv4)
+  })
+
+  it('returns CF-Connecting-IP when Cf-Pseudo-IPv4 is present but different', () => {
+    const headers = new Headers()
+    headers.set('CF-Connecting-IP', ipv6)
+    headers.set('Cf-Pseudo-IPv4', ipv4)
+
+    expect(getIPFromHeaders(headers)).toEqual(ipv6)
+  })
+
+  it('returns CF-Connecting-IPv6 when Cf-Pseudo-IPv4 matches CF-Connecting-IP', () => {
+    const headers = new Headers()
+    headers.set('CF-Connecting-IP', ipv4)
+    headers.set('Cf-Pseudo-IPv4', ipv4)
+    headers.set('CF-Connecting-IPv6', ipv6)
+
+    expect(getIPFromHeaders(headers)).toEqual(ipv6)
+  })
+
+  it('returns an empty string when no headers are set', () => {
+    expect(getIPFromHeaders(new Headers())).toEqual('')
   })
 })
