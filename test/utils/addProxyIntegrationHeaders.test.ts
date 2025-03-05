@@ -1,6 +1,5 @@
-import { addProxyIntegrationHeaders } from '../../src/utils'
+import { addProxyIntegrationHeaders, getIPFromHeaders } from '../../src/utils'
 import { WorkerEnv } from '../../src/env'
-import { getIPFromHeaders } from '../../src/utils/addProxyIntegrationHeaders'
 
 describe('addProxyIntegrationHeaders', () => {
   let headers: Headers

@@ -12,7 +12,7 @@ export {
   addTrafficMonitoringSearchParamsForProCDN,
 } from './addTrafficMonitoring'
 export { returnHttpResponse } from './returnHttpResponse'
-export { addProxyIntegrationHeaders } from './addProxyIntegrationHeaders'
+export { addProxyIntegrationHeaders, getIPFromHeaders } from './addProxyIntegrationHeaders'
 export { filterCookies } from './cookie'
 export {
   createRoute,
