@@ -33,8 +33,8 @@ describe('addProxyIntegrationHeaders', () => {
     env.PROXY_SECRET = null
     addProxyIntegrationHeaders(headers, 'https://example.com/worker/result', env)
     expect(headers.get('FPJS-Proxy-Secret')).toBe(null)
-    expect(headers.get('FPJS-Proxy-Client-IP')).toBe(null)
-    expect(headers.get('FPJS-Proxy-Forwarded-Host')).toBe(null)
+    expect(headers.get('FPJS-Proxy-Client-IP')).toBe(ipv4)
+    expect(headers.get('FPJS-Proxy-Forwarded-Host')).toBe('example.com')
     expect(headers.get('x-custom-header')).toBe('custom-value')
   })
 
