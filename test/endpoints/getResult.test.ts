@@ -310,7 +310,7 @@ describe('ingress API request headers', () => {
     fetchSpy.mockRestore()
   })
 
-  test('req headers are the same (except proxy headers) when no proxy secret', async () => {
+  test('even if proxy secret is undefined, other FPJS-Proxy-* headers are still added to the proxied request headers. Original headers are preserved.', async () => {
     const workerEnv: WorkerEnv = {
       FPJS_CDN_URL: config.fpcdn,
       FPJS_INGRESS_BASE_HOST: config.ingressApi,

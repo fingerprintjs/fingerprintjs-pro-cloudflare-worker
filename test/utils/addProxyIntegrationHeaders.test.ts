@@ -29,7 +29,7 @@ describe('addProxyIntegrationHeaders', () => {
     expect(headers.get('x-custom-header')).toBe('custom-value')
   })
 
-  test('not append proxy headers when PROXY_SECRET is not set', () => {
+  test('even if proxy secret is null, other FPJS-Proxy-* headers are still added to the proxied request headers. Original headers are preserved.', () => {
     env.PROXY_SECRET = null
     addProxyIntegrationHeaders(headers, 'https://example.com/worker/result', env)
     expect(headers.get('FPJS-Proxy-Secret')).toBe(null)
