@@ -310,7 +310,7 @@ describe('ingress API request headers', () => {
     fetchSpy.mockRestore()
   })
 
-  test('req headers are the same (except Cookie) when no proxy secret', async () => {
+  test('even if proxy secret is undefined, other FPJS-Proxy-* headers are still added to the proxied request headers. Original headers are preserved.', async () => {
     const workerEnv: WorkerEnv = {
       FPJS_CDN_URL: config.fpcdn,
       FPJS_INGRESS_BASE_HOST: config.ingressApi,
@@ -318,21 +318,25 @@ describe('ingress API request headers', () => {
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
     }
+    const testIP = '203.0.1113.195'
     const reqHeaders = new Headers({
       accept: '*/*',
       'cache-control': 'no-cache',
       'accept-language': 'en-US',
       'user-agent': 'Mozilla/5.0',
       'x-some-header': 'some value',
-      'cf-connecting-ip': '203.0.113.195',
-      'x-forwarded-for': '203.0.113.195, 2001:db8:85a3:8d3:1319:8a2e:370:7348',
+      'cf-connecting-ip': testIP,
+      'x-forwarded-for': `${testIP}, 2001:db8:85a3:8d3:1319:8a2e:370:7348`,
     })
     const req = new Request(reqURL.toString(), { headers: reqHeaders, method: 'POST' })
     await worker.fetch(req, workerEnv)
+    const expectedHeaders = new Headers(reqHeaders)
+    expectedHeaders.set('FPJS-Proxy-Client-IP', testIP)
+    expectedHeaders.set('FPJS-Proxy-Forwarded-Host', 'example.com')
     receivedHeaders.forEach((value, key) => {
-      expect(reqHeaders.get(key)).toBe(value)
+      expect(expectedHeaders.get(key)).toBe(value)
     })
-    reqHeaders.forEach((value, key) => {
+    expectedHeaders.forEach((value, key) => {
       expect(receivedHeaders.get(key)).toBe(value)
     })
   })
