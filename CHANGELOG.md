@@ -1,3 +1,15 @@
+## [1.6.0-rc.2](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.6.0-rc.1...v1.6.0-rc.2) (2025-03-18)
+
+
+### Features
+
+* proxy integration headers handling when proxy secret is missing ([e8c1948](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/commit/e8c19489d2974a284c28bb965c2df42c13a42853))
+
+
+### Bug Fixes
+
+* correctly resolve client IP from headers ([97f2515](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/commit/97f25156f35595ac741c7bbf1ea23f95885e9cf5))
+
 ## [1.6.0-rc.2](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.6.0-rc.1...v1.6.0-rc.2) (2025-03-13)
 
 
