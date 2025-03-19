@@ -4,10 +4,61 @@ import { FPJSResponse } from '../../src/utils'
 import { config } from '../../src/config'
 
 const workerEnv: WorkerEnv = {
+  FPJS_CDN_URL: config.fpcdn,
+  FPJS_INGRESS_BASE_HOST: config.ingressApi,
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
 }
+
+describe('ingress API url from worker env', () => {
+  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let reqURL: URL
+  let receivedReqURL = ''
+
+  beforeAll(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy.mockImplementation(async (input, init) => {
+      const req = new Request(input, init)
+      receivedReqURL = req.url
+      return new Response()
+    })
+  })
+
+  beforeEach(() => {
+    reqURL = new URL('https://example.com/worker_path/get_result')
+
+    receivedReqURL = ''
+  })
+
+  afterAll(() => {
+    fetchSpy.mockRestore()
+  })
+
+  test('custom ingress url', async () => {
+    const env = {
+      ...workerEnv,
+      FPJS_INGRESS_BASE_HOST: 'ingress.test.com',
+    } satisfies WorkerEnv
+
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, env)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe(`https://ingress.test.com`)
+  })
+
+  test('null ingress url', async () => {
+    const env = {
+      ...workerEnv,
+      FPJS_INGRESS_BASE_HOST: null,
+    } satisfies WorkerEnv
+
+    const req = new Request(reqURL.toString(), { method: 'POST' })
+    await worker.fetch(req, env)
+    const receivedURL = new URL(receivedReqURL)
+    expect(receivedURL.origin).toBe(`https://${config.ingressApi}`.toLowerCase())
+  })
+})
 
 describe('ingress API request proxy URL', () => {
   let fetchSpy: jest.MockInstance<Promise<Response>, any>
@@ -259,27 +310,33 @@ describe('ingress API request headers', () => {
     fetchSpy.mockRestore()
   })
 
-  test('req headers are the same (except Cookie) when no proxy secret', async () => {
+  test('even if proxy secret is undefined, other FPJS-Proxy-* headers are still added to the proxied request headers. Original headers are preserved.', async () => {
     const workerEnv: WorkerEnv = {
+      FPJS_CDN_URL: config.fpcdn,
+      FPJS_INGRESS_BASE_HOST: config.ingressApi,
       PROXY_SECRET: null,
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
     }
+    const testIP = '203.0.1113.195'
     const reqHeaders = new Headers({
       accept: '*/*',
       'cache-control': 'no-cache',
       'accept-language': 'en-US',
       'user-agent': 'Mozilla/5.0',
       'x-some-header': 'some value',
-      'cf-connecting-ip': '203.0.113.195',
-      'x-forwarded-for': '203.0.113.195, 2001:db8:85a3:8d3:1319:8a2e:370:7348',
+      'cf-connecting-ip': testIP,
+      'x-forwarded-for': `${testIP}, 2001:db8:85a3:8d3:1319:8a2e:370:7348`,
     })
     const req = new Request(reqURL.toString(), { headers: reqHeaders, method: 'POST' })
     await worker.fetch(req, workerEnv)
+    const expectedHeaders = new Headers(reqHeaders)
+    expectedHeaders.set('FPJS-Proxy-Client-IP', testIP)
+    expectedHeaders.set('FPJS-Proxy-Forwarded-Host', 'example.com')
     receivedHeaders.forEach((value, key) => {
-      expect(reqHeaders.get(key)).toBe(value)
+      expect(expectedHeaders.get(key)).toBe(value)
     })
-    reqHeaders.forEach((value, key) => {
+    expectedHeaders.forEach((value, key) => {
       expect(receivedHeaders.get(key)).toBe(value)
     })
   })

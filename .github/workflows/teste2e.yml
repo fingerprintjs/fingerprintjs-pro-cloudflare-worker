@@ -22,9 +22,7 @@ jobs:
   build-and-deploy-and-test-e2e-mock:
     runs-on: ubuntu-20.04
     name: Build & Deploy & Test e2e using mock app
-    env:
-      FPCDN: ${{ secrets.MOCK_FPCDN }}
-      INGRESS_API: ${{ secrets.MOCK_INGRESS_API }}
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,6 +59,8 @@ jobs:
           echo GET_RESULT_PATH = \"${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}\" >> wrangler.toml
           echo AGENT_SCRIPT_DOWNLOAD_PATH = \"${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}\" >> wrangler.toml
           echo PROXY_SECRET = \"secret\" >> wrangler.toml
+          echo FPJS_CDN_URL = \"${{secrets.MOCK_FPCDN}}\" >> wrangler.toml
+          echo FPJS_INGRESS_BASE_HOST = \"${{secrets.MOCK_INGRESS_API}}\" >> wrangler.toml
           cat wrangler.toml
       - name: Publish
         uses: cloudflare/wrangler-action@v3
@@ -73,9 +73,12 @@ jobs:
         with:
           path: 'package.json'
           prop_path: 'version'
+      - name: Wait for some time for the worker to come online
+        run: sleep 180
+        shell: bash
       - name: Run test
         run: |
-          npm exec -y "git+https://github.com/fingerprintjs/dx-team-mock-for-proxy-integrations-e2e-tests.git" -- --api-url="${{env.api_url}}" --host="https://${{env.test_client_domain}}" --cdn-proxy-path="${{env.worker_path}}/${{env.agent_download_path}}" --ingress-proxy-path="${{env.worker_path}}/${{env.get_result_path}}"
+          npm exec -y "git+https://github.com/fingerprintjs/dx-team-mock-for-proxy-integrations-e2e-tests.git" -- --api-url="${{env.api_url}}" --cdn-proxy-url="https://${{env.test_client_domain}}/${{env.worker_path}}/${{env.agent_download_path}}" --ingress-proxy-url="https://${{env.test_client_domain}}/${{env.worker_path}}/${{env.get_result_path}}" --traffic-name="fingerprintjs-pro-cloudflare" --integration-version="${{steps.version.outputs.prop}}"
         env:
           test_client_domain: ${{secrets.TEST_CLIENT_DOMAIN}}
           worker_version: ${{steps.version.outputs.prop}}

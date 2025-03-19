@@ -1,4 +1,4 @@
 export const config = {
-  fpcdn: '__FPCDN__',
-  ingressApi: '__INGRESS_API__',
+  fpcdn: 'fpcdn.io',
+  ingressApi: 'api.fpjs.io',
 }
