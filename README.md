@@ -14,7 +14,7 @@
 
 # Fingerprint Pro Cloudflare worker
 
-[Fingerprint](https://fingerprint.com/) is a device intelligence platform offering 99.5% accurate visitor identification.
+[Fingerprint](https://fingerprint.com/) is a device intelligence platform offering visitor identification and smart signals with industry-leading accuracy.
 
 Fingerprint Pro Cloudflare Integration is responsible for
 
