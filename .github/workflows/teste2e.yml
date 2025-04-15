@@ -7,16 +7,6 @@ on:
   schedule:
     - cron: '30 1 * * *'
   workflow_dispatch:
-    inputs:
-      version_bump:
-        description: 'A type of version bump'
-        default: 'patch'
-        required: true
-        type: choice
-        options:
-          - major
-          - minor
-          - patch
 
 jobs:
   build-and-deploy-and-test-e2e-mock:
@@ -40,8 +30,7 @@ jobs:
 
       - name: Upgrade version
         run: |
-          version_bump=${{ github.event.inputs.version_bump || 'patch' }}
-          pnpm version $version_bump --preid snapshot --no-git-tag
+          pnpm version prerelease --preid snapshot --no-commit-hooks --no-git-tag-version --ignore-scripts
 
       - name: Generate random paths
         run: |
@@ -118,8 +107,7 @@ jobs:
 
       - name: Upgrade version
         run: |
-          version_bump=${{ github.event.inputs.version_bump || 'patch' }}
-          pnpm version $version_bump --preid snapshot --no-git-tag
+          pnpm version prerelease --preid snapshot --no-commit-hooks --no-git-tag-version --ignore-scripts
       - name: Generate random paths
         run: |
           postfix=$(date +%s)

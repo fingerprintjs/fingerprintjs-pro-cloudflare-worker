@@ -69,6 +69,7 @@ test.describe('visitorId', () => {
   }
 
   async function runTest(page: Page, url: string) {
+    console.log(`Running goto url: ${url}...`)
     await page.goto(url, {
       waitUntil: 'networkidle',
     })
