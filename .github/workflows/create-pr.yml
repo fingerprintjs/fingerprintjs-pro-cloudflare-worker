@@ -13,3 +13,6 @@ jobs:
       target_branch: ${{ github.event.release.prerelease && 'main' || 'rc' }}
       tag_name: ${{ github.event.release.tag_name }}
       prerelease: ${{ github.event.release.prerelease }}
+      app_id:  ${{ vars.RUNNER_APP_ID }}
+    secrets:
+      APP_PRIVATE_KEY: ${{ secrets.RUNNER_APP_PRIVATE_KEY }}
