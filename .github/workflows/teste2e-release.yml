@@ -6,6 +6,14 @@ on:
       - published
 
 jobs:
+  set_datadog_team:
+    name: 'Set Datadog team and release tag'
+    uses: fingerprintjs/dx-team-toolkit/.github/workflows/set-datadog-team.yml@v1
+    with:
+      additionalTags: 'release-tag-name:${{ github.event.release.tag_name }}'
+    secrets:
+      DD_API_KEY: ${{ secrets.INTEGRATIONS_DATADOG_API_KEY }}
+
   test-release:
     runs-on: ubuntu-24.04
     name: Test release
