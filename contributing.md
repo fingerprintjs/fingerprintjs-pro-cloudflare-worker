@@ -5,7 +5,7 @@
 - Node 20
 - Typescript 4+
 - Playwright
-- [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) v3+
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) v4+
 
 ## Working with code
 
@@ -26,13 +26,9 @@ Run `pnpm build` for creating a build in `dist` folder. After building, `dist/fi
 
 ### How to run locally
 
-Install [Wrangler](https://developers.cloudflare.com/workers/get-started/guide/#1-install-wrangler-workers-cli) provided by Cloudflare.
+Running `pnpm install` will install [Wrangler](https://developers.cloudflare.com/workers/wrangler/) from Cloudflare locally.
 
-❗Please use `Wrangler 2` instead of `Wrangler 1`. For more info, please visit [here](https://developers.cloudflare.com/workers/wrangler/compare-v1-v2/).
-
-First run `wrangler login`. This will open the browser and ask you to log in to your CF account to authorize Wrangler in your local machine. You can use `wrangler logout` any time to log out.
-
-Then, you can run `wrangler dev` to run the worker locally. By default, it will run on `http://localhost:8787` and will have the following endpoints:
+After running `pnpm install`, you can run `pnpm wrangler dev` to run the worker locally. By default, it will run on `http://localhost:8787` and will have the following endpoints:
 - `/cf-worker/agent` for downloading the Pro Agent script (a.k.a `import` url or `scriptUrlPattern`)
 - `/cf-worker/getResult` for getting the result (a.k.a. `endpoint`)
 
@@ -103,4 +99,4 @@ The workflow `release.yml` is responsible for releasing a new version. Run it on
 
 ### How to keep your worker up-to-date
 
-CF Integration by Fingerprint always uses the latest stable version for the customers, and upgrades customer workers automatically.
+The [Fingerprint Cloudflare Proxy Integration](https://dev.fingerprint.com/docs/cloudflare-integration) always uses the latest stable version of this worker, and upgrades customer workers automatically.
