@@ -35,7 +35,7 @@ jobs:
 
       - name: Get wrangler version
         id: wrangler-version
-        run: echo version=$(pnpm ls --depth -1 --json wrangler | jq -r '.[0].devDependencies.wrangler.version') >> $GITHUB_OUTPUT
+        run: echo version=$(pnpm ls --json wrangler | jq -r '.[0].devDependencies.wrangler.version') >> $GITHUB_OUTPUT
 
       - name: Download release asset
         run: node scripts/downloadGitHubRelease.mjs
