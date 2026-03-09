@@ -33,6 +33,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Get wrangler version
+        id: wrangler-version
+        run: echo version=$(pnpm ls --json wrangler | jq -r '.[0].devDependencies.wrangler.version') >> $GITHUB_OUTPUT
+
       - name: Download release asset
         run: node scripts/downloadGitHubRelease.mjs
         env:
@@ -48,9 +52,8 @@ jobs:
         id: random-path-generator
       - name: Modify wrangler.toml
         run: |
-           sed -i '/^account_id = ""$/d' wrangler.toml
            sed -i 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
-           sed -i 's/route = .*/route = "${{ secrets.TEST_CLIENT_DOMAIN }}\/${{steps.random-path-generator.outputs.WORKER_PATH}}\/*"/' wrangler.toml
+           sed -i 's/# route = .*/route = "${{ secrets.TEST_CLIENT_DOMAIN }}\/${{steps.random-path-generator.outputs.WORKER_PATH}}\/*"/' wrangler.toml
            echo [vars] >> wrangler.toml
            echo GET_RESULT_PATH = \"${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}\" >> wrangler.toml
            echo AGENT_SCRIPT_DOWNLOAD_PATH = \"${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}\" >> wrangler.toml
@@ -64,6 +67,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          wranglerVersion: ${{ steps.wrangler-version.outputs.version }}
       - name: Get version
         id: version
         uses: notiz-dev/github-action-json-property@a5a9c668b16513c737c3e1f8956772c99c73f6e8 # commit hash = v0.2.0
@@ -83,6 +87,7 @@ jobs:
       - name: Clean up worker
         run: |
           curl -i -X DELETE "https://api.cloudflare.com/client/v4/accounts/${{secrets.CF_ACCOUNT_ID}}/workers/scripts/${{steps.random-path-generator.outputs.WORKER_NAME}}" -H"Authorization: bearer ${{secrets.CF_API_TOKEN}}"
+
       - name: Report Status
         if: always()
         uses: ravsamhq/notify-slack-action@0d9c6ff1de9903da88d24c0564f6e83cb28faca9

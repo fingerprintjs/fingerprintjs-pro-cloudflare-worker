@@ -1,12 +1,11 @@
-account_id = ""
-route = ""
-name = ""
+name = "fingerprint-pro-cloudflare-worker-local-development"
 main = "./dist/fingerprintjs-pro-cloudflare-worker.esm.js"
 workers_dev = true
 compatibility_date = "2024-04-01"
+# route = ""
 
 [build]
-command = "npm install -g pnpm && pnpm install && pnpm build"
+command = "pnpm install && pnpm build"
 
 [[rules]]
 type = "ESModule"
