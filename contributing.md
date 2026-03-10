@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Node 20
+- Node 24
 - Typescript 4+
 - Playwright
 - [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) v4+
