@@ -31,7 +31,7 @@ function buildHeaders(styleNonce: string): Headers {
 function createWorkerVersionElement(): string {
   return `
   <span>
-  ℹ️ Worker version: __current_worker_version__
+  ℹ️ Worker version: ${__APP_VERSION__}
   </span>
   `
 }

@@ -1,16 +1,15 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "fingerprint-pro-cloudflare-worker-local-development",
-  "compatibility_date": "2024-04-01",
-  "main": "./dist/fingerprintjs-pro-cloudflare-worker.esm.js",
-  "build": {
-    "command": "pnpm install && pnpm build",
-  },
-  "rules": [
-    {
-      "type": "ESModule",
-      "globs": ["**/*.js"],
-    },
-  ],
+  "compatibility_date": "2026-03-10",
+  "main": "./src/index.ts",
   "workers_dev": false,
+  // If the environment variable values are falsy, the defaults are used.
+  "vars": {
+    "AGENT_SCRIPT_DOWNLOAD_PATH": "",
+    "GET_RESULT_PATH": "",
+    "PROXY_SECRET": "",
+    "FPJS_CDN_URL": "",
+    "FPJS_INGRESS_BASE_HOST": "",
+  },
 }

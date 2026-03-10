@@ -1,5 +1,6 @@
 # Project artifacts
-/node_modules/
+**/dist/
+**/node_modules/
 
 # code coverage
 /coverage
@@ -9,4 +10,9 @@
 .idea/
 .vscode/
 yarn-error.log
-dist/
+
+# Cloudflare
+.wrangler
+
+# E2E Tests
+/e2e/test-results

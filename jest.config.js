@@ -2,7 +2,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'miniflare',
-  testRegex: '/test/.+test.tsx?$',
+  testRegex: '/__tests__/.+test.ts$',
   passWithNoTests: true,
   collectCoverageFrom: ['./src/**/*.ts'],
   coverageReporters: ['lcov', 'json-summary', ['text', { file: 'coverage.txt', path: './' }]],

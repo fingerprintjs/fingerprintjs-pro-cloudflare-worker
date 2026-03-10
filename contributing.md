@@ -28,17 +28,17 @@ Run `pnpm build` for creating a build in `dist` folder. After building, `dist/fi
 
 Running `pnpm install` will install [Wrangler](https://developers.cloudflare.com/workers/wrangler/) from Cloudflare locally.
 
-After running `pnpm install`, you can run `pnpm wrangler dev` to run the worker locally. By default, it will run on `http://localhost:8787` and will have the following endpoints:
-- `/cf-worker/agent` for downloading the Pro Agent script (a.k.a `import` url or `scriptUrlPattern`)
-- `/cf-worker/getResult` for getting the result (a.k.a. `endpoint`)
+After running `pnpm install`, you can run `pnpm dev` to run the worker locally. By default, it will run on `http://localhost:5173` and will have the following endpoints:
+- `/agent` for downloading the Pro Agent script (a.k.a `import` url or `scriptUrlPattern`)
+- `/getResult` for getting the result (a.k.a. `endpoint`)
 
 You can use the worker locally with a client like the example below:
 ```html
 <script>
   // REPLACE <API_KEY>
-  const fpPromise = import('http://localhost:8787/cf-worker/agent?apiKey=<API_KEY>') 
+  const fpPromise = import('http://localhost:5173/agent?apiKey=<API_KEY>') 
     .then(FingerprintJS => FingerprintJS.load({
-      endpoint: 'http://localhost:8787/cf-worker/getResult'
+      endpoint: 'http://localhost:5173/getResult'
     }))
 
   // Get the visitor identifier when you need it.
@@ -78,7 +78,7 @@ Run `pnpm test`.
 
 End-to-end tests are run automatically on every PR. They also run daily on the `main` branch.
 
-End-to-end tests are located in the `test/e2e` folder and run by [playwright](https://github.com/microsoft/playwright) environment. 
+End-to-end tests are located in the `e2e` folder and run by [playwright](https://github.com/microsoft/playwright) environment. 
 The `teste2e.yml` workflow is responsible for deploying a new Cloudflare worker, running end-to-end tests, and cleaning up the worker in the end. `teste2e.yml` works like this:
 1. Check out the current branch (can be any branch).
 2. Bump version according to the input, default to `patch`.

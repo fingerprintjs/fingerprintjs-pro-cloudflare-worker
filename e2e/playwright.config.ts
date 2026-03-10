@@ -1,7 +1,7 @@
 import { PlaywrightTestConfig } from '@playwright/test'
 
 const config: PlaywrightTestConfig = {
-  testDir: './test/e2e',
+  testDir: './tests',
 }
 
 export default config

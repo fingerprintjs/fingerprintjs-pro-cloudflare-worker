@@ -1,0 +1,8 @@
+packages:
+  - e2e
+  - ./
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - workerd

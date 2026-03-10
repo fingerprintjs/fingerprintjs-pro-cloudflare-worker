@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist/src",
+    "module": "es6",
+    "moduleResolution": "node",
+    "target": "es2020",
+    "noEmitOnError": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "types": ["@types/jest", "node"]
+  },
+  "include": ["./vite-env.d.ts", "./worker-configuration.d.ts", "./__tests__/**/*", "./src/**/*"]
+}

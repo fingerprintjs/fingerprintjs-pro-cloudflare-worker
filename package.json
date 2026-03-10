@@ -4,19 +4,26 @@
   "description": "FingerprintJS Pro Cloudflare Worker",
   "author": "FingerprintJS, Inc (https://fingerprintjs.com)",
   "license": "MIT",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker.git"
   },
+  "exports": {
+    "./worker": "./dist/fingerprint_pro_cloudflare_worker_local_development/index.js"
+  },
   "scripts": {
-    "build": "rimraf dist && rollup -c rollup.config.js --bundleConfigAsCjs",
+    "dev": "vite",
+    "build": "vite build",
     "lint": "eslint --ext .js,.ts,.mjs,.json --ignore-path .gitignore --max-warnings 0 .",
     "lint:fix": "pnpm lint --fix",
     "test": "jest --coverage",
     "test:coverage": "jest --coverage",
-    "test:dts": "tsc --noEmit --isolatedModules dist/fingerprintjs-pro-cloudflare-worker.d.ts",
-    "test:e2e": "pnpm exec playwright test",
-    "prepare": "husky"
+    "test:e2e": "pnpm --filter e2e test",
+    "prepare": "husky",
+    "wrangler:types": "wrangler types --strict-vars=false"
   },
   "lint-staged": {
     "*.{js,ts,mjs}": "pnpm lint:fix"
@@ -26,34 +33,20 @@
       "path": "./node_modules/cz-conventional-changelog"
     }
   },
-  "main": "dist/fingerprintjs-pro-cloudflare-worker.esm.js",
-  "module": "dist/fingerprintjs-pro-cloudflare-worker.esm.js",
-  "types": "dist/fingerprintjs-pro-cloudflare-worker.d.ts",
-  "sideEffects": false,
-  "files": [
-    "dist"
-  ],
   "engines": {
     "node": ">=16"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^3.4.0",
-    "@commitlint/cli": "^17.6.5",
-    "@commitlint/config-conventional": "^17.4.4",
+    "@cloudflare/vite-plugin": "^1.27.0",
+    "@commitlint/cli": "^19.8.1",
     "@fingerprintjs/commit-lint-dx-team": "^0.0.2",
     "@fingerprintjs/conventional-changelog-dx-team": "^0.1.0",
     "@fingerprintjs/eslint-config-dx-team": "^0.1.0",
     "@fingerprintjs/prettier-config-dx-team": "^0.1.0",
     "@fingerprintjs/tsconfig-dx-team": "^0.0.2",
-    "@playwright/test": "^1.43.0",
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-replace": "^5.0.5",
-    "@rollup/plugin-typescript": "^11.1.6",
     "@types/cookie": "^0.5.1",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.2.5",
+    "@types/node": "^24.12.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "commitizen": "^4.3.0",
@@ -63,13 +56,11 @@
     "jest-environment-miniflare": "^2.14.0",
     "lint-staged": "^13.2.2",
     "prettier": "^3.2.5",
-    "rimraf": "^5.0.1",
-    "rollup": "^4.14.1",
-    "rollup-plugin-dts": "^6.1.0",
-    "rollup-plugin-license": "^3.3.1",
     "ts-jest": "^29.1.2",
     "typescript": "^5.4.4",
-    "wrangler": "^4"
+    "vite": "^7.3.1",
+    "vite-plugin-checker": "^0.10.3",
+    "wrangler": "^4.72.0"
   },
   "dependencies": {
     "cookie": "0.5.0"
