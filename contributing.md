@@ -2,14 +2,14 @@
 
 ## Requirements
 
-- Node 20
+- Node 24 (for development; the published package supports Node >=16 as specified in `package.json`)
 - Typescript 4+
 - Playwright
 - [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) v4+
 
 ## Working with code
 
-We prefer using [pnpm](https://pnpm.io/) for installing dependencies and running scripts.
+We prefer using [pnpm](https://pnpm.io/) for installing dependencies and running scripts. `pnpm` version 9.x is required. If you have `corepack` installed, the exact version of `pnpm` used by this repository can be installed with `corepack install`.
 
 The `main` is locked for the push action. 
 
