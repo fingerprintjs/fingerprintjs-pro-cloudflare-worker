@@ -16,7 +16,7 @@
     "test:coverage": "jest --coverage",
     "test:dts": "tsc --noEmit --isolatedModules dist/fingerprintjs-pro-cloudflare-worker.d.ts",
     "test:e2e": "pnpm exec playwright test",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "lint-staged": {
     "*.{js,ts,mjs}": "pnpm lint:fix"
