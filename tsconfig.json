@@ -8,16 +8,8 @@
     "noEmitOnError": true,
     "strict": true,
     "esModuleInterop": true,
-    "types": [
-      "@cloudflare/workers-types",
-      "@types/jest",
-      "node"
-    ]
+    "types": ["@cloudflare/workers-types", "@types/jest", "node"]
   },
   "files": ["src/index.ts"],
-  "exclude": [
-    "dist",
-    "node_modules",
-    "**/*.test.ts"
-  ]
+  "exclude": ["dist", "node_modules", "**/*.test.ts"]
 }
