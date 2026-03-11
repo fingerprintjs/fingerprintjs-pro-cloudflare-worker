@@ -2,14 +2,14 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "composite": true,
-    "outDir": "dist/src",
-    "module": "es6",
-    "moduleResolution": "node",
-    "target": "es2020",
-    "noEmitOnError": true,
-    "strict": true,
-    "esModuleInterop": true,
-    "types": ["@types/jest", "node"]
+    "target": "es2021",
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tests.tsbuildinfo",
+    "lib": ["ES2021"],
+    "types": ["vite/client"],
+    "isolatedModules": true,
+    "sourceMap": true
   },
-  "include": ["./vite-env.d.ts", "./worker-configuration.d.ts", "./__tests__/**/*", "./src/**/*"]
+  "include": ["./vite-env.d.ts", "./worker-configuration.d.ts", "./__tests__/**/*", "./src/**/*", "vitest.config.ts"]
 }

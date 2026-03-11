@@ -1,3 +1,4 @@
+import { describe, test, expect, beforeEach, vi, type Mock } from 'vitest'
 import { handleRequestWithRoutes, Route } from '../../src/handler'
 import { getGetResultPath, getScriptDownloadPath, getStatusPagePath, WorkerEnv } from '../../src/env'
 import { createRoute } from '../../src/utils'
@@ -17,9 +18,9 @@ const env: WorkerEnv = {
 
 describe('download Pro Agent Script', () => {
   let routes: Route[] = []
-  let mockAgentDownloadHandler: jest.Mock
+  let mockAgentDownloadHandler: Mock
   beforeEach(() => {
-    mockAgentDownloadHandler = jest.fn()
+    mockAgentDownloadHandler = vi.fn()
     routes = [
       {
         pathPattern: createRoute(getScriptDownloadPath(env)),
@@ -61,9 +62,9 @@ describe('download Pro Agent Script', () => {
 
 describe('get GetResult', () => {
   let routes: Route[] = []
-  let mockIngressAPIHandler: jest.Mock
+  let mockIngressAPIHandler: Mock
   beforeEach(() => {
-    mockIngressAPIHandler = jest.fn()
+    mockIngressAPIHandler = vi.fn()
     routes = [
       {
         pathPattern: createRoute(getGetResultPath(env)),
@@ -110,9 +111,9 @@ describe('get GetResult', () => {
 
 describe('status page', () => {
   let routes: Route[] = []
-  let mockStatusPageHandler: jest.Mock
+  let mockStatusPageHandler: Mock
   beforeEach(() => {
-    mockStatusPageHandler = jest.fn()
+    mockStatusPageHandler = vi.fn()
     routes = [
       {
         pathPattern: createRoute(getStatusPagePath()),
@@ -154,13 +155,13 @@ describe('status page', () => {
 
 describe('no match paths', () => {
   let routes: Route[] = []
-  let mockAgentDownloadHandler: jest.Mock
-  let mockIngressAPIHandler: jest.Mock
-  let mockStatusPageHandler: jest.Mock
+  let mockAgentDownloadHandler: Mock
+  let mockIngressAPIHandler: Mock
+  let mockStatusPageHandler: Mock
   beforeEach(() => {
-    mockAgentDownloadHandler = jest.fn()
-    mockIngressAPIHandler = jest.fn()
-    mockStatusPageHandler = jest.fn()
+    mockAgentDownloadHandler = vi.fn()
+    mockIngressAPIHandler = vi.fn()
+    mockStatusPageHandler = vi.fn()
     routes = [
       {
         pathPattern: createRoute(getScriptDownloadPath(env)),

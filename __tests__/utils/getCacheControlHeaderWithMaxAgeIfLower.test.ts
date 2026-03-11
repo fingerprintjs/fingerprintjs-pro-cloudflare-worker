@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import { getCacheControlHeaderWithMaxAgeIfLower } from '../../src/utils'
 
 describe('getCacheControlHeaderWithMaxAgeIfLower', () => {

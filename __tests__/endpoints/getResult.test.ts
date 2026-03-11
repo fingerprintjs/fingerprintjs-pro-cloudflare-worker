@@ -1,3 +1,4 @@
+import { describe, test, expect, beforeAll, beforeEach, afterAll, vi, type MockInstance } from 'vitest'
 import { WorkerEnv } from '../../src/env'
 import worker from '../../src'
 import { FPJSResponse } from '../../src/utils'
@@ -12,12 +13,12 @@ const workerEnv: WorkerEnv = {
 }
 
 describe('ingress API url from worker env', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   let reqURL: URL
   let receivedReqURL = ''
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       receivedReqURL = req.url
@@ -61,12 +62,12 @@ describe('ingress API url from worker env', () => {
 })
 
 describe('ingress API request proxy URL', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   let reqURL: URL
   let receivedReqURL = ''
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       receivedReqURL = req.url
@@ -125,12 +126,12 @@ describe('ingress API request proxy URL', () => {
 })
 
 describe('ingress API request proxy URL with suffix', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   let reqURL: URL
   let receivedReqURL = ''
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       receivedReqURL = req.url
@@ -223,12 +224,12 @@ describe('ingress API request proxy URL with suffix', () => {
 })
 
 describe('ingress API request query parameters', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   let reqURL: URL
   let receivedReqURL = ''
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       receivedReqURL = req.url
@@ -288,12 +289,12 @@ describe('ingress API request query parameters', () => {
 })
 
 describe('ingress API request headers', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   const reqURL = new URL('https://example.com/worker_path/get_result')
   let receivedHeaders: Headers
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       receivedHeaders = req.headers
@@ -396,12 +397,12 @@ describe('ingress API request headers', () => {
 })
 
 describe('ingress API request body', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   const reqURL = new URL('https://example.com/worker_path/get_result')
   let receivedBody = ''
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       receivedBody = await req.text()
@@ -423,12 +424,12 @@ describe('ingress API request body', () => {
 })
 
 describe('ingress API request HTTP method', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   const reqURL = new URL('https://example.com/worker_path/get_result')
   let requestMethod: string
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       requestMethod = req.method
@@ -465,10 +466,10 @@ describe('ingress API request HTTP method', () => {
 })
 
 describe('ingress API response headers for GET req', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
   })
 
   afterAll(() => {
@@ -507,10 +508,10 @@ describe('ingress API response headers for GET req', () => {
 })
 
 describe('ingress API response headers for POST req', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
   })
 
   afterAll(() => {
@@ -549,10 +550,10 @@ describe('ingress API response headers for POST req', () => {
 })
 
 describe('ingress API response body when successful', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
   })
 
   afterAll(() => {
@@ -570,10 +571,10 @@ describe('ingress API response body when successful', () => {
 })
 
 describe('GET req response when failure', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
   })
 
   afterAll(() => {
@@ -616,10 +617,10 @@ describe('GET req response when failure', () => {
 })
 
 describe('ingress API response when failure', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
   })
 
   afterAll(() => {
@@ -676,12 +677,12 @@ describe('ingress API response when failure', () => {
 })
 
 describe('GET request cache durations', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   const reqURL = new URL('https://example.com/worker_path/get_result')
   let receivedCfObject: IncomingRequestCfProperties | RequestInitCfProperties | null | undefined = null
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
   })
 
   beforeEach(() => {
@@ -720,12 +721,12 @@ describe('GET request cache durations', () => {
 })
 
 describe('POST request cache durations', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   const reqURL = new URL('https://example.com/worker_path/get_result')
   let receivedCfObject: IncomingRequestCfProperties | RequestInitCfProperties | null | undefined = null
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
   })
 
   beforeEach(() => {

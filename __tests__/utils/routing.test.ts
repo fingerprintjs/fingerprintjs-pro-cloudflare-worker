@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { removeTrailingSlashesAndMultiSlashes, addTrailingWildcard, replaceDot, createRoute } from '../../src/utils'
 import { addEndingTrailingSlashToRoute, addPathnameMatchBeforeRoute } from '../../src/utils'
 

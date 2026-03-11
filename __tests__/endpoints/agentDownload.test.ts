@@ -1,3 +1,4 @@
+import { describe, test, expect, beforeAll, beforeEach, afterAll, vi, type MockInstance } from 'vitest'
 import worker from '../../src/index'
 import { WorkerEnv } from '../../src/env'
 import { config } from '../../src/config'
@@ -11,12 +12,12 @@ const workerEnv: WorkerEnv = {
 }
 
 describe('agent download cdn url from worker env', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   let reqURL: URL
   let receivedReqURL = ''
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       receivedReqURL = req.url
@@ -63,12 +64,12 @@ describe('agent download cdn url from worker env', () => {
 })
 
 describe('agent download request proxy URL', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   let reqURL: URL
   let receivedReqURL = ''
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       receivedReqURL = req.url
@@ -126,12 +127,12 @@ describe('agent download request proxy URL', () => {
 })
 
 describe('agent download request query parameters', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   let reqURL: URL
   let receivedReqURL = ''
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       receivedReqURL = req.url
@@ -195,12 +196,12 @@ describe('agent download request query parameters', () => {
 })
 
 describe('agent download request HTTP headers', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   const reqURL = new URL('https://example.com/worker_path/agent_download?apiKey=someApiKey')
   let receivedHeaders: Headers
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       receivedHeaders = req.headers
@@ -251,12 +252,12 @@ describe('agent download request HTTP headers', () => {
 })
 
 describe('agent download request cache durations', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   const reqURL = new URL('https://example.com/worker_path/agent_download?apiKey=someApiKey')
   let receivedCfObject: IncomingRequestCfProperties | RequestInitCfProperties | null | undefined = null
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
   })
 
   beforeEach(() => {
@@ -336,12 +337,12 @@ describe('agent download request cache durations', () => {
 })
 
 describe('agent download request HTTP method', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
   const reqURL = new URL('https://example.com/worker_path/agent_download?apiKey=someApiKey')
   let requestMethod: string
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation(async (input, init) => {
       const req = new Request(input, init)
       requestMethod = req.method
@@ -372,10 +373,10 @@ describe('agent download request HTTP method', () => {
 })
 
 describe('agent download response', () => {
-  let fetchSpy: jest.MockInstance<Promise<Response>, any>
+  let fetchSpy: MockInstance<typeof fetch>
 
   beforeAll(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
   })
 
   afterAll(() => {
