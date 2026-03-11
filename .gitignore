@@ -16,3 +16,6 @@ yarn-error.log
 
 # E2E Tests
 /e2e/test-results
+
+# E2E related temporary files
+/e2e-deploy
