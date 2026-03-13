@@ -180,6 +180,8 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           wranglerVersion: ${{ steps.wrangler-version.outputs.version }}
+          workingDirectory: e2e-deploy
+
       - name: Get version
         id: version
         uses: notiz-dev/github-action-json-property@a5a9c668b16513c737c3e1f8956772c99c73f6e8 # commit hash = v0.2.0
