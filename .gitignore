@@ -15,8 +15,8 @@ yarn-error.log
 # Cloudflare
 .wrangler
 
-# E2E Tests
-/e2e/test-results
+# E2E Test results
+/test-results
 
 # E2E related temporary files
 /e2e-deploy

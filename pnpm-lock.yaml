@@ -33,6 +33,9 @@ importers:
       '@fingerprintjs/tsconfig-dx-team':
         specifier: ^0.0.2
         version: 0.0.2
+      '@playwright/test':
+        specifier: ^1.58.2
+        version: 1.58.2
       '@types/cookie':
         specifier: ^0.5.1
         version: 0.5.1
@@ -699,6 +702,11 @@ packages:
     resolution: {integrity: sha512-Ebw0+MCqoYflop7wVKj711ccbNlrwTBCtjY5rlbiY9kHL2bCYxq+qltK6uPsVBGGAOb033H2VO0YobcQVxoW7Q==}
     engines: {node: '>=16'}
     deprecated: Please update to the latest version of Playwright to test up-to-date browsers.
+    hasBin: true
+
+  '@playwright/test@1.58.2':
+    resolution: {integrity: sha512-akea+6bHYBBfA9uQqSYmlJXn61cTa+jbO87xVLCWbTqbWadRVmhxlXATaOjOgcBaWU4ePo0wB41KMFv3o35IXA==}
+    engines: {node: '>=18'}
     hasBin: true
 
   '@poppinss/colors@4.1.6':
@@ -2191,9 +2199,19 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
+  playwright-core@1.58.2:
+    resolution: {integrity: sha512-yZkEtftgwS8CsfYo7nm0KE8jsvm6i/PTgVtB8DL726wNf6H2IMsDuxCpJj59KDaxCtSnrWan2AeDqM7JBaultg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   playwright@1.43.0:
     resolution: {integrity: sha512-SiOKHbVjTSf6wHuGCbqrEyzlm6qvXcv7mENP+OZon1I07brfZLGdfWV0l/efAzVx7TF3Z45ov1gPEkku9q25YQ==}
     engines: {node: '>=16'}
+    hasBin: true
+
+  playwright@1.58.2:
+    resolution: {integrity: sha512-vA30H8Nvkq/cPBnNw4Q8TWz1EJyqgpuinBcHET0YVJVFldr8JDNiU9LaWAE1KqSkRYazuaBhTpB5ZzShOezQ6A==}
+    engines: {node: '>=18'}
     hasBin: true
 
   postcss@8.5.8:
@@ -3369,6 +3387,10 @@ snapshots:
   '@playwright/test@1.43.0':
     dependencies:
       playwright: 1.43.0
+
+  '@playwright/test@1.58.2':
+    dependencies:
+      playwright: 1.58.2
 
   '@poppinss/colors@4.1.6':
     dependencies:
@@ -4878,9 +4900,17 @@ snapshots:
 
   playwright-core@1.43.0: {}
 
+  playwright-core@1.58.2: {}
+
   playwright@1.43.0:
     dependencies:
       playwright-core: 1.43.0
+    optionalDependencies:
+      fsevents: 2.3.2
+
+  playwright@1.58.2:
+    dependencies:
+      playwright-core: 1.58.2
     optionalDependencies:
       fsevents: 2.3.2
 
