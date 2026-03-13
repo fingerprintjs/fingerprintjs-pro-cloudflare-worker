@@ -255,7 +255,7 @@ describe('ingress API request query parameters', () => {
     const url = new URL(receivedReqURL)
     const iiValues = url.searchParams.getAll('ii')
     expect(iiValues.length).toBe(1)
-    expect(iiValues[0]).toBe('fingerprintjs-pro-cloudflare/__current_worker_version__/ingress')
+    expect(iiValues[0]).toBe(`fingerprintjs-pro-cloudflare/${__current_worker_version__}/ingress`)
   })
   test('traffic monitoring when there is ii parameter before', async () => {
     reqURL.searchParams.append('ii', 'fingerprintjs-pro-react/v1.2.3')
@@ -265,14 +265,14 @@ describe('ingress API request query parameters', () => {
     const iiValues = url.searchParams.getAll('ii')
     expect(iiValues.length).toBe(2)
     expect(iiValues[0]).toBe('fingerprintjs-pro-react/v1.2.3')
-    expect(iiValues[1]).toBe('fingerprintjs-pro-cloudflare/__current_worker_version__/ingress')
+    expect(iiValues[1]).toBe(`fingerprintjs-pro-cloudflare/${__current_worker_version__}/ingress`)
   })
   test('whole query string when no ii parameter before', async () => {
     const req = new Request(reqURL.toString(), { method: 'POST' })
     await worker.fetch(req, workerEnv)
     const url = new URL(receivedReqURL)
     expect(url.search).toBe(
-      '?someKey=someValue' + '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fingress'
+      '?someKey=someValue' + `&ii=fingerprintjs-pro-cloudflare%2F${__current_worker_version__}%2Fingress`
     )
   })
   test('whole query string when there is ii parameter before', async () => {
@@ -283,7 +283,7 @@ describe('ingress API request query parameters', () => {
     expect(url.search).toBe(
       '?someKey=someValue' +
         '&ii=fingerprintjs-pro-react%2Fv1.2.3' +
-        '&ii=fingerprintjs-pro-cloudflare%2F__current_worker_version__%2Fingress'
+        `&ii=fingerprintjs-pro-cloudflare%2F${__current_worker_version__}%2Fingress`
     )
   })
 })

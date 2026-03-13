@@ -4,6 +4,7 @@
 
 # code coverage
 /coverage
+report.json
 
 # Random excess stuff
 .DS_Store

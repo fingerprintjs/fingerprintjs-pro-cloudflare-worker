@@ -1,4 +1,4 @@
-declare const __APP_VERSION__: string
+declare const __current_worker_version__: string
 
 /**
  * Defined here, since it's used by vite/client type definitions.

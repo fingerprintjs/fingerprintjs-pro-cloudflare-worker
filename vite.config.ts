@@ -6,7 +6,7 @@ import pkg from './package.json'
 
 export default defineConfig({
   define: {
-    __APP_VERSION__: `"${pkg.version}"`,
+    __current_worker_version__: JSON.stringify(pkg.version),
   },
   server: {
     cors: false,

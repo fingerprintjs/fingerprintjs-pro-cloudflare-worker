@@ -10,7 +10,7 @@ export default defineConfig({
     projects: [
       {
         define: {
-          __APP_VERSION__: '"0.0.1-test.0"',
+          __current_worker_version__: JSON.stringify('0.0.1-test.0'),
         },
         test: {
           environment: 'node',
