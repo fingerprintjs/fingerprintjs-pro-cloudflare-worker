@@ -52,7 +52,7 @@ jobs:
 
       - name: Generate random paths
         run: |
-          postfix=$(date +%s)
+          postfix="$(date +%s)-release-e2e"
           echo WORKER_NAME=automated-test-$postfix >> $GITHUB_OUTPUT
           echo WORKER_PATH=fpjs-worker-$postfix >> $GITHUB_OUTPUT
           echo GET_RESULT_PATH=get-result-$postfix >> $GITHUB_OUTPUT
