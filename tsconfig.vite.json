@@ -3,5 +3,5 @@
   "compilerOptions": {
     "composite": true
   },
-  "include": ["vite.ts", "build-utils"]
+  "include": ["vite.config.ts", "build-utils"]
 }
