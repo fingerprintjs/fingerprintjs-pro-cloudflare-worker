@@ -2,7 +2,7 @@
   "mode": "pre",
   "tag": "rc",
   "initialVersions": {
-    "@fingerprintjs/cloudflare-worker-typescript": "1.6.0"
+    "@fingerprint/cloudflare-worker-proxy": "1.6.0"
   },
   "changesets": []
 }
