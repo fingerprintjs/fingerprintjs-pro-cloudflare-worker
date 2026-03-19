@@ -24,7 +24,7 @@ function createRoutes(env: WorkerEnv): Route[] {
   }
   const statusRoute: Route = {
     pathPattern: createRoute(getStatusPagePath()),
-    handler: (request, env) => handleStatusPage(request, env),
+    handler: () => handleStatusPage(),
   }
   routes.push(downloadScriptRoute)
   routes.push(ingressAPIRoute)

@@ -22,6 +22,7 @@ function makeDownloadScriptRequest(request: Request, env: WorkerEnv): Promise<Re
 
   const headers = new Headers(request.headers)
   headers.delete('Cookie')
+  headers.delete('Referer')
 
   console.log(`Downloading script from cdnEndpoint ${newURL.toString()}...`)
   const newRequest = new Request(newURL.toString(), new Request(request, { headers }))
