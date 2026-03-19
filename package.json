@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:release": "pnpm build && cp ./dist/fingerprint_pro_cloudflare_worker_local_development/index.js ./dist/fingerprintjs-pro-cloudflare-worker.esm.js && cp ./dist/fingerprint_pro_cloudflare_worker_local_development/index.js ./dist/fingerprint-cloudflare-worker-proxy.js",
+    "build:release": "pnpm build && ./scripts/copy-worker-script-for-release.sh",
     "lint": "eslint --ext .js,.ts,.mjs,.json --ignore-path .gitignore --max-warnings 0 .",
     "lint:fix": "pnpm lint --fix",
     "test": "vitest --run",
