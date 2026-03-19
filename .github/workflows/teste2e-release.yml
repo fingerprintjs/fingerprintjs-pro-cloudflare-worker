@@ -33,41 +33,57 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Get wrangler version
-        id: wrangler-version
-        run: echo version=$(pnpm ls --json wrangler | jq -r '.[0].devDependencies.wrangler.version') >> $GITHUB_OUTPUT
-
       - name: Download release asset
         run: node scripts/downloadGitHubRelease.mjs
         env:
           TAG: ${{ github.event.release.tag_name }}
 
+      - name: Create the worker script and wrangler.json
+        run: |
+          pnpm build
+          # Remove local wrangler state after build
+          rm -rf .wrangler
+
+      - name: Set up the deploy directory
+        run: |
+          mkdir -p e2e-deploy
+          cp dist/*/wrangler.json e2e-deploy
+          cp fingerprintjs-pro-cloudflare-worker.esm.js e2e-deploy/index.js
+
       - name: Generate random paths
         run: |
-          postfix=$(date +%s)
+          postfix="$(date +%s)-release-e2e"
           echo WORKER_NAME=automated-test-$postfix >> $GITHUB_OUTPUT
           echo WORKER_PATH=fpjs-worker-$postfix >> $GITHUB_OUTPUT
           echo GET_RESULT_PATH=get-result-$postfix >> $GITHUB_OUTPUT
           echo AGENT_DOWNLOAD_PATH=agent-download-$postfix >> $GITHUB_OUTPUT
         id: random-path-generator
-      - name: Modify wrangler.toml
+
+      - name: Set variables for e2e tests in wrangler.json
         run: |
-           sed -i 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
-           sed -i 's/# route = .*/route = "${{ secrets.TEST_CLIENT_DOMAIN }}\/${{steps.random-path-generator.outputs.WORKER_PATH}}\/*"/' wrangler.toml
-           echo [vars] >> wrangler.toml
-           echo GET_RESULT_PATH = \"${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}\" >> wrangler.toml
-           echo AGENT_SCRIPT_DOWNLOAD_PATH = \"${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}\" >> wrangler.toml
-           echo PROXY_SECRET = \"${{secrets.PROXY_SECRET}}\" >> wrangler.toml
-           sed -i '/\[build\]/,+1d' wrangler.toml    
-           sed -i 's/main = "\.\/dist\/fingerprintjs-pro-cloudflare-worker\.esm\.js"/main = "\.\/fingerprintjs-pro-cloudflare-worker\.esm\.js"/' wrangler.toml
-          
-           cat wrangler.toml
+          jq \
+            --arg name "${{steps.random-path-generator.outputs.WORKER_NAME}}" \
+            --arg route "${{ secrets.TEST_CLIENT_DOMAIN }}/${{steps.random-path-generator.outputs.WORKER_PATH}}/*" \
+            --arg get_result_path "${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}" \
+            --arg agent_download_path "${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}" \
+            --arg proxy_secret "${{ secrets.PROXY_SECRET }}" \
+            '.name = $name | .route = $route | .vars.GET_RESULT_PATH = $get_result_path | .vars.AGENT_SCRIPT_DOWNLOAD_PATH = $agent_download_path | .vars.PROXY_SECRET = $proxy_secret' \
+            e2e-deploy/wrangler.json > e2e-deploy/wrangler.json.tmp && mv e2e-deploy/wrangler.json.tmp e2e-deploy/wrangler.json
+
+          cat e2e-deploy/wrangler.json
+
+      - name: Get wrangler version
+        id: wrangler-version
+        run: echo version=$(pnpm ls --json wrangler | jq -r '.[0].devDependencies.wrangler.version') >> $GITHUB_OUTPUT
+
       - name: Publish
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           wranglerVersion: ${{ steps.wrangler-version.outputs.version }}
+          workingDirectory: e2e-deploy
+
       - name: Get version
         id: version
         uses: notiz-dev/github-action-json-property@a5a9c668b16513c737c3e1f8956772c99c73f6e8 # commit hash = v0.2.0

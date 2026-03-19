@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import {
   addTrafficMonitoringSearchParamsForProCDN,
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
@@ -15,7 +16,7 @@ describe('addTrafficMonitoringSearchParamsForProCDN', () => {
     const url = new URL('https://fingerprint.com')
     addTrafficMonitoringSearchParamsForProCDN(url)
     expect(url.searchParams.get(SEARCH_PARAM_NAME)).toBe(
-      'fingerprintjs-pro-cloudflare/__current_worker_version__/procdn'
+      `fingerprintjs-pro-cloudflare/${__current_worker_version__}/procdn`
     )
   })
   test('works with other query parameters', () => {
@@ -25,7 +26,7 @@ describe('addTrafficMonitoringSearchParamsForProCDN', () => {
     url.searchParams.append(SEARCH_PARAM_NAME, 'some_other_integration_2')
     const expected = [
       'some_other_integration',
-      'fingerprintjs-pro-cloudflare/__current_worker_version__/procdn',
+      `fingerprintjs-pro-cloudflare/${__current_worker_version__}/procdn`,
       'some_other_integration_2',
     ]
     expectTwoArraysToBeEqual(url.searchParams.getAll(SEARCH_PARAM_NAME), expected)
@@ -37,7 +38,7 @@ describe('addTrafficMonitoringSearchParamsForVisitorIdRequest', () => {
     const url = new URL('https://fingerprint.com')
     addTrafficMonitoringSearchParamsForVisitorIdRequest(url)
     expect(url.searchParams.get(SEARCH_PARAM_NAME)).toBe(
-      'fingerprintjs-pro-cloudflare/__current_worker_version__/ingress'
+      `fingerprintjs-pro-cloudflare/${__current_worker_version__}/ingress`
     )
   })
   test('works with other query parameters', () => {
@@ -47,7 +48,7 @@ describe('addTrafficMonitoringSearchParamsForVisitorIdRequest', () => {
     url.searchParams.append(SEARCH_PARAM_NAME, 'some_other_integration_2')
     const expected = [
       'some_other_integration',
-      'fingerprintjs-pro-cloudflare/__current_worker_version__/ingress',
+      `fingerprintjs-pro-cloudflare/${__current_worker_version__}/ingress`,
       'some_other_integration_2',
     ]
     expectTwoArraysToBeEqual(url.searchParams.getAll(SEARCH_PARAM_NAME), expected)

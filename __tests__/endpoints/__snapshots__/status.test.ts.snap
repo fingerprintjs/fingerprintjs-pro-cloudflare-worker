@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`status page content when agent script download path and proxy secret are not set 1`] = `
+exports[`status page content > when agent script download path and proxy secret are not set 1`] = `
 "
   <html lang='en-US'>
   <head>
@@ -20,7 +20,7 @@ exports[`status page content when agent script download path and proxy secret ar
     <h1>Fingerprint Pro Cloudflare Integration</h1>
   <span>🎉 Your Cloudflare worker is deployed</span>
   <span>
-  ℹ️ Worker version: __current_worker_version__
+  ℹ️ Worker version: 0.0.1-test.0
   </span>
   
     <span>
@@ -44,7 +44,7 @@ exports[`status page content when agent script download path and proxy secret ar
   "
 `;
 
-exports[`status page content when agent script download path is not set 1`] = `
+exports[`status page content > when agent script download path is not set 1`] = `
 "
   <html lang='en-US'>
   <head>
@@ -64,7 +64,7 @@ exports[`status page content when agent script download path is not set 1`] = `
     <h1>Fingerprint Pro Cloudflare Integration</h1>
   <span>🎉 Your Cloudflare worker is deployed</span>
   <span>
-  ℹ️ Worker version: __current_worker_version__
+  ℹ️ Worker version: 0.0.1-test.0
   </span>
   
     <span>
@@ -84,7 +84,7 @@ exports[`status page content when agent script download path is not set 1`] = `
   "
 `;
 
-exports[`status page content when all variables are set 1`] = `
+exports[`status page content > when all variables are set 1`] = `
 "
   <html lang='en-US'>
   <head>
@@ -104,7 +104,7 @@ exports[`status page content when all variables are set 1`] = `
     <h1>Fingerprint Pro Cloudflare Integration</h1>
   <span>🎉 Your Cloudflare worker is deployed</span>
   <span>
-  ℹ️ Worker version: __current_worker_version__
+  ℹ️ Worker version: 0.0.1-test.0
   </span>
   
     <span>
@@ -120,7 +120,7 @@ exports[`status page content when all variables are set 1`] = `
   "
 `;
 
-exports[`status page content when get result path is not set 1`] = `
+exports[`status page content > when get result path is not set 1`] = `
 "
   <html lang='en-US'>
   <head>
@@ -140,7 +140,7 @@ exports[`status page content when get result path is not set 1`] = `
     <h1>Fingerprint Pro Cloudflare Integration</h1>
   <span>🎉 Your Cloudflare worker is deployed</span>
   <span>
-  ℹ️ Worker version: __current_worker_version__
+  ℹ️ Worker version: 0.0.1-test.0
   </span>
   
     <span>
@@ -160,7 +160,7 @@ exports[`status page content when get result path is not set 1`] = `
   "
 `;
 
-exports[`status page content when proxy secret is not set 1`] = `
+exports[`status page content > when proxy secret is not set 1`] = `
 "
   <html lang='en-US'>
   <head>
@@ -180,7 +180,7 @@ exports[`status page content when proxy secret is not set 1`] = `
     <h1>Fingerprint Pro Cloudflare Integration</h1>
   <span>🎉 Your Cloudflare worker is deployed</span>
   <span>
-  ℹ️ Worker version: __current_worker_version__
+  ℹ️ Worker version: 0.0.1-test.0
   </span>
   
     <span>

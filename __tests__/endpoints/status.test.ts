@@ -1,3 +1,4 @@
+import { describe, test, expect, beforeEach } from 'vitest'
 import worker from '../../src'
 import { config } from '../../src/config'
 import { WorkerEnv } from '../../src/env'

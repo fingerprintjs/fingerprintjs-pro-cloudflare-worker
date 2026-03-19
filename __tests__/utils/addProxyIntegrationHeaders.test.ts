@@ -1,3 +1,4 @@
+import { describe, it, test, expect, beforeEach } from 'vitest'
 import { addProxyIntegrationHeaders, getIPFromHeaders } from '../../src/utils'
 import { WorkerEnv } from '../../src/env'
 

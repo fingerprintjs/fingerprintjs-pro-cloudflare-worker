@@ -2,9 +2,9 @@ export { getCacheControlHeaderWithMaxAgeIfLower } from './getCacheControlHeaderW
 export {
   createErrorResponseForIngress,
   createFallbackErrorResponse,
-  ErrorData,
-  FPJSResponse,
-  Notification,
+  type ErrorData,
+  type FPJSResponse,
+  type Notification,
 } from './createErrorResponse'
 export { fetchCacheable } from './fetchCacheable'
 export {

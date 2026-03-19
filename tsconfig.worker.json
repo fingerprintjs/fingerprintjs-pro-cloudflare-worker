@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "target": "es2021",
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
+    "lib": ["ES2021"],
+    "types": ["vite/client"],
+    "isolatedModules": true
+  },
+  "include": ["./vite-env.d.ts", "./worker-configuration.d.ts", "./src/**/*"]
+}

@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import { getAgentScriptEndpoint, getVisitorIdEndpoint } from '../../src/utils'
 import { config } from '../../src/config'
 

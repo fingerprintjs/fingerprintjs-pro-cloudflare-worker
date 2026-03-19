@@ -1,6 +1,5 @@
-import { test, expect, Page, request, APIRequestContext } from '@playwright/test'
-import { areVisitorIdAndRequestIdValid, wait } from './utils'
-import { ElementHandle } from 'playwright-core'
+import { test, expect, Page, request, APIRequestContext, ElementHandle } from '@playwright/test'
+import { areVisitorIdAndRequestIdValid, wait } from '../utils'
 
 const INT_VERSION = process.env.worker_version || ''
 const WORKER_PATH = process.env.worker_path || 'fpjs-worker-default'
