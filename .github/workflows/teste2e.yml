@@ -79,15 +79,10 @@ jobs:
 
       - name: Set compatibility date
         run: |
-          if [ "${{ matrix.default_compatibility_date }}" = "true" ]; then
-            jq \
-              'del(.compatibility_date)' \
-              e2e-deploy/wrangler.json > e2e-deploy/wrangler.json.tmp && mv e2e-deploy/wrangler.json.tmp e2e-deploy/wrangler.json
-          else
-            jq \
-              --arg date "$(date -u +%Y-%m-%d)" '.compatibility_date = $date' \
-              e2e-deploy/wrangler.json > e2e-deploy/wrangler.json.tmp && mv e2e-deploy/wrangler.json.tmp e2e-deploy/wrangler.json
-          fi
+          [[ "${{ matrix.default_compatibility_date }}" == "true" ]] && compatibility_date="2021-11-02" || compatibility_date="$(date -u +%Y-%m-%d)"
+          jq \
+            --arg date "$compatibility_date" '.compatibility_date = $date' \
+            e2e-deploy/wrangler.json > e2e-deploy/wrangler.json.tmp && mv e2e-deploy/wrangler.json.tmp e2e-deploy/wrangler.json
 
           cat e2e-deploy/wrangler.json
 
