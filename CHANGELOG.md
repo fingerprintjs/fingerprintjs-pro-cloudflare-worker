@@ -1,10 +1,12 @@
-## [1.6.0](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.5.0...v1.6.0) (2025-03-19)
+# Fingerprint Cloudflare Worker Proxy Integration
 
 ## 1.7.0-rc.0
 
 ### Minor Changes
 
 - Add support for API V4 ([b3d8ba5](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/commit/b3d8ba5c1a7759dea283ab86df3f592b72de4cc7))
+
+## [1.6.0](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/compare/v1.5.0...v1.6.0) (2025-03-19)
 
 ### Features
 
