@@ -9,6 +9,12 @@ on:
   workflow_dispatch:
 
 jobs:
+  set_datadog_team:
+    name: Set Datadog team
+    uses: fingerprintjs/dx-team-toolkit/.github/workflows/set-datadog-team.yml@v1
+    secrets:
+      DD_API_KEY: ${{ secrets.INTEGRATIONS_DATADOG_API_KEY }}
+
   build-and-deploy-and-test-e2e-mock:
     runs-on: ubuntu-24.04
     name: Build & Deploy & Test e2e using mock app
@@ -26,36 +32,61 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@129abb77bf5884e578fcaf1f37628e41622cc371
         with:
-          version: 8
+          version: 9
 
       - name: Upgrade version
         run: |
           pnpm version prerelease --preid snapshot --no-commit-hooks --no-git-tag-version --ignore-scripts
 
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Create the worker script and wrangler.json
+        run: |
+          pnpm build
+          # Remove local wrangler state after build
+          rm -rf .wrangler
+
+      - name: Set up the deploy directory
+        run: |
+          mkdir -p e2e-deploy
+          cp dist/*/index.js dist/*/wrangler.json e2e-deploy
+
       - name: Generate random paths
         run: |
-          postfix=$(date +%s)
+          postfix="$(date +%s)-mock-e2e"
           echo WORKER_NAME=automated-test-$postfix >> $GITHUB_OUTPUT
           echo WORKER_PATH=fpjs-worker-$postfix >> $GITHUB_OUTPUT
           echo GET_RESULT_PATH=get-result-$postfix >> $GITHUB_OUTPUT
           echo AGENT_DOWNLOAD_PATH=agent-download-$postfix >> $GITHUB_OUTPUT
         id: random-path-generator
-      - name: Modify wrangler.toml
+
+      - name: Set variables for e2e tests in wrangler.json
         run: |
-          sed -i 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
-          sed -i 's/route = .*/route = "${{ secrets.TEST_CLIENT_DOMAIN }}\/${{steps.random-path-generator.outputs.WORKER_PATH}}\/*"/' wrangler.toml
-          echo [vars] >> wrangler.toml
-          echo GET_RESULT_PATH = \"${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}\" >> wrangler.toml
-          echo AGENT_SCRIPT_DOWNLOAD_PATH = \"${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}\" >> wrangler.toml
-          echo PROXY_SECRET = \"secret\" >> wrangler.toml
-          echo FPJS_CDN_URL = \"${{secrets.MOCK_FPCDN}}\" >> wrangler.toml
-          echo FPJS_INGRESS_BASE_HOST = \"${{secrets.MOCK_INGRESS_API}}\" >> wrangler.toml
-          cat wrangler.toml
+          jq \
+            --arg name "${{steps.random-path-generator.outputs.WORKER_NAME}}" \
+            --arg route "${{ secrets.TEST_CLIENT_DOMAIN }}/${{steps.random-path-generator.outputs.WORKER_PATH}}/*" \
+            --arg get_result_path "${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}" \
+            --arg agent_download_path "${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}" \
+            --arg proxy_secret "secret" \
+            --arg fpjs_cdn_url "${{secrets.MOCK_FPCDN}}" \
+            --arg fpjs_ingress_base_host "${{secrets.MOCK_INGRESS_API}}" \
+            '.name = $name | .route = $route | .vars.GET_RESULT_PATH = $get_result_path | .vars.AGENT_SCRIPT_DOWNLOAD_PATH = $agent_download_path | .vars.PROXY_SECRET = $proxy_secret | .vars.FPJS_CDN_URL = $fpjs_cdn_url | .vars.FPJS_INGRESS_BASE_HOST = $fpjs_ingress_base_host' \
+            e2e-deploy/wrangler.json > e2e-deploy/wrangler.json.tmp && mv e2e-deploy/wrangler.json.tmp e2e-deploy/wrangler.json
+
+            cat e2e-deploy/wrangler.json
+
+      - name: Get wrangler version
+        id: wrangler-version
+        run: echo version=$(pnpm ls --json wrangler | jq -r '.[0].devDependencies.wrangler.version') >> $GITHUB_OUTPUT
+
       - name: Publish
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          wranglerVersion: ${{ steps.wrangler-version.outputs.version }}
+          workingDirectory: e2e-deploy
       - name: Get version
         id: version
         uses: notiz-dev/github-action-json-property@a5a9c668b16513c737c3e1f8956772c99c73f6e8 # commit hash = v0.2.0
@@ -78,14 +109,6 @@ jobs:
       - name: Clean up worker
         run: |
           curl -i -X DELETE "https://api.cloudflare.com/client/v4/accounts/${{secrets.CF_ACCOUNT_ID}}/workers/scripts/${{steps.random-path-generator.outputs.WORKER_NAME}}" -H"Authorization: bearer ${{secrets.CF_API_TOKEN}}"
-      - name: Report Status
-        if: always()
-        uses: ravsamhq/notify-slack-action@0d9c6ff1de9903da88d24c0564f6e83cb28faca9
-        with:
-          status: ${{ job.status }}
-          notification_title: "Cloudflare Worker E2E Test using mock app has {status_message}"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   build-and-deploy-and-test-e2e:
     runs-on: ubuntu-24.04
@@ -103,40 +126,67 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@129abb77bf5884e578fcaf1f37628e41622cc371
         with:
-          version: 8
+          version: 9
 
       - name: Upgrade version
         run: |
           pnpm version prerelease --preid snapshot --no-commit-hooks --no-git-tag-version --ignore-scripts
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Create the worker script and wrangler.json
+        run: |
+          pnpm build
+          # Remove local wrangler state after build
+          rm -rf .wrangler
+
+      - name: Set up the deploy directory
+        run: |
+          mkdir -p e2e-deploy
+          cp dist/*/index.js dist/*/wrangler.json e2e-deploy
+
       - name: Generate random paths
         run: |
-          postfix=$(date +%s)
+          postfix="$(date +%s)-e2e"
           echo WORKER_NAME=automated-test-$postfix >> $GITHUB_OUTPUT
           echo WORKER_PATH=fpjs-worker-$postfix >> $GITHUB_OUTPUT
           echo GET_RESULT_PATH=get-result-$postfix >> $GITHUB_OUTPUT
           echo AGENT_DOWNLOAD_PATH=agent-download-$postfix >> $GITHUB_OUTPUT
         id: random-path-generator
-      - name: Modify wrangler.toml
+
+      - name: Set variables for e2e tests in wrangler.json
         run: |
-           sed -i 's/name = .*/name = "${{steps.random-path-generator.outputs.WORKER_NAME}}"/' wrangler.toml
-           sed -i 's/route = .*/route = "${{ secrets.TEST_CLIENT_DOMAIN }}\/${{steps.random-path-generator.outputs.WORKER_PATH}}\/*"/' wrangler.toml
-           echo [vars] >> wrangler.toml
-           echo GET_RESULT_PATH = \"${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}\" >> wrangler.toml
-           echo AGENT_SCRIPT_DOWNLOAD_PATH = \"${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}\" >> wrangler.toml
-           echo PROXY_SECRET = \"${{secrets.PROXY_SECRET}}\" >> wrangler.toml
-           cat wrangler.toml
+          jq \
+            --arg name "${{steps.random-path-generator.outputs.WORKER_NAME}}" \
+            --arg route "${{ secrets.TEST_CLIENT_DOMAIN }}/${{steps.random-path-generator.outputs.WORKER_PATH}}/*" \
+            --arg get_result_path "${{ steps.random-path-generator.outputs.GET_RESULT_PATH }}" \
+            --arg agent_download_path "${{ steps.random-path-generator.outputs.AGENT_DOWNLOAD_PATH }}" \
+            --arg proxy_secret "${{ secrets.PROXY_SECRET }}" \
+            '.name = $name | .route = $route | .vars.GET_RESULT_PATH = $get_result_path | .vars.AGENT_SCRIPT_DOWNLOAD_PATH = $agent_download_path | .vars.PROXY_SECRET = $proxy_secret' \
+            e2e-deploy/wrangler.json > e2e-deploy/wrangler.json.tmp && mv e2e-deploy/wrangler.json.tmp e2e-deploy/wrangler.json
+
+            cat e2e-deploy/wrangler.json
+
+      - name: Get wrangler version
+        id: wrangler-version
+        run: echo version=$(pnpm ls --json wrangler | jq -r '.[0].devDependencies.wrangler.version') >> $GITHUB_OUTPUT
+
       - name: Publish
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          wranglerVersion: ${{ steps.wrangler-version.outputs.version }}
+          workingDirectory: e2e-deploy
+
       - name: Get version
         id: version
         uses: notiz-dev/github-action-json-property@a5a9c668b16513c737c3e1f8956772c99c73f6e8 # commit hash = v0.2.0
         with:
           path: 'package.json'
           prop_path: 'version'
-      - name: Install dependencies
+      - name: Install playwright dependencies
         run: pnpm exec playwright install
       - name: Run test
         run:  pnpm test:e2e
@@ -149,11 +199,3 @@ jobs:
       - name: Clean up worker
         run: |
           curl -i -X DELETE "https://api.cloudflare.com/client/v4/accounts/${{secrets.CF_ACCOUNT_ID}}/workers/scripts/${{steps.random-path-generator.outputs.WORKER_NAME}}" -H"Authorization: bearer ${{secrets.CF_API_TOKEN}}"
-      - name: Report Status
-        if: always()
-        uses: ravsamhq/notify-slack-action@0d9c6ff1de9903da88d24c0564f6e83cb28faca9
-        with:
-          status: ${{ job.status }}
-          notification_title: "Cloudflare Worker E2E Test has {status_message}"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -1,4 +1,4 @@
-const INT_VERSION = '__current_worker_version__'
+const INT_VERSION = __current_worker_version__
 const PARAM_NAME = 'ii'
 
 function getTrafficMonitoringValue(type: 'procdn' | 'ingress'): string {

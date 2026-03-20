@@ -1,12 +1,22 @@
 # Project artifacts
-/node_modules/
+**/dist/
+**/node_modules/
 
 # code coverage
 /coverage
+report.json
 
 # Random excess stuff
 .DS_Store
 .idea/
 .vscode/
 yarn-error.log
-dist/
+
+# Cloudflare
+.wrangler
+
+# E2E Test results
+/test-results
+
+# E2E related temporary files
+/e2e-deploy

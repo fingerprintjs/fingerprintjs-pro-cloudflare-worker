@@ -2,14 +2,14 @@
 
 ## Requirements
 
-- Node 20
+- Node 24 (for development; the published package supports Node >=16 as specified in `package.json`)
 - Typescript 4+
 - Playwright
-- [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) v3+
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) v4+
 
 ## Working with code
 
-We prefer using [pnpm](https://pnpm.io/) for installing dependencies and running scripts.
+We prefer using [pnpm](https://pnpm.io/) for installing dependencies and running scripts. `pnpm` version 9.x is required. If you have `corepack` installed, the exact version of `pnpm` used by this repository can be installed with `corepack install`.
 
 The `main` is locked for the push action. 
 
@@ -26,23 +26,19 @@ Run `pnpm build` for creating a build in `dist` folder. After building, `dist/fi
 
 ### How to run locally
 
-Install [Wrangler](https://developers.cloudflare.com/workers/get-started/guide/#1-install-wrangler-workers-cli) provided by Cloudflare.
+Running `pnpm install` will install [Wrangler](https://developers.cloudflare.com/workers/wrangler/) from Cloudflare locally.
 
-❗Please use `Wrangler 2` instead of `Wrangler 1`. For more info, please visit [here](https://developers.cloudflare.com/workers/wrangler/compare-v1-v2/).
-
-First run `wrangler login`. This will open the browser and ask you to log in to your CF account to authorize Wrangler in your local machine. You can use `wrangler logout` any time to log out.
-
-Then, you can run `wrangler dev` to run the worker locally. By default, it will run on `http://localhost:8787` and will have the following endpoints:
-- `/cf-worker/agent` for downloading the Pro Agent script (a.k.a `import` url or `scriptUrlPattern`)
-- `/cf-worker/getResult` for getting the result (a.k.a. `endpoint`)
+After running `pnpm install`, you can run `pnpm dev` to run the worker locally. By default, it will run on `http://localhost:5173` and will have the following endpoints:
+- `/agent` for downloading the Pro Agent script (a.k.a `import` url or `scriptUrlPattern`)
+- `/getResult` for getting the result (a.k.a. `endpoint`)
 
 You can use the worker locally with a client like the example below:
 ```html
 <script>
   // REPLACE <API_KEY>
-  const fpPromise = import('http://localhost:8787/cf-worker/agent?apiKey=<API_KEY>') 
+  const fpPromise = import('http://localhost:5173/agent?apiKey=<API_KEY>') 
     .then(FingerprintJS => FingerprintJS.load({
-      endpoint: 'http://localhost:8787/cf-worker/getResult'
+      endpoint: 'http://localhost:5173/getResult'
     }))
 
   // Get the visitor identifier when you need it.
@@ -82,7 +78,7 @@ Run `pnpm test`.
 
 End-to-end tests are run automatically on every PR. They also run daily on the `main` branch.
 
-End-to-end tests are located in the `test/e2e` folder and run by [playwright](https://github.com/microsoft/playwright) environment. 
+End-to-end tests are located in the `e2e` folder and run by [playwright](https://github.com/microsoft/playwright) environment. 
 The `teste2e.yml` workflow is responsible for deploying a new Cloudflare worker, running end-to-end tests, and cleaning up the worker in the end. `teste2e.yml` works like this:
 1. Check out the current branch (can be any branch).
 2. Bump version according to the input, default to `patch`.
@@ -103,4 +99,4 @@ The workflow `release.yml` is responsible for releasing a new version. Run it on
 
 ### How to keep your worker up-to-date
 
-CF Integration by Fingerprint always uses the latest stable version for the customers, and upgrades customer workers automatically.
+The [Fingerprint Cloudflare Proxy Integration](https://dev.fingerprint.com/docs/cloudflare-integration) always uses the latest stable version of this worker, and upgrades customer workers automatically.
