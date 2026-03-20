@@ -22,7 +22,7 @@ Create pull requests for the `main` branch.
 ### How to build
 After cloning the repo, run `pnpm install` to install packages.
 
-Run `pnpm build` for creating a build in `dist` folder. After building, `dist/fingerprintjs-pro-cloudflare-worker.esm.js` file is created, and it is used to deploy to CF.
+Run `pnpm build` for creating a build in `dist` folder. The build creates the worker script file, located at `dist/fingerprint_pro_cloudflare_worker_local_development/index.js`.
 
 ### How to run locally
 

@@ -7,8 +7,8 @@
    </picture>
   </a>
 <p align="center">
-<a href="https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker"><img src="https://img.shields.io/github/v/release/fingerprintjs/fingerprintjs-pro-cloudflare-worker" alt="Current NPM version"></a>
-<a href="https://fingerprintjs.github.io/fingerprintjs-pro-cloudflare-worker/"><img src="https://raw.githubusercontent.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/gh-pages/badges.svg" alt="coverage"></a>
+<a href="https://github.com/fingerprintjs/cloudflare-worker-proxy"><img src="https://img.shields.io/github/v/release/fingerprintjs/cloudflare-worker-proxy" alt="Current NPM version"></a>
+<a href="https://fingerprintjs.github.io/cloudflare-worker-proxy/"><img src="https://raw.githubusercontent.com/fingerprintjs/cloudflare-worker-proxy/gh-pages/badges.svg" alt="coverage"></a>
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/:license-mit-blue.svg" alt="MIT license"></a>
 <a href="https://discord.gg/39EpE2neBg"><img src="https://img.shields.io/discord/852099967190433792?style=logo&label=Discord&logo=Discord&logoColor=white" alt="Discord server"></a>
 
@@ -39,8 +39,8 @@ See the [Cloudflare integration guide](https://dev.fingerprint.com/docs/cloudfla
 
 ## Support
 
-To report problems, ask questions or provide feedback, please use [Issues](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/issues). If you need private support, you can email us at [oss-support@fingerprint.com](mailto:oss-support@fingerprint.com).
+To report problems, ask questions or provide feedback, please use [Issues](https://github.com/fingerprintjs/cloudflare-worker-proxy/issues). If you need private support, you can email us at [oss-support@fingerprint.com](mailto:oss-support@fingerprint.com).
 
 ## License
 
-This project is licensed under the MIT license. See the [LICENSE](https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker/blob/main/LICENSE) file for more info.
+This project is licensed under the MIT license. See the [LICENSE](https://github.com/fingerprintjs/cloudflare-worker-proxy/blob/main/LICENSE) file for more info.
