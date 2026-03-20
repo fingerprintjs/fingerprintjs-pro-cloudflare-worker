@@ -186,9 +186,9 @@ describe('no match paths', () => {
     expect(mockStatusPageHandler).not.toHaveBeenCalled()
     expect(response.status).toBe(404)
     expect(response.headers.get('content-type')).toBe('application/json')
-    const responseBody = await response.json()
+    const responseBody = await response.json<any>()
     const expected = { error: `unmatched path /${workerPath}/hello` }
     expect(responseBody).toMatchObject(expected)
-    expect(expected).toMatchObject(responseBody as any)
+    expect(expected).toMatchObject(responseBody)
   })
 })

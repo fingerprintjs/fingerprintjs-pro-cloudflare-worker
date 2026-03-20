@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, beforeEach, afterAll, vi, type MockInstance } from 'vitest'
+import { describe, test, assert, expect, beforeAll, beforeEach, afterAll, vi, type MockInstance } from 'vitest'
 import { WorkerEnv } from '../../src/env'
 import worker from '../../src'
 import { FPJSResponse } from '../../src/utils'
@@ -609,10 +609,10 @@ describe('GET req response when failure', () => {
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('content-type')).toBe('application/json')
     expect(response.status).toBe(500)
-    const responseBody = await response.json()
+    const responseBody = await response.json<any>()
     // Note: toStrictEqual does not work for some reason, using double toMatchObject instead
     expect(responseBody).toMatchObject({ error: 'some error' })
-    expect({ error: 'some error' }).toMatchObject(responseBody as any)
+    expect({ error: 'some error' }).toMatchObject(responseBody)
   })
 })
 
@@ -655,7 +655,7 @@ describe('ingress API response when failure', () => {
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('content-type')).toBe('application/json')
     expect(response.status).toBe(500)
-    const responseBody = (await response.json()) as FPJSResponse
+    const responseBody = await response.json<FPJSResponse>()
     const expectedResponseBody: Omit<FPJSResponse, 'requestId'> = {
       v: '2',
       error: {
@@ -707,7 +707,8 @@ describe('GET request cache durations', () => {
   })
   test('cloudflare network cache is not set', async () => {
     fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
+      assert.isDefined(init)
+      receivedCfObject = init.cf
       const responseHeaders = new Headers({
         'cache-control': 'public, max-age=3613, s-maxage=575500',
       })
@@ -739,7 +740,8 @@ describe('POST request cache durations', () => {
 
   test('cache-control is not added', async () => {
     fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
+      assert.isDefined(init)
+      receivedCfObject = init.cf
       const responseHeaders = new Headers({
         'access-control-allow-credentials': 'true',
         'access-control-expose-headers': 'Retry-After',
@@ -754,7 +756,8 @@ describe('POST request cache durations', () => {
   })
   test('cloudflare network cache is not set', async () => {
     fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
+      assert.isDefined(init)
+      receivedCfObject = init.cf
       const responseHeaders = new Headers({
         'access-control-allow-credentials': 'true',
         'access-control-expose-headers': 'Retry-After',

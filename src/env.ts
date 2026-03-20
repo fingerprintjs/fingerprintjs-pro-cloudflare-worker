@@ -18,7 +18,7 @@ export const Defaults: WorkerEnv = {
 
 function getVarOrDefault(variable: keyof WorkerEnv, defaults: WorkerEnv): (env: WorkerEnv) => string | null {
   return function (env: WorkerEnv): string | null {
-    return (env[variable] || defaults[variable]) as string | null
+    return env[variable] || defaults[variable]
   }
 }
 

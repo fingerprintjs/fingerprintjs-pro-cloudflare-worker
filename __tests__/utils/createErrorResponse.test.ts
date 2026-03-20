@@ -19,10 +19,10 @@ describe('createErrorResponseForIngress', () => {
       if (body.value == null) {
         return
       }
-      const bodyString = Array.from(body.value)
+      const bodyString = Array.from<number>(body.value)
         .map((el) => String.fromCharCode(el))
         .join('')
-      const errorData = JSON.parse(bodyString) as FPJSResponse
+      const errorData: FPJSResponse = JSON.parse(bodyString)
       expect(errorData.v).toBe('2')
       expect(errorData.error).not.toBeNull()
       expect(errorData.error?.code).toBe('IntegrationFailed')
@@ -56,10 +56,10 @@ describe('createErrorResponseForIngress', () => {
       if (body.value == null) {
         return
       }
-      const bodyString = Array.from(body.value)
+      const bodyString = Array.from<number>(body.value)
         .map((el) => String.fromCharCode(el))
         .join('')
-      const errorData = JSON.parse(bodyString) as FPJSResponse
+      const errorData: FPJSResponse = JSON.parse(bodyString)
       expect(errorData.error).not.toBeNull()
       expect(errorData.error?.code).toBe('IntegrationFailed')
       expect(errorData.error?.message).toBe('An error occurred with Cloudflare worker. Reason: some error message')
@@ -77,10 +77,10 @@ describe('createErrorResponseForIngress', () => {
       if (body.value == null) {
         return
       }
-      const bodyString = Array.from(body.value)
+      const bodyString = Array.from<number>(body.value)
         .map((el) => String.fromCharCode(el))
         .join('')
-      const errorData = JSON.parse(bodyString) as FPJSResponse
+      const errorData: FPJSResponse = JSON.parse(bodyString)
       expect(errorData.error).not.toBeNull()
       expect(errorData.error?.code).toBe('IntegrationFailed')
       expect(errorData.error?.message).toBe('An error occurred with Cloudflare worker. Reason: unknown')
@@ -104,10 +104,10 @@ describe('createFallbackErrorResponse', () => {
       if (body.value == null) {
         return
       }
-      const bodyString = Array.from(body.value)
+      const bodyString = Array.from<number>(body.value)
         .map((el) => String.fromCharCode(el))
         .join('')
-      const errorData = JSON.parse(bodyString) as { error: string }
+      const errorData: { error: string } = JSON.parse(bodyString)
       expect(errorData.error).toBe('some error message')
     })
   })
