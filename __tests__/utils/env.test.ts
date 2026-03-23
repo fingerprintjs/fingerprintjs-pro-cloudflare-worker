@@ -1,5 +1,17 @@
 import { describe, it, expect } from 'vitest'
-import { Defaults, WorkerEnv, getIntegrationPathDepth } from '../../src/env'
+import { Defaults, WorkerEnv, getCdnUrl, getIngressBaseHost, getIntegrationPathDepth } from '../../src/env'
+
+describe('getCdnUrl', () => {
+  it('uses default when empty string configured', () => {
+    expect(getCdnUrl({ ...Defaults, FPJS_CDN_URL: '' })).toBe(Defaults.FPJS_CDN_URL)
+  })
+})
+
+describe('getIngressBaseHost', () => {
+  it('uses default when empty string configured', () => {
+    expect(getIngressBaseHost({ ...Defaults, FPJS_INGRESS_BASE_HOST: '' })).toBe(Defaults.FPJS_INGRESS_BASE_HOST)
+  })
+})
 
 describe('getIntegrationPathDepth', () => {
   function makeEnv(depth: WorkerEnv['INTEGRATION_PATH_DEPTH']): WorkerEnv {

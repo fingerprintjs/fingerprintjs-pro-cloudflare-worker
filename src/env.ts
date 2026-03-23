@@ -23,7 +23,7 @@ function getVarOrDefault<K extends keyof WorkerEnv>(
   defaults: WorkerEnv
 ): (env: WorkerEnv) => WorkerEnv[K] {
   return function (env: WorkerEnv): WorkerEnv[K] {
-    return env[variable] ?? defaults[variable]
+    return env[variable] || defaults[variable]
   }
 }
 
