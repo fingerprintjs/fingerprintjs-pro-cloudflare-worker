@@ -3,7 +3,7 @@
   "changelog": [
     "@fingerprintjs/changesets-changelog-format",
     {
-      "repo": "fingerprintjs/fingerprintjs-pro-cloudflare-worker"
+      "repo": "fingerprintjs/cloudflare-worker-proxy"
     }
   ],
   "commit": false,

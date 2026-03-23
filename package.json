@@ -9,7 +9,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/fingerprintjs/fingerprintjs-pro-cloudflare-worker.git"
+    "url": "https://github.com/fingerprintjs/cloudflare-worker-proxy.git"
   },
   "exports": {
     "./worker": "./dist/fingerprint_pro_cloudflare_worker_local_development/index.js"

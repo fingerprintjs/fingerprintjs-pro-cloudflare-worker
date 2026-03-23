@@ -48,7 +48,7 @@ jobs:
         run: |
           mkdir -p e2e-deploy
           cp dist/*/wrangler.json e2e-deploy
-          cp fingerprintjs-pro-cloudflare-worker.esm.js e2e-deploy/index.js
+          cp fingerprint-cloudflare-worker-proxy.js e2e-deploy/index.js
 
       - name: Generate random paths
         run: |

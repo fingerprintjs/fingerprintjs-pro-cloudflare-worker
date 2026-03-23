@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 const config = {
   token: process.env.GITHUB_TOKEN,
   owner: 'fingerprintjs',
-  repo: 'fingerprintjs-pro-cloudflare-worker',
+  repo: 'cloudflare-worker-proxy',
 }
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -86,7 +86,7 @@ async function downloadReleaseAsset(url, token) {
 }
 
 async function findReleaseAsset(assets) {
-  const targetAssetsName = 'fingerprintjs-pro-cloudflare-worker.esm.js'
+  const targetAssetsName = 'fingerprint-cloudflare-worker-proxy.js'
 
   const targetAsset = assets.find((asset) => asset.name === targetAssetsName && asset.state === 'uploaded')
 
