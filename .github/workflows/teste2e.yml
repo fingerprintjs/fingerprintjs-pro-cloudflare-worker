@@ -123,6 +123,12 @@ jobs:
   build-and-deploy-and-test-e2e:
     runs-on: ubuntu-24.04
     name: Build & Deploy & Test e2e
+    strategy:
+      max-parallel: 1
+      matrix:
+        default_compatibility_date:
+          - true
+          - false
     steps:
       - uses: actions/checkout@v4
         with:
@@ -176,7 +182,14 @@ jobs:
             '.name = $name | .route = $route | .vars.GET_RESULT_PATH = $get_result_path | .vars.AGENT_SCRIPT_DOWNLOAD_PATH = $agent_download_path | .vars.PROXY_SECRET = $proxy_secret' \
             e2e-deploy/wrangler.json > e2e-deploy/wrangler.json.tmp && mv e2e-deploy/wrangler.json.tmp e2e-deploy/wrangler.json
 
-            cat e2e-deploy/wrangler.json
+      - name: Set compatibility date
+        run: |
+          [[ "${{ matrix.default_compatibility_date }}" == "true" ]] && compatibility_date="2021-11-02" || compatibility_date="$(date -u +%Y-%m-%d)"
+          jq \
+            --arg date "$compatibility_date" '.compatibility_date = $date' \
+            e2e-deploy/wrangler.json > e2e-deploy/wrangler.json.tmp && mv e2e-deploy/wrangler.json.tmp e2e-deploy/wrangler.json
+
+          cat e2e-deploy/wrangler.json
 
       - name: Get wrangler version
         id: wrangler-version
