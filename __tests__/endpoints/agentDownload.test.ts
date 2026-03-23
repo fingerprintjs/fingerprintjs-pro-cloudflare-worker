@@ -9,6 +9,7 @@ const workerEnv: WorkerEnv = {
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
+  INTEGRATION_PATH_DEPTH: 1,
 }
 
 describe('agent download cdn url from worker env', () => {

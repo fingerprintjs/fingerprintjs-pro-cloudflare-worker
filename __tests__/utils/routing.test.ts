@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { removeTrailingSlashesAndMultiSlashes, addTrailingWildcard, replaceDot, createRoute } from '../../src/utils'
-import { addEndingTrailingSlashToRoute, addPathnameMatchBeforeRoute } from '../../src/utils'
+import { removeTrailingSlashesAndMultiSlashes } from '../../src/utils'
+import { createRoutePathPrefix, stripPrefixPathSegments } from '../../src/utils/routing'
 
 describe('removeTrailingSlashesAndMultiSlashes', () => {
   it('returns /path for /path', () => {
@@ -32,85 +32,45 @@ describe('removeTrailingSlashesAndMultiSlashes', () => {
   })
 })
 
-describe('addTrailingWildcard', () => {
-  it('returns /a for /a', () => {
-    expect(addTrailingWildcard('/a')).toBe('/a')
+describe('createRoutePathPrefix', () => {
+  it('throws for an invalid route', () => {
+    expect(() => {
+      createRoutePathPrefix('missingSlash')
+    }).toThrow()
   })
-  it('returns /a(/.*)? for /a/*', () => {
-    expect(addTrailingWildcard('/a/*')).toBe('/a(/.*)?')
-  })
-  it('returns /a/b(.*)? for /a/b*', () => {
-    expect(addTrailingWildcard('/a/b*')).toBe('/a/b(.*)?')
-  })
-  it('returns empty string for empty string', () => {
-    expect(addTrailingWildcard('')).toBe('')
+
+  it('removes duplicated start slashes', () => {
+    expect(createRoutePathPrefix('//')).toBe('/')
   })
 })
 
-describe('replaceDot', () => {
-  it('returns /a for /a', () => {
-    expect(replaceDot('/a')).toBe('/a')
+describe('stripPrefixPathSegments', () => {
+  it.each([0, -1])('throws if segmentCount is %i', (segmentCount) => {
+    expect(() => stripPrefixPathSegments(new URL('https://example.com/a/b'), segmentCount)).toThrow(
+      'segmentCount must be greater than 0'
+    )
   })
-  it('returns /a\\.b/c for /a.b/c', () => {
-    expect(replaceDot('/a.b/c')).toBe('/a\\.b/c')
-  })
-  it('returns /a/b. for /a/b.', () => {
-    expect(replaceDot('/a/b.')).toBe('/a/b.')
-  })
-  it('returns empty string for empty string', () => {
-    expect(replaceDot('')).toBe('')
-  })
-})
 
-describe('addEndingTrailingSlashToRoute', () => {
-  it('returns /status\\/* for /status', () => {
-    expect(addEndingTrailingSlashToRoute('/status')).toBe('/status\\/*')
+  it.each([
+    [1, 'https://example.com/prefix/path', '/path'],
+    [1, 'https://example.com/prefix', '/'],
+    [1, 'https://example.com/prefix/', '/'],
+    [2, 'https://example.com/a/b/c', '/c'],
+    [2, 'https://example.com/a/b/c/', '/c/'],
+    [2, 'https://example.com/a/b', '/'],
+    [2, 'https://example.com/a/b/', '/'],
+    [1, 'https://example.com/prefix/foo/bar/baz', '/foo/bar/baz'],
+    [1, 'https://example.com/prefix/foo/bar/baz/', '/foo/bar/baz/'],
+    [1, 'https://example.com/prefix/path?foo=bar#section', '/path'],
+    [1, 'https://example.com', '/'],
+  ])('strips %i segment(s) from %s, returning %s', (segmentCount, url, expected) => {
+    expect(stripPrefixPathSegments(new URL(url), segmentCount)).toBe(expected)
   })
-  it('returns \\/* for empty string', () => {
-    expect(addEndingTrailingSlashToRoute('')).toBe('\\/*')
-  })
-})
 
-describe('addPathnameMatchBeforeRoute', () => {
-  it('returns [\\/[A-Za-z0-9:._-]*/status for /status', () => {
-    expect(addPathnameMatchBeforeRoute('/status')).toBe('[\\/[A-Za-z0-9:._-]*/status')
-  })
-  it('returns [\\/[A-Za-z0-9:._-]* for empty string', () => {
-    expect(addPathnameMatchBeforeRoute('')).toBe('[\\/[A-Za-z0-9:._-]*')
-  })
-})
-
-describe('createRoute prefix', () => {
-  const matchingRouteCases = [
-    '/fpjs-worker-path-0123456789/status',
-    '/fpjsworker/status',
-    '/status',
-    '/status/',
-    '//status',
-    '//status//',
-    '/path/path2/path3/path4/status',
-    '/path/path2//path3/path4/status',
-    '/worker_path/status',
-    '/status/worker_path/status',
-  ]
-  it.each(matchingRouteCases)('%s matches /status', (route) => {
-    expect(createRoute('/status').test(route)).toBe(true)
-  })
-  const unMatchingRouteCases = ['/status/some-path']
-  it.each(unMatchingRouteCases)("%s doesn't match /status", (route) => {
-    expect(createRoute('/status').test(route)).toBe(false)
-  })
-})
-
-describe('createRoute suffix', () => {
-  const suffixPath = '/ingress(/.*)?'
-  const toBeMatched = ['/ingress', '/ingress/', '/ingress/foo', '/ingress/foo/bar', '/ingress/foo/bar/baz']
-  const toBeFail = ['/ingressfoo', '/ingressfoo/', '/ingressfoo/bar']
-
-  it.each(toBeMatched)('should match with suffix', (suffix) => {
-    expect(createRoute(suffixPath).test(suffix)).toBe(true)
-  })
-  it.each(toBeFail)('should not match with suffix', (suffix) => {
-    expect(createRoute(suffixPath).test(suffix)).toBe(false)
+  it.each([
+    ['https://example.com/a', 2],
+    ['https://example.com/', 2],
+  ])('returns undefined when %s does not have enough segments for count %i', (url, segmentCount) => {
+    expect(stripPrefixPathSegments(new URL(url), segmentCount)).toBeUndefined()
   })
 })
