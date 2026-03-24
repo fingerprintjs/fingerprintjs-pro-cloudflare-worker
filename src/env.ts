@@ -69,8 +69,10 @@ export function getStatusPagePath(): string {
 export function getIntegrationPathDepth(env: WorkerEnv): number {
   const integrationPathDepth = env['INTEGRATION_PATH_DEPTH']
   if (integrationPathDepth !== null) {
-    if (integrationPathDepth <= 0) {
-      console.warn(`INTEGRATION_PATH_DEPTH must be greater than 0, defaulting to ${Defaults.INTEGRATION_PATH_DEPTH}`)
+    if (!Number.isInteger(integrationPathDepth) || integrationPathDepth <= 0) {
+      console.warn(
+        `INTEGRATION_PATH_DEPTH must be an integer and greater than 0, defaulting to ${Defaults.INTEGRATION_PATH_DEPTH}`
+      )
       return Defaults.INTEGRATION_PATH_DEPTH
     }
     return integrationPathDepth
