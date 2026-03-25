@@ -27,7 +27,7 @@ function getVarOrDefault<K extends keyof WorkerEnv>(
 
 function isVarSet(variable: keyof WorkerEnv): (env: WorkerEnv) => boolean {
   return function (env: WorkerEnv): boolean {
-    return env[variable] != null
+    return !!env[variable]
   }
 }
 
