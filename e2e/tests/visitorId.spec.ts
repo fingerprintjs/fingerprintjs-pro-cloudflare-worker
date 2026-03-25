@@ -7,10 +7,19 @@ const WORKER_PATH = process.env.worker_path || 'fpjs-worker-default'
 const GET_RESULT_PATH = process.env.get_result_path || 'get-result-default'
 const AGENT_DOWNLOAD_PATH = process.env.agent_download_path || 'agent-download-default'
 
-const testWebsiteURL = new URL(`https://${process.env.test_client_domain}`)
-testWebsiteURL.searchParams.set('worker-path', WORKER_PATH)
-testWebsiteURL.searchParams.set('get-result-path', GET_RESULT_PATH)
-testWebsiteURL.searchParams.set('agent-download-path', AGENT_DOWNLOAD_PATH)
+const testWebsiteURLV3 = new URL(`https://${process.env.test_client_domain}`)
+testWebsiteURLV3.searchParams.set('worker-path', WORKER_PATH)
+testWebsiteURLV3.searchParams.set('get-result-path', GET_RESULT_PATH)
+testWebsiteURLV3.searchParams.set('agent-download-path', AGENT_DOWNLOAD_PATH)
+
+const testWebsiteURLV4 = new URL(`https://${process.env.test_client_domain}`)
+testWebsiteURLV4.searchParams.set('worker-path', WORKER_PATH)
+testWebsiteURLV4.searchParams.set('v4', 'true')
+
+const testCases: [string, URL][] = [
+  ['v3', testWebsiteURLV3],
+  ['v4', testWebsiteURLV4],
+]
 
 const workerDomain = process.env.test_client_domain
 
@@ -81,11 +90,13 @@ test.describe('visitorId', () => {
     await page.waitForSelector('#cdn-result > code').then(testForElement)
   }
 
-  test('should show visitorId in the HTML (NPM & CDN)', async ({ page }) => {
-    const reqContext = await request.newContext()
-    const isOnline = await waitUntilOnline(reqContext, INT_VERSION)
-    expect(isOnline).toBeTruthy()
+  for (const [name, url] of testCases) {
+    test(`should show visitorId in the HTML (NPM & CDN) - ${name}`, async ({ page }) => {
+      const reqContext = await request.newContext()
+      const isOnline = await waitUntilOnline(reqContext, INT_VERSION)
+      expect(isOnline).toBeTruthy()
 
-    await runTest(page, testWebsiteURL.href)
-  })
+      await runTest(page, url.href)
+    })
+  }
 })
