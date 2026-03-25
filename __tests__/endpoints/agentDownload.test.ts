@@ -4,7 +4,6 @@ import { WorkerEnv } from '../../src/env'
 import { config } from '../../src/config'
 
 const workerEnv: WorkerEnv = {
-  FPJS_CDN_URL: config.fpcdn,
   FPJS_INGRESS_BASE_HOST: config.ingressApi,
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',

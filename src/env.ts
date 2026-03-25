@@ -4,7 +4,6 @@ export type WorkerEnv = {
   AGENT_SCRIPT_DOWNLOAD_PATH: string | null
   GET_RESULT_PATH: string | null
   PROXY_SECRET: string | null
-  FPJS_CDN_URL: string | null
   FPJS_INGRESS_BASE_HOST: string | null
   INTEGRATION_PATH_DEPTH: number | null
 }
@@ -13,7 +12,6 @@ export const Defaults = {
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
   GET_RESULT_PATH: 'getResult',
   PROXY_SECRET: null,
-  FPJS_CDN_URL: config.fpcdn,
   FPJS_INGRESS_BASE_HOST: config.ingressApi,
   INTEGRATION_PATH_DEPTH: 1,
 } satisfies WorkerEnv
@@ -33,7 +31,6 @@ function isVarSet(variable: keyof WorkerEnv): (env: WorkerEnv) => boolean {
   }
 }
 
-export const getCdnUrl = getVarOrDefault('FPJS_CDN_URL', Defaults)
 export const getIngressBaseHost = getVarOrDefault('FPJS_INGRESS_BASE_HOST', Defaults)
 
 export const agentScriptDownloadPathVarName = 'AGENT_SCRIPT_DOWNLOAD_PATH'
