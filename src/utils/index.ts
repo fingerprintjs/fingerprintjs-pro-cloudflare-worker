@@ -8,7 +8,6 @@ export {
 } from './createErrorResponse'
 export { addTrafficMonitoringSearchParamsForIngressRequest } from './addTrafficMonitoring'
 export { returnHttpResponse } from './returnHttpResponse'
-export { isMethodSafe } from './http'
 export { addProxyIntegrationHeaders, getIPFromHeaders } from './addProxyIntegrationHeaders'
 export { filterCookies } from './cookie'
 export { createRoutePathPrefix, removeTrailingSlashesAndMultiSlashes, stripPrefixPathSegments } from './routing'

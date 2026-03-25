@@ -5,15 +5,14 @@ import {
   createFallbackErrorResponse,
   createResponseWithMaxAge,
   filterCookies,
-  isMethodSafe,
 } from '../utils'
 import { addTrafficMonitoringSearchParamsForIngressRequest } from '../utils/addTrafficMonitoring'
 
 export async function handleApiRequest(receivedRequest: Request, env: WorkerEnv, targetURL: URL): Promise<Response> {
-  const methodSafe = isMethodSafe(receivedRequest.method)
+  const methodAuthorized = isMethodAuthorized(receivedRequest.method)
   try {
     let fingerprintRequest: Request<unknown, CfProperties<unknown>>
-    if (methodSafe) {
+    if (!methodAuthorized) {
       const headers = new Headers(receivedRequest.headers)
       headers.delete('Cookie')
 
@@ -33,7 +32,7 @@ export async function handleApiRequest(receivedRequest: Request, env: WorkerEnv,
     console.log(`Sending ${fingerprintRequest.method} to ${fingerprintRequest.url}...`)
     return await fetch(fingerprintRequest).then((originResponse) => modifyResponseIfNecessary(originResponse))
   } catch (e) {
-    if (methodSafe) {
+    if (!methodAuthorized) {
       return createFallbackErrorResponse(e)
     }
 
@@ -50,6 +49,10 @@ export function modifyResponseIfNecessary(originResponse: Response): Response {
     return createResponseWithMaxAge(modifiedResponse, maxMaxAge, maxSMaxAge)
   }
   return modifiedResponse
+}
+
+export function isMethodAuthorized(method: string) {
+  return method === 'POST'
 }
 
 function updateRequestInitForIngress(
