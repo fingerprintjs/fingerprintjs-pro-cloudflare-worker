@@ -204,6 +204,98 @@ exports[`status page content > when get result path is not set 1`] = `
   "
 `;
 
+exports[`status page content > when integration path depth is invalid 1`] = `
+"
+  <html lang='en-US'>
+  <head>
+    <meta charset='utf-8'/>
+    <title>Fingerprint Pro Cloudflare Worker</title>
+    <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
+      h1, span {
+        display: block;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        text-align: center;
+      }
+      h2 {
+        display: block;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Fingerprint Pro Cloudflare Integration</h1>
+  <span>🎉 Your Cloudflare worker is deployed</span>
+  <span>
+  ℹ️ Worker version: 0.0.1-test.0
+  </span>
+  <h2>Required Variables</h2>
+    <span>
+    🚨 The following required environment variables are not defined or invalid:
+    </span>
+    
+      <span>
+      🔴 <strong>INTEGRATION_PATH_DEPTH </strong> is not valid. The default value of 1 will be used instead.
+      </span>
+      <h2>V3 API Variables</h2>
+    <span>
+    ✅ All v3 API environment variables are set.
+    </span>
+    
+  <span>
+  ❓Please contact <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> with any issues.
+  </span>
+    
+  </body>
+  </html>
+  "
+`;
+
+exports[`status page content > when integration path depth is not set 1`] = `
+"
+  <html lang='en-US'>
+  <head>
+    <meta charset='utf-8'/>
+    <title>Fingerprint Pro Cloudflare Worker</title>
+    <link rel='icon' type='image/x-icon' href='https://fingerprint.com/img/favicon.ico'>
+    <style nonce='QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB'>
+      h1, span {
+        display: block;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        text-align: center;
+      }
+      h2 {
+        display: block;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Fingerprint Pro Cloudflare Integration</h1>
+  <span>🎉 Your Cloudflare worker is deployed</span>
+  <span>
+  ℹ️ Worker version: 0.0.1-test.0
+  </span>
+  <h2>Required Variables</h2>
+    <span>
+     ✅ All required environment variables are set.
+    </span>
+    <h2>V3 API Variables</h2>
+    <span>
+    ✅ All v3 API environment variables are set.
+    </span>
+    
+  <span>
+  ❓Please contact <a href='mailto:support@fingerprint.com'>support@fingerprint.com</a> with any issues.
+  </span>
+    
+  </body>
+  </html>
+  "
+`;
+
 exports[`status page content > when proxy secret is not set 1`] = `
 "
   <html lang='en-US'>
