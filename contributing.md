@@ -93,6 +93,14 @@ Do not forget to delete the worker manually after using the Cloudflare dashboard
 
 If the required environment variables are supplied, `pnpm test:e2e` can be run locally without needing `teste2e.yml`. For example, the command `worker_version=1.2.3 pnpm test:e2e` sets `worker_version` as a temporary env variable on *nix systems.
 
+#### Proxy integration validation tests
+
+The `teste2e.yml` workflow also includes a job to run the test suite from [fingerprintjs/dx-team-mock-for-proxy-integrations-e2e-tests](https://github.com/fingerprintjs/dx-team-mock-for-proxy-integrations-e2e-tests) against a deployed Cloudflare worker.
+
+The job runs the test suite twice: once with the default compatibility date for the Cloudflare worker runtime and once with the current date (the latest compatibility date).
+See the [Cloudflare documentation for compatibility dates](https://developers.cloudflare.com/workers/configuration/compatibility-dates/) for more information.
+
+
 ### How to release a new version
 
 The workflow `release.yml` is responsible for releasing a new version. Run it on the `main` branch.

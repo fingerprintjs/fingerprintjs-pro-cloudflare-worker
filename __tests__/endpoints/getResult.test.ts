@@ -10,6 +10,7 @@ const workerEnv: WorkerEnv = {
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
+  INTEGRATION_PATH_DEPTH: 1,
 }
 
 describe('ingress API url from worker env', () => {
@@ -318,6 +319,7 @@ describe('ingress API request headers', () => {
       PROXY_SECRET: null,
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
+      INTEGRATION_PATH_DEPTH: 1,
     }
     const testIP = '203.0.1113.195'
     const reqHeaders = new Headers({
