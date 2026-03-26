@@ -115,4 +115,4 @@ The workflow `release.yml` is responsible for releasing a new version. Run it on
 
 ### How to keep your worker up-to-date
 
-The [Fingerprint Cloudflare Proxy Integration](https://dev.fingerprint.com/docs/cloudflare-integration) always uses the latest stable version of this worker, and upgrades customer workers automatically.
+The [Fingerprint Cloudflare Proxy Integration](https://docs.fingerprint.com/docs/cloudflare-integration) always uses the latest stable version of this worker, and upgrades customer workers automatically.
