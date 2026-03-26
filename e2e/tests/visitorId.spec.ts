@@ -29,6 +29,13 @@ interface GetResult {
   visitorFound: boolean
 }
 
+interface V4GetResult {
+  event_id: string
+  visitor_id: string
+}
+
+type Result = GetResult | V4GetResult
+
 test.describe('visitorId', () => {
   async function waitUntilOnline(
     reqContext: APIRequestContext,
@@ -68,14 +75,23 @@ test.describe('visitorId', () => {
     expect(textContent != null).toStrictEqual(true)
     assert(typeof textContent === 'string')
 
-    let jsonContent: GetResult | undefined
+    let jsonContent: Result | undefined
     try {
       jsonContent = JSON.parse(textContent)
     } catch (e) {
       // do nothing
     }
     assert(jsonContent)
-    const { visitorId, requestId } = jsonContent
+
+    let visitorId = ''
+    let requestId = ''
+    if ('event_id' in jsonContent) {
+      visitorId = jsonContent.visitor_id
+      requestId = jsonContent.event_id
+    } else if ('requestId' in jsonContent) {
+      visitorId = jsonContent.visitorId
+      requestId = jsonContent.requestId
+    }
     expect(areVisitorIdAndRequestIdValid(visitorId, requestId)).toStrictEqual(true)
   }
 
