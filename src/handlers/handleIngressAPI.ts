@@ -4,7 +4,7 @@ import {
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
   createErrorResponseForIngress,
   filterCookies,
-  getVisitorIdEndpoint,
+  getIngressEndpointUrl,
   createFallbackErrorResponse,
 } from '../utils'
 
@@ -12,28 +12,19 @@ function copySearchParams(oldURL: URL, newURL: URL): void {
   newURL.search = new URLSearchParams(oldURL.search).toString()
 }
 
-function createRequestURL(
-  ingressBaseUrl: string,
-  receivedRequestURL: string,
-  routeMatches: RegExpMatchArray | undefined
-) {
-  const routeSuffix = routeMatches ? routeMatches[1] : undefined
+function createRequestURL(ingressBaseUrl: string, receivedRequestURL: string, targetPath: string) {
   const oldURL = new URL(receivedRequestURL)
-  const endpoint = getVisitorIdEndpoint(ingressBaseUrl, oldURL.searchParams, routeSuffix)
+  const endpoint = getIngressEndpointUrl(ingressBaseUrl, oldURL.searchParams, targetPath)
   const newURL = new URL(endpoint)
   copySearchParams(oldURL, newURL)
 
   return newURL
 }
 
-async function makeIngressRequest(
-  receivedRequest: Request,
-  env: WorkerEnv,
-  routeMatches: RegExpMatchArray | undefined
-) {
+async function makeIngressRequest(receivedRequest: Request, env: WorkerEnv, targetPath: string) {
   const ingressBaseUrl = getIngressBaseHost(env)!
 
-  const requestURL = createRequestURL(ingressBaseUrl, receivedRequest.url, routeMatches)
+  const requestURL = createRequestURL(ingressBaseUrl, receivedRequest.url, targetPath)
   addTrafficMonitoringSearchParamsForVisitorIdRequest(requestURL)
   let headers = new Headers(receivedRequest.headers)
   headers = filterCookies(headers, (key) => key === '_iidt')
@@ -48,14 +39,10 @@ async function makeIngressRequest(
   return fetch(request).then((oldResponse) => new Response(oldResponse.body, oldResponse))
 }
 
-function makeCacheEndpointRequest(
-  receivedRequest: Request,
-  env: WorkerEnv,
-  routeMatches: RegExpMatchArray | undefined
-) {
+function makeCacheEndpointRequest(receivedRequest: Request, env: WorkerEnv, targetPath: string) {
   const ingressBaseUrl = getIngressBaseHost(env)!
 
-  const requestURL = createRequestURL(ingressBaseUrl, receivedRequest.url, routeMatches)
+  const requestURL = createRequestURL(ingressBaseUrl, receivedRequest.url, targetPath)
   const headers = new Headers(receivedRequest.headers)
   headers.delete('Cookie')
 
@@ -65,17 +52,17 @@ function makeCacheEndpointRequest(
   return fetch(request).then((oldResponse) => new Response(oldResponse.body, oldResponse))
 }
 
-export async function handleIngressAPI(request: Request, env: WorkerEnv, routeMatches: RegExpMatchArray | undefined) {
+export async function handleIngressAPI(request: Request, env: WorkerEnv, targetPath: string) {
   if (request.method === 'GET') {
     try {
-      return await makeCacheEndpointRequest(request, env, routeMatches)
+      return await makeCacheEndpointRequest(request, env, targetPath)
     } catch (e) {
       return createFallbackErrorResponse(e)
     }
   }
 
   try {
-    return await makeIngressRequest(request, env, routeMatches)
+    return await makeIngressRequest(request, env, targetPath)
   } catch (e) {
     return createErrorResponseForIngress(request, e)
   }

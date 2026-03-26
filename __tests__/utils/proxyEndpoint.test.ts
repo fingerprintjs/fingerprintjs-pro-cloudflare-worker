@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { getAgentScriptEndpoint, getVisitorIdEndpoint } from '../../src/utils'
+import { getAgentScriptEndpoint, getIngressEndpointUrl } from '../../src/utils'
 import { config } from '../../src/config'
 
 describe('getAgentScriptEndpoint', () => {
@@ -38,35 +38,35 @@ describe('getAgentScriptEndpoint', () => {
   })
 })
 
-describe('getVisitorIdEndpoint', () => {
+describe('getIngressEndpointUrl', () => {
   test('no region', () => {
     const urlSearchParams = new URLSearchParams()
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams)).toBe(`https://${config.ingressApi}`)
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, '/')).toBe(`https://${config.ingressApi}/`)
   })
   test('us region', () => {
     const urlSearchParams = new URLSearchParams()
     urlSearchParams.set('region', 'us')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams)).toBe(`https://${config.ingressApi}`)
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, '/')).toBe(`https://${config.ingressApi}/`)
   })
   test('eu region', () => {
     const urlSearchParams = new URLSearchParams()
     urlSearchParams.set('region', 'eu')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams)).toBe(`https://eu.${config.ingressApi}`)
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, '/')).toBe(`https://eu.${config.ingressApi}/`)
   })
   test('ap region', () => {
     const urlSearchParams = new URLSearchParams()
     urlSearchParams.set('region', 'ap')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams)).toBe(`https://ap.${config.ingressApi}`)
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, '/')).toBe(`https://ap.${config.ingressApi}/`)
   })
   test('invalid region', () => {
     const urlSearchParams = new URLSearchParams()
     urlSearchParams.set('region', 'foo.bar/baz')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams)).toBe(`https://${config.ingressApi}`)
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, '/')).toBe(`https://${config.ingressApi}/`)
   })
   test('no region with suffix', () => {
     const urlSearchParams = new URLSearchParams()
     const pathName = '/suffix/more/path'
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams, pathName)).toBe(
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, pathName)).toBe(
       `https://${config.ingressApi}/suffix/more/path`
     )
   })
@@ -74,7 +74,7 @@ describe('getVisitorIdEndpoint', () => {
     const urlSearchParams = new URLSearchParams()
     const pathName = '/suffix/more/path'
     urlSearchParams.set('region', 'us')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams, pathName)).toBe(
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, pathName)).toBe(
       `https://${config.ingressApi}/suffix/more/path`
     )
   })
@@ -82,7 +82,7 @@ describe('getVisitorIdEndpoint', () => {
     const urlSearchParams = new URLSearchParams()
     const pathName = '/suffix/more/path'
     urlSearchParams.set('region', 'eu')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams, pathName)).toBe(
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, pathName)).toBe(
       `https://eu.${config.ingressApi}/suffix/more/path`
     )
   })
@@ -90,7 +90,7 @@ describe('getVisitorIdEndpoint', () => {
     const urlSearchParams = new URLSearchParams()
     const pathName = '/suffix/more/path'
     urlSearchParams.set('region', 'ap')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams, pathName)).toBe(
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, pathName)).toBe(
       `https://ap.${config.ingressApi}/suffix/more/path`
     )
   })
@@ -98,7 +98,7 @@ describe('getVisitorIdEndpoint', () => {
     const urlSearchParams = new URLSearchParams()
     const pathName = '/suffix/more/path'
     urlSearchParams.set('region', 'foo.bar/baz')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams, pathName)).toBe(
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, pathName)).toBe(
       `https://${config.ingressApi}/suffix/more/path`
     )
   })
@@ -106,7 +106,7 @@ describe('getVisitorIdEndpoint', () => {
     const urlSearchParams = new URLSearchParams()
     const pathName = '/.suffix/more/path'
     urlSearchParams.set('region', 'ap')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams, pathName)).toBe(
+    expect(getIngressEndpointUrl(config.ingressApi, urlSearchParams, pathName)).toBe(
       `https://ap.${config.ingressApi}/.suffix/more/path`
     )
   })
@@ -114,16 +114,8 @@ describe('getVisitorIdEndpoint', () => {
     const urlSearchParams = new URLSearchParams()
     const pathName = 'suffix/more/path'
     urlSearchParams.set('region', 'ap')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams, pathName)).toBe(
-      `https://ap.${config.ingressApi}/suffix/more/path`
-    )
-  })
-  test('invalid suffix starts from dot', () => {
-    const urlSearchParams = new URLSearchParams()
-    const pathName = '.suffix/more/path'
-    urlSearchParams.set('region', 'ap')
-    expect(getVisitorIdEndpoint(config.ingressApi, urlSearchParams, pathName)).toBe(
-      `https://ap.${config.ingressApi}/.suffix/more/path`
-    )
+    expect(() => {
+      getIngressEndpointUrl(config.ingressApi, urlSearchParams, pathName)
+    }).toThrow()
   })
 })

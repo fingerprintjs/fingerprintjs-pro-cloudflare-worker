@@ -6,18 +6,23 @@ export type WorkerEnv = {
   PROXY_SECRET: string | null
   FPJS_CDN_URL: string | null
   FPJS_INGRESS_BASE_HOST: string | null
+  INTEGRATION_PATH_DEPTH: number | null
 }
 
-export const Defaults: WorkerEnv = {
+export const Defaults = {
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
   GET_RESULT_PATH: 'getResult',
   PROXY_SECRET: null,
   FPJS_CDN_URL: config.fpcdn,
   FPJS_INGRESS_BASE_HOST: config.ingressApi,
-}
+  INTEGRATION_PATH_DEPTH: 1,
+} satisfies WorkerEnv
 
-function getVarOrDefault(variable: keyof WorkerEnv, defaults: WorkerEnv): (env: WorkerEnv) => string | null {
-  return function (env: WorkerEnv): string | null {
+function getVarOrDefault<K extends keyof WorkerEnv>(
+  variable: K,
+  defaults: WorkerEnv
+): (env: WorkerEnv) => WorkerEnv[K] {
+  return function (env: WorkerEnv): WorkerEnv[K] {
     return env[variable] || defaults[variable]
   }
 }
@@ -46,7 +51,7 @@ export const isGetResultPathSet = isVarSet(getResultPathVarName)
 
 export function getGetResultPath(env: WorkerEnv): string {
   const getResultPathVar = getGetResultPathVar(env)
-  return `/${getResultPathVar}(/.*)?`
+  return `/${getResultPathVar}`
 }
 
 export const proxySecretVarName = 'PROXY_SECRET'
@@ -59,4 +64,18 @@ export function getProxySecret(env: WorkerEnv): string | null {
 
 export function getStatusPagePath(): string {
   return `/status`
+}
+
+export function getIntegrationPathDepth(env: WorkerEnv): number {
+  const integrationPathDepth = env['INTEGRATION_PATH_DEPTH']
+  if (integrationPathDepth !== null) {
+    if (!Number.isInteger(integrationPathDepth) || integrationPathDepth <= 0) {
+      console.warn(
+        `INTEGRATION_PATH_DEPTH must be an integer and greater than 0, defaulting to ${Defaults.INTEGRATION_PATH_DEPTH}`
+      )
+      return Defaults.INTEGRATION_PATH_DEPTH
+    }
+    return integrationPathDepth
+  }
+  return Defaults.INTEGRATION_PATH_DEPTH
 }
