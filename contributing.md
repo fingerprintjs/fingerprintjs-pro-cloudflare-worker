@@ -1,4 +1,4 @@
-# Contributing to FingerprintJS Pro Cloudflare Worker
+# Contributing to FingerprintJS Cloudflare Worker
 
 ## Requirements
 
@@ -22,14 +22,14 @@ Create pull requests for the `main` branch.
 ### How to build
 After cloning the repo, run `pnpm install` to install packages.
 
-Run `pnpm build` for creating a build in `dist` folder. The build creates the worker script file, located at `dist/fingerprint_pro_cloudflare_worker_local_development/index.js`.
+Run `pnpm build` for creating a build in `dist` folder. The build creates the worker script file, located at `dist/fingerprint_proxy_local_development/index.js`.
 
 ### How to run locally
 
 Running `pnpm install` will install [Wrangler](https://developers.cloudflare.com/workers/wrangler/) from Cloudflare locally.
 
 After running `pnpm install`, you can run `pnpm dev` to run the worker locally. By default, it will run on `http://localhost:5173` and will have the following endpoints:
-- `/agent` for downloading the Pro Agent script (a.k.a `import` url or `scriptUrlPattern`)
+- `/agent` for downloading the Fingerprint agent script (a.k.a `import` url or `scriptUrlPattern`)
 - `/getResult` for getting the result (a.k.a. `endpoint`)
 
 You can use the worker locally with a client like the example below:
