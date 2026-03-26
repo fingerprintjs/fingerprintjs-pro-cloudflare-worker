@@ -9,8 +9,8 @@ export type WorkerEnv = {
 }
 
 export const Defaults = {
-  AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
-  GET_RESULT_PATH: 'getResult',
+  AGENT_SCRIPT_DOWNLOAD_PATH: null,
+  GET_RESULT_PATH: null,
   PROXY_SECRET: null,
   FPJS_INGRESS_BASE_HOST: config.ingressApi,
   INTEGRATION_PATH_DEPTH: 1,
