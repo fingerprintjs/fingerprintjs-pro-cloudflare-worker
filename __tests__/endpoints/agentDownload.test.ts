@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, beforeEach, afterAll, vi, type MockInstance } from 'vitest'
+import { describe, test, assert, expect, beforeAll, beforeEach, afterAll, vi, type MockInstance } from 'vitest'
 import worker from '../../src/index'
 import { WorkerEnv } from '../../src/env'
 import { config } from '../../src/config'
@@ -9,6 +9,7 @@ const workerEnv: WorkerEnv = {
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: 'get_result',
   AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
+  INTEGRATION_PATH_DEPTH: 1,
 }
 
 describe('agent download cdn url from worker env', () => {
@@ -270,7 +271,8 @@ describe('agent download request cache durations', () => {
 
   test('browser cache set to an hour when original value is higher', async () => {
     fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
+      assert.isDefined(init)
+      receivedCfObject = init.cf
       const responseHeaders = new Headers({
         'cache-control': 'public, max-age=3613',
       })
@@ -283,7 +285,8 @@ describe('agent download request cache durations', () => {
   })
   test('browser cache is the same when original value is lower than an hour', async () => {
     fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
+      assert.isDefined(init)
+      receivedCfObject = init.cf
       const responseHeaders = new Headers({
         'cache-control': 'public, max-age=100',
       })
@@ -296,7 +299,8 @@ describe('agent download request cache durations', () => {
   })
   test('proxy cache set to a minute when original value is higher', async () => {
     fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
+      assert.isDefined(init)
+      receivedCfObject = init.cf
       const responseHeaders = new Headers({
         'cache-control': 'public, max-age=3613, s-maxage=575500',
       })
@@ -309,7 +313,8 @@ describe('agent download request cache durations', () => {
   })
   test('proxy cache is the same when original value is lower than a minute', async () => {
     fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
+      assert.isDefined(init)
+      receivedCfObject = init.cf
       const responseHeaders = new Headers({
         'cache-control': 'public, max-age=3613, s-maxage=10',
       })
@@ -322,7 +327,8 @@ describe('agent download request cache durations', () => {
   })
   test('cloudflare network cache is set to 1 min', async () => {
     fetchSpy.mockImplementation(async (_, init) => {
-      receivedCfObject = (init as RequestInit).cf
+      assert.isDefined(init)
+      receivedCfObject = init.cf
       const responseHeaders = new Headers({
         'cache-control': 'public, max-age=3613, s-maxage=575500',
       })
@@ -437,9 +443,9 @@ describe('agent download response', () => {
     const response = await worker.fetch(req, workerEnv)
     expect(response.headers.get('content-type')).toBe('application/json')
     expect(response.status).toBe(500)
-    const responseBody = await response.json()
+    const responseBody = await response.json<any>()
     // Note: toStrictEqual does not work for some reason, using double toMatchObject instead
     expect(responseBody).toMatchObject({ error: 'some error' })
-    expect({ error: 'some error' }).toMatchObject(responseBody as any)
+    expect({ error: 'some error' }).toMatchObject(responseBody)
   })
 })

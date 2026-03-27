@@ -33,4 +33,12 @@ describe('filterCookies', () => {
     const resultHeaders = filterCookies(headers, (key) => key === '_iidt')
     expect(resultHeaders.get('cookie')).toBe(`_iidt=${_iidtCookieValue}`)
   })
+
+  it('preserves percent-encoded _iidt value', () => {
+    const headers = new Headers()
+    const _iidtCookieValue = '%41%42%43'
+    headers.set('cookie', `x=y; _iidt=${_iidtCookieValue}; b=2`)
+    const resultHeaders = filterCookies(headers, (key) => key === '_iidt')
+    expect(resultHeaders.get('cookie')).toBe(`_iidt=${_iidtCookieValue}`)
+  })
 })

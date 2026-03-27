@@ -2,7 +2,7 @@ import { parse } from 'cookie'
 
 export function filterCookies(headers: Headers, filterFunc: (key: string) => boolean): Headers {
   const newHeaders = new Headers(headers)
-  const cookie = parse(headers.get('cookie') || '')
+  const cookie = parse(headers.get('cookie') || '', { decode: (str) => str })
   const filteredCookieList = []
   for (const cookieName in cookie) {
     if (filterFunc(cookieName)) {

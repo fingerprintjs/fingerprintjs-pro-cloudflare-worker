@@ -11,11 +11,15 @@ export function getAgentScriptEndpoint(baseCdnUrl: string, searchParams: URLSear
   return `${base}${lv}`
 }
 
-export function getVisitorIdEndpoint(
+export function getIngressEndpointUrl(
   baseIngressUrl: string,
   searchParams: URLSearchParams,
-  pathSuffix: string | undefined = undefined
+  targetPath: string
 ): string {
+  if (!targetPath.startsWith('/')) {
+    throw new Error('targetPath must start with /')
+  }
+
   const region = searchParams.get('region') || 'us'
   let prefix = ''
   switch (region) {
@@ -29,9 +33,5 @@ export function getVisitorIdEndpoint(
       prefix = ''
       break
   }
-  let suffix = pathSuffix ?? ''
-  if (suffix.length > 0 && !suffix.startsWith('/')) {
-    suffix = '/' + suffix
-  }
-  return `https://${prefix}${baseIngressUrl}${suffix}`
+  return `https://${prefix}${baseIngressUrl}${targetPath}`
 }

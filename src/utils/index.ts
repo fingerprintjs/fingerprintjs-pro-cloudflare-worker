@@ -14,13 +14,6 @@ export {
 export { returnHttpResponse } from './returnHttpResponse'
 export { addProxyIntegrationHeaders, getIPFromHeaders } from './addProxyIntegrationHeaders'
 export { filterCookies } from './cookie'
-export {
-  createRoute,
-  addTrailingWildcard,
-  removeTrailingSlashesAndMultiSlashes,
-  replaceDot,
-  addPathnameMatchBeforeRoute,
-  addEndingTrailingSlashToRoute,
-} from './routing'
-export { getAgentScriptEndpoint, getVisitorIdEndpoint } from './proxyEndpoint'
+export { createRoutePathPrefix, removeTrailingSlashesAndMultiSlashes, stripPrefixPathSegments } from './routing'
+export { getAgentScriptEndpoint, getIngressEndpointUrl } from './proxyEndpoint'
 export { createResponseWithMaxAge } from './createResponseWithMaxAge'

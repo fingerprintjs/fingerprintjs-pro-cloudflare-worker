@@ -1,5 +1,6 @@
 import { test, expect, Page, request, APIRequestContext, ElementHandle } from '@playwright/test'
 import { areVisitorIdAndRequestIdValid, wait } from '../utils'
+import assert from 'node:assert'
 
 const INT_VERSION = process.env.worker_version || ''
 const WORKER_PATH = process.env.worker_path || 'fpjs-worker-default'
@@ -56,14 +57,16 @@ test.describe('visitorId', () => {
   async function testForElement(el: ElementHandle<SVGElement | HTMLElement>) {
     const textContent = await el.textContent()
     expect(textContent != null).toStrictEqual(true)
-    let jsonContent
+    assert(typeof textContent === 'string')
+
+    let jsonContent: GetResult | undefined
     try {
-      jsonContent = JSON.parse(textContent as string)
+      jsonContent = JSON.parse(textContent)
     } catch (e) {
       // do nothing
     }
-    expect(jsonContent).toBeTruthy()
-    const { visitorId, requestId } = jsonContent as GetResult
+    assert(jsonContent)
+    const { visitorId, requestId } = jsonContent
     expect(areVisitorIdAndRequestIdValid(visitorId, requestId)).toStrictEqual(true)
   }
 
