@@ -43,7 +43,7 @@ export async function handleApiRequest(receivedRequest: Request, env: WorkerEnv,
 export function modifyResponseIfNecessary(originResponse: Response): Response {
   const modifiedResponse = new Response(originResponse.body, originResponse)
   const contentType = modifiedResponse.headers.get('Content-Type')
-  if (contentType && (contentType === 'text/javascript' || contentType.startsWith('text/javascript;'))) {
+  if (contentType?.trimStart().startsWith('text/javascript')) {
     const maxMaxAge = 60 * 60
     const maxSMaxAge = 60
     return createResponseWithMaxAge(modifiedResponse, maxMaxAge, maxSMaxAge)
