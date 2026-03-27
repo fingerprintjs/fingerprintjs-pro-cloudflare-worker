@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>34/34</span>
+                <span class='fraction'>33/33</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>5/6</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>31/31</span>
+                <span class='fraction'>30/30</span>
             </div>
         
             
@@ -132,20 +132,7 @@
 <a name='L67'></a><a href='#L67'>67</a>
 <a name='L68'></a><a href='#L68'>68</a>
 <a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a>
-<a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a>
-<a name='L76'></a><a href='#L76'>76</a>
-<a name='L77'></a><a href='#L77'>77</a>
-<a name='L78'></a><a href='#L78'>78</a>
-<a name='L79'></a><a href='#L79'>79</a>
-<a name='L80'></a><a href='#L80'>80</a>
-<a name='L81'></a><a href='#L81'>81</a>
-<a name='L82'></a><a href='#L82'>82</a>
-<a name='L83'></a><a href='#L83'>83</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L70'></a><a href='#L70'>70</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -160,11 +147,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">40x</span>
 <span class="cline-any cline-yes">40x</span>
 <span class="cline-any cline-yes">40x</span>
 <span class="cline-any cline-yes">40x</span>
@@ -174,10 +156,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">30x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">30x</span>
@@ -193,10 +171,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">30x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -233,7 +207,7 @@ import {
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
   createErrorResponseForIngress,
   filterCookies,
-  getVisitorIdEndpoint,
+  getIngressEndpointUrl,
   createFallbackErrorResponse,
 } from '../utils'
 &nbsp;
@@ -241,28 +215,19 @@ function copySearchParams(oldURL: URL, newURL: URL): void {
   newURL.search = new URLSearchParams(oldURL.search).toString()
 }
 &nbsp;
-function createRequestURL(
-  ingressBaseUrl: string,
-  receivedRequestURL: string,
-  routeMatches: RegExpMatchArray | undefined
-) {
-  const routeSuffix = routeMatches ? routeMatches[1] : <span class="branch-1 cbranch-no" title="branch not covered" >undefined</span>
+function createRequestURL(ingressBaseUrl: string, receivedRequestURL: string, targetPath: string) {
   const oldURL = new URL(receivedRequestURL)
-  const endpoint = getVisitorIdEndpoint(ingressBaseUrl, oldURL.searchParams, routeSuffix)
+  const endpoint = getIngressEndpointUrl(ingressBaseUrl, oldURL.searchParams, targetPath)
   const newURL = new URL(endpoint)
   copySearchParams(oldURL, newURL)
 &nbsp;
   return newURL
 }
 &nbsp;
-async function makeIngressRequest(
-  receivedRequest: Request,
-  env: WorkerEnv,
-  routeMatches: RegExpMatchArray | undefined
-) {
+async function makeIngressRequest(receivedRequest: Request, env: WorkerEnv, targetPath: string) {
   const ingressBaseUrl = getIngressBaseHost(env)!
 &nbsp;
-  const requestURL = createRequestURL(ingressBaseUrl, receivedRequest.url, routeMatches)
+  const requestURL = createRequestURL(ingressBaseUrl, receivedRequest.url, targetPath)
   addTrafficMonitoringSearchParamsForVisitorIdRequest(requestURL)
   let headers = new Headers(receivedRequest.headers)
   headers = filterCookies(headers, (key) =&gt; key === '_iidt')
@@ -277,14 +242,10 @@ async function makeIngressRequest(
   return fetch(request).then((oldResponse) =&gt; new Response(oldResponse.body, oldResponse))
 }
 &nbsp;
-function makeCacheEndpointRequest(
-  receivedRequest: Request,
-  env: WorkerEnv,
-  routeMatches: RegExpMatchArray | undefined
-) {
+function makeCacheEndpointRequest(receivedRequest: Request, env: WorkerEnv, targetPath: string) {
   const ingressBaseUrl = getIngressBaseHost(env)!
 &nbsp;
-  const requestURL = createRequestURL(ingressBaseUrl, receivedRequest.url, routeMatches)
+  const requestURL = createRequestURL(ingressBaseUrl, receivedRequest.url, targetPath)
   const headers = new Headers(receivedRequest.headers)
   headers.delete('Cookie')
 &nbsp;
@@ -294,17 +255,17 @@ function makeCacheEndpointRequest(
   return fetch(request).then((oldResponse) =&gt; new Response(oldResponse.body, oldResponse))
 }
 &nbsp;
-export async function handleIngressAPI(request: Request, env: WorkerEnv, routeMatches: RegExpMatchArray | undefined) {
+export async function handleIngressAPI(request: Request, env: WorkerEnv, targetPath: string) {
   if (request.method === 'GET') {
     try {
-      return await makeCacheEndpointRequest(request, env, routeMatches)
+      return await makeCacheEndpointRequest(request, env, targetPath)
     } catch (e) {
       return createFallbackErrorResponse(e)
     }
   }
 &nbsp;
   try {
-    return await makeIngressRequest(request, env, routeMatches)
+    return await makeIngressRequest(request, env, targetPath)
   } catch (e) {
     return createErrorResponseForIngress(request, e)
   }
@@ -316,7 +277,7 @@ export async function handleIngressAPI(request: Request, env: WorkerEnv, routeMa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-23T14:33:11.843Z
+                at 2026-03-27T13:42:26.642Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
