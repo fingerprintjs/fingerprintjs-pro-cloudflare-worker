@@ -1,4 +1,4 @@
-# Contributing to FingerprintJS Cloudflare Worker
+# Contributing to Fingerprint Cloudflare Worker
 
 ## Requirements
 
