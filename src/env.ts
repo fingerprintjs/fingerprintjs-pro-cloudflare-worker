@@ -63,16 +63,29 @@ export function getStatusPagePath(): string {
   return `/status`
 }
 
-export function getIntegrationPathDepth(env: WorkerEnv): number {
-  const integrationPathDepth = env['INTEGRATION_PATH_DEPTH']
-  if (integrationPathDepth !== null) {
-    if (!Number.isInteger(integrationPathDepth) || integrationPathDepth <= 0) {
-      console.warn(
-        `INTEGRATION_PATH_DEPTH must be an integer and greater than 0, defaulting to ${Defaults.INTEGRATION_PATH_DEPTH}`
-      )
-      return Defaults.INTEGRATION_PATH_DEPTH
-    }
-    return integrationPathDepth
+export const integrationPathDepthVarName = 'INTEGRATION_PATH_DEPTH'
+export function isIntegrationPathDepthValid(env: WorkerEnv) {
+  const integrationPathDepth = env[integrationPathDepthVarName]
+  if (integrationPathDepth !== null && integrationPathDepth !== undefined) {
+    return Number.isInteger(integrationPathDepth) && integrationPathDepth > 0
   }
-  return Defaults.INTEGRATION_PATH_DEPTH
+
+  // The default value is valid
+  return true
+}
+
+export function getIntegrationPathDepth(env: WorkerEnv): number {
+  const integrationPathDepth = env[integrationPathDepthVarName]
+  if (integrationPathDepth === null || integrationPathDepth === undefined) {
+    return Defaults.INTEGRATION_PATH_DEPTH
+  }
+
+  if (!Number.isInteger(integrationPathDepth) || integrationPathDepth <= 0) {
+    console.warn(
+      `INTEGRATION_PATH_DEPTH must be an integer and greater than 0, defaulting to ${Defaults.INTEGRATION_PATH_DEPTH}`
+    )
+    return Defaults.INTEGRATION_PATH_DEPTH
+  }
+
+  return integrationPathDepth
 }
