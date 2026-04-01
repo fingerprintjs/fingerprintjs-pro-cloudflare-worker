@@ -53,6 +53,8 @@ function createIngressRequestURL(env: WorkerEnv, receivedRequestURL: URL, target
 function createAgentScriptURL(env: WorkerEnv, receivedRequestURL: URL) {
   const ingressBaseUrl = getIngressBaseHost(env)!
 
+  // In V4, the Indentification API (Ingress) host also works as a proxy for the JavaScript agent CDN
+  // that's why we are passing it here
   const agentScriptEndpoint = getAgentScriptEndpoint(ingressBaseUrl, receivedRequestURL.searchParams)
   const newURL = new URL(agentScriptEndpoint)
   copySearchParams(receivedRequestURL, newURL)
