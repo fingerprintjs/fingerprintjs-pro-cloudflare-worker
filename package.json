@@ -27,6 +27,7 @@
     "test:e2e": "pnpm exec playwright test",
     "prepare": "husky",
     "wrangler:types": "wrangler types --strict-vars=false",
+    "typecheck": "tsc -p tsconfig.worker.json --noEmit && tsc -p tsconfig.tests.json --noEmit",
     "changeset:version": "changeset version",
     "changeset:publish": "HUSKY=0 changeset publish"
   },
