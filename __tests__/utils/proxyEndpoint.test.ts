@@ -9,22 +9,22 @@ describe('getAgentScriptEndpoint', () => {
   test('apiKey exists, version does not exist', () => {
     const urlSearchParams = new URLSearchParams()
     urlSearchParams.set('apiKey', apiKey)
-    expect(f(config.fpcdn, urlSearchParams)).toBe(`https://${config.fpcdn}/web/v3/${apiKey}`)
+    expect(f(config.ingressApi, urlSearchParams)).toBe(`https://${config.ingressApi}/web/v3/${apiKey}`)
   })
   test('apiKey exists, version exists', () => {
     const version = '4'
     const urlSearchParams = new URLSearchParams()
     urlSearchParams.set('apiKey', apiKey)
     urlSearchParams.set('version', version)
-    expect(f(config.fpcdn, urlSearchParams)).toBe(`https://${config.fpcdn}/web/v${version}/${apiKey}`)
+    expect(f(config.ingressApi, urlSearchParams)).toBe(`https://${config.ingressApi}/web/v${version}/${apiKey}`)
   })
   test('apiKey exists, version does not exist, loaderVersion exists', () => {
     const loaderVersion = '3.7.0'
     const urlSearchParams = new URLSearchParams()
     urlSearchParams.set('apiKey', apiKey)
     urlSearchParams.set('loaderVersion', loaderVersion)
-    expect(f(config.fpcdn, urlSearchParams)).toBe(
-      `https://${config.fpcdn}/web/v3/${apiKey}/loader_v${loaderVersion}.js`
+    expect(f(config.ingressApi, urlSearchParams)).toBe(
+      `https://${config.ingressApi}/web/v3/${apiKey}/loader_v${loaderVersion}.js`
     )
   })
   test('apiKey exists, version exists, loaderVersion exists', () => {
@@ -34,8 +34,8 @@ describe('getAgentScriptEndpoint', () => {
     urlSearchParams.set('apiKey', apiKey)
     urlSearchParams.set('version', version)
     urlSearchParams.set('loaderVersion', loaderVersion)
-    expect(f(config.fpcdn, urlSearchParams)).toBe(
-      `https://${config.fpcdn}/web/v${version}/${apiKey}/loader_v${loaderVersion}.js`
+    expect(f(config.ingressApi, urlSearchParams)).toBe(
+      `https://${config.ingressApi}/web/v${version}/${apiKey}/loader_v${loaderVersion}.js`
     )
   })
 })
