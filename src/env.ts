@@ -4,16 +4,14 @@ export type WorkerEnv = {
   AGENT_SCRIPT_DOWNLOAD_PATH: string | null
   GET_RESULT_PATH: string | null
   PROXY_SECRET: string | null
-  FPJS_CDN_URL: string | null
   FPJS_INGRESS_BASE_HOST: string | null
   INTEGRATION_PATH_DEPTH: number | null
 }
 
 export const Defaults = {
-  AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
-  GET_RESULT_PATH: 'getResult',
+  AGENT_SCRIPT_DOWNLOAD_PATH: null,
+  GET_RESULT_PATH: null,
   PROXY_SECRET: null,
-  FPJS_CDN_URL: config.fpcdn,
   FPJS_INGRESS_BASE_HOST: config.ingressApi,
   INTEGRATION_PATH_DEPTH: 1,
 } satisfies WorkerEnv
@@ -29,11 +27,10 @@ function getVarOrDefault<K extends keyof WorkerEnv>(
 
 function isVarSet(variable: keyof WorkerEnv): (env: WorkerEnv) => boolean {
   return function (env: WorkerEnv): boolean {
-    return env[variable] != null
+    return !!env[variable]
   }
 }
 
-export const getCdnUrl = getVarOrDefault('FPJS_CDN_URL', Defaults)
 export const getIngressBaseHost = getVarOrDefault('FPJS_INGRESS_BASE_HOST', Defaults)
 
 export const agentScriptDownloadPathVarName = 'AGENT_SCRIPT_DOWNLOAD_PATH'
@@ -66,16 +63,29 @@ export function getStatusPagePath(): string {
   return `/status`
 }
 
-export function getIntegrationPathDepth(env: WorkerEnv): number {
-  const integrationPathDepth = env['INTEGRATION_PATH_DEPTH']
-  if (integrationPathDepth !== null) {
-    if (!Number.isInteger(integrationPathDepth) || integrationPathDepth <= 0) {
-      console.warn(
-        `INTEGRATION_PATH_DEPTH must be an integer and greater than 0, defaulting to ${Defaults.INTEGRATION_PATH_DEPTH}`
-      )
-      return Defaults.INTEGRATION_PATH_DEPTH
-    }
-    return integrationPathDepth
+export const integrationPathDepthVarName = 'INTEGRATION_PATH_DEPTH'
+export function isIntegrationPathDepthValid(env: WorkerEnv) {
+  const integrationPathDepth = env[integrationPathDepthVarName]
+  if (integrationPathDepth !== null && integrationPathDepth !== undefined) {
+    return Number.isInteger(integrationPathDepth) && integrationPathDepth > 0
   }
-  return Defaults.INTEGRATION_PATH_DEPTH
+
+  // The default value is valid
+  return true
+}
+
+export function getIntegrationPathDepth(env: WorkerEnv): number {
+  const integrationPathDepth = env[integrationPathDepthVarName]
+  if (integrationPathDepth === null || integrationPathDepth === undefined) {
+    return Defaults.INTEGRATION_PATH_DEPTH
+  }
+
+  if (!Number.isInteger(integrationPathDepth) || integrationPathDepth <= 0) {
+    console.warn(
+      `INTEGRATION_PATH_DEPTH must be an integer and greater than 0, defaulting to ${Defaults.INTEGRATION_PATH_DEPTH}`
+    )
+    return Defaults.INTEGRATION_PATH_DEPTH
+  }
+
+  return integrationPathDepth
 }

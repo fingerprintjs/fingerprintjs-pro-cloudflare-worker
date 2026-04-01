@@ -10,3 +10,17 @@ jobs:
     uses: fingerprintjs/dx-team-toolkit/.github/workflows/build-typescript-project.yml@v1
     with:
       checkTypes: false
+  typecheck:
+    name: Check types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@129abb77bf5884e578fcaf1f37628e41622cc371
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm typecheck
