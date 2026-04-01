@@ -181,7 +181,7 @@ describe('default route', () => {
   })
 
   test('slash in the end', async () => {
-    const request = new Request(`https://example.com/${workerPath}`)
+    const request = new Request(`https://example.com/${workerPath}/`)
     await handleRequestWithRoutes(request, env, routes)
     expect(mockApiRequestHandler).toHaveBeenCalledTimes(1)
     expect(mockIngressAPIHandler).not.toHaveBeenCalled()
