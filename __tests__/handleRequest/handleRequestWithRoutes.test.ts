@@ -16,7 +16,7 @@ const env: WorkerEnv = {
   AGENT_SCRIPT_DOWNLOAD_PATH: agentScriptDownloadPath,
   GET_RESULT_PATH: getResultPath,
   PROXY_SECRET: proxySecret,
-  INTEGRATION_PATH_DEPTH: 1,
+  INTEGRATION_PATH_DEPTH: '1',
 }
 
 describe('download Pro Agent Script', () => {
@@ -219,7 +219,7 @@ describe('no match paths', () => {
     ]
   })
 
-  test.each([['https://example.com/hello', { ...env, INTEGRATION_PATH_DEPTH: 2 }]])(
+  test.each([['https://example.com/hello', { ...env, INTEGRATION_PATH_DEPTH: '2' }]])(
     'no match - %s',
     async (url, testEnv) => {
       const reqUrl = new URL(url)

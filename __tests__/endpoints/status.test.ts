@@ -17,7 +17,7 @@ describe('status page content', () => {
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
-      INTEGRATION_PATH_DEPTH: 1,
+      INTEGRATION_PATH_DEPTH: '1',
     }
     const req = new Request('http://localhost/worker_path/status')
     const response = await worker.fetch(req, workerEnv)
@@ -29,7 +29,7 @@ describe('status page content', () => {
       PROXY_SECRET: null,
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
-      INTEGRATION_PATH_DEPTH: 1,
+      INTEGRATION_PATH_DEPTH: '1',
     }
     const req = new Request('http://localhost/worker_path/status')
     const response = await worker.fetch(req, workerEnv)
@@ -41,7 +41,7 @@ describe('status page content', () => {
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: null,
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
-      INTEGRATION_PATH_DEPTH: 1,
+      INTEGRATION_PATH_DEPTH: '1',
     }
     const req = new Request('http://localhost/worker_path/status')
     const response = await worker.fetch(req, workerEnv)
@@ -53,7 +53,7 @@ describe('status page content', () => {
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: null,
-      INTEGRATION_PATH_DEPTH: 1,
+      INTEGRATION_PATH_DEPTH: '1',
     }
     const req = new Request('http://localhost/worker_path/status')
     const response = await worker.fetch(req, workerEnv)
@@ -65,7 +65,7 @@ describe('status page content', () => {
       PROXY_SECRET: null,
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: null,
-      INTEGRATION_PATH_DEPTH: 1,
+      INTEGRATION_PATH_DEPTH: '1',
     }
     const req = new Request('http://localhost/worker_path/status')
     const response = await worker.fetch(req, workerEnv)
@@ -77,7 +77,7 @@ describe('status page content', () => {
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
-      INTEGRATION_PATH_DEPTH: 0,
+      INTEGRATION_PATH_DEPTH: '0',
     }
     const req = new Request('http://localhost/worker_path/status')
     const response = await worker.fetch(req, workerEnv)
@@ -105,7 +105,7 @@ describe('status page response headers', () => {
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
-      INTEGRATION_PATH_DEPTH: 1,
+      INTEGRATION_PATH_DEPTH: '1',
     }
     const req = new Request('http://localhost/worker_path/status')
     const response = await worker.fetch(req, workerEnv)
@@ -122,7 +122,7 @@ describe('status page other HTTP methods than GET', () => {
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent_download',
-      INTEGRATION_PATH_DEPTH: 1,
+      INTEGRATION_PATH_DEPTH: '1',
     }
     const req = new Request('http://localhost/worker_path/status', { method: 'POST' })
     const response = await worker.fetch(req, workerEnv)

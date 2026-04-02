@@ -18,7 +18,7 @@ describe('addProxyIntegrationHeaders', () => {
       GET_RESULT_PATH: 'result-path',
       PROXY_SECRET: 'secret_value',
       FPJS_INGRESS_BASE_HOST: null,
-      INTEGRATION_PATH_DEPTH: 1,
+      INTEGRATION_PATH_DEPTH: '1',
     }
   })
 

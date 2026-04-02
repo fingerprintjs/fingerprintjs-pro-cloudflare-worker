@@ -16,7 +16,11 @@ describe('getIntegrationPathDepth', () => {
     expect(getIntegrationPathDepth(makeEnv(3))).toBe(3)
   })
 
-  it.each([null, 0, -1, NaN, +Infinity, -Infinity, -0, 0.1])(
+  it('parses a positive integer provided as a string', () => {
+    expect(getIntegrationPathDepth(makeEnv('3'))).toBe(3)
+  })
+
+  it.each([null, 0, -1, NaN, +Infinity, -Infinity, -0, 0.1, '', '0', 'abc', '1.5'])(
     'returns the default for an invalid INTEGRATION_PATH_DEPTH - %s',
     (input) => {
       expect(getIntegrationPathDepth(makeEnv(input))).toBe(Defaults.INTEGRATION_PATH_DEPTH)
