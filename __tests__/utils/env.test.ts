@@ -27,6 +27,13 @@ describe('getIntegrationPathDepth', () => {
     expect(getIntegrationPathDepth(makeEnv(input))).toBe(expected)
   })
 
+  it('returns the default when INTEGRATION_PATH_DEPTH is undefined at runtime', () => {
+    // Extra test even though types should already guard against 'undefined', hence the assertion
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const env = { ...Defaults, INTEGRATION_PATH_DEPTH: undefined } as unknown as WorkerEnv
+    expect(getIntegrationPathDepth(env)).toBe(Defaults.INTEGRATION_PATH_DEPTH)
+  })
+
   it.each([null, -1, NaN, +Infinity, -Infinity, -0, 0.1, '', 'abc', '1.5'])(
     'returns the default for an invalid INTEGRATION_PATH_DEPTH - %s',
     (input) => {
