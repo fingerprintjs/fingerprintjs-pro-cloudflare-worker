@@ -1,5 +1,11 @@
 # Fingerprint Cloudflare Worker Proxy Integration
 
+## 1.7.0-rc.2
+
+### Patch Changes
+
+- normalize INTEGRATION_PATH_DEPTH to number and allow `0` ([4d60ccc](https://github.com/fingerprintjs/cloudflare-worker-proxy/commit/4d60ccc6ee81eb99e810c68b5179ea0a99bc195c))
+
 ## 1.7.0-rc.1
 
 ### Patch Changes
