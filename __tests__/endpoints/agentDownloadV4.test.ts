@@ -8,7 +8,7 @@ const workerEnv: WorkerEnv = {
   PROXY_SECRET: 'proxy_secret',
   GET_RESULT_PATH: null,
   AGENT_SCRIPT_DOWNLOAD_PATH: null,
-  INTEGRATION_PATH_DEPTH: 1,
+  INTEGRATION_PATH_DEPTH: '1',
 }
 
 const agentDownloadPath = '/web/v4/someApiKey'
