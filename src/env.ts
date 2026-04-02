@@ -66,14 +66,14 @@ export function getStatusPagePath(): string {
 export const integrationPathDepthVarName = 'INTEGRATION_PATH_DEPTH'
 function normalizeIntegrationPathDepth(env: WorkerEnv): number | null {
   const integrationPathDepth = env[integrationPathDepthVarName]
-  if (integrationPathDepth === null || integrationPathDepth === undefined) {
+  if (integrationPathDepth === null || integrationPathDepth === undefined || integrationPathDepth === '') {
     return null
   }
   return typeof integrationPathDepth === 'string' ? Number(integrationPathDepth) : integrationPathDepth
 }
 
-function isPositiveInteger(value: number): boolean {
-  return Number.isInteger(value) && value > 0
+function isNonNegativeInteger(value: number): boolean {
+  return Number.isInteger(value) && value >= 0 && !Object.is(value, -0)
 }
 
 export function envHasValidIntegrationPathDepth(env: WorkerEnv) {
@@ -81,7 +81,7 @@ export function envHasValidIntegrationPathDepth(env: WorkerEnv) {
   if (integrationPathDepth == null) {
     return true
   }
-  return isPositiveInteger(integrationPathDepth)
+  return isNonNegativeInteger(integrationPathDepth)
 }
 
 export function getIntegrationPathDepth(env: WorkerEnv): number {
@@ -90,9 +90,9 @@ export function getIntegrationPathDepth(env: WorkerEnv): number {
     return Defaults.INTEGRATION_PATH_DEPTH
   }
 
-  if (!isPositiveInteger(integrationPathDepth)) {
+  if (!isNonNegativeInteger(integrationPathDepth)) {
     console.warn(
-      `INTEGRATION_PATH_DEPTH must be an integer and greater than 0, defaulting to ${Defaults.INTEGRATION_PATH_DEPTH}`
+      `INTEGRATION_PATH_DEPTH must be an integer greater than or equal to 0, defaulting to ${Defaults.INTEGRATION_PATH_DEPTH}`
     )
     return Defaults.INTEGRATION_PATH_DEPTH
   }

@@ -194,6 +194,39 @@ describe('default route', () => {
   })
 })
 
+describe('INTEGRATION_PATH_DEPTH = 0', () => {
+  const depthZeroEnv: WorkerEnv = { ...env, INTEGRATION_PATH_DEPTH: '0' }
+  let routes: Route[] = []
+  let mockAgentDownloadHandler: Mock
+  let mockIngressAPIHandler: Mock
+  beforeEach(() => {
+    mockAgentDownloadHandler = vi.fn()
+    mockIngressAPIHandler = vi.fn()
+    routes = [
+      {
+        pathPrefix: createRoutePathPrefix(getScriptDownloadPath(depthZeroEnv)),
+        handler: mockAgentDownloadHandler,
+      },
+      {
+        pathPrefix: createRoutePathPrefix(getGetResultPath(depthZeroEnv)),
+        handler: mockIngressAPIHandler,
+      },
+    ]
+  })
+
+  test('matches agent download path without prefix', async () => {
+    const request = new Request(`https://example.com/${agentScriptDownloadPath}`)
+    await handleRequestWithRoutes(request, depthZeroEnv, routes)
+    expect(mockAgentDownloadHandler).toHaveBeenCalledTimes(1)
+  })
+
+  test('matches get result path without prefix', async () => {
+    const request = new Request(`https://example.com/${getResultPath}`)
+    await handleRequestWithRoutes(request, depthZeroEnv, routes)
+    expect(mockIngressAPIHandler).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe('no match paths', () => {
   let routes: Route[] = []
   let mockAgentDownloadHandler: Mock

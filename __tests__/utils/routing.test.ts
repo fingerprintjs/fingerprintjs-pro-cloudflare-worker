@@ -45,13 +45,17 @@ describe('createRoutePathPrefix', () => {
 })
 
 describe('stripPrefixPathSegments', () => {
-  it.each([0, -1])('throws if segmentCount is %i', (segmentCount) => {
-    expect(() => stripPrefixPathSegments(new URL('https://example.com/a/b'), segmentCount)).toThrow(
-      'segmentCount must be greater than 0'
+  it('throws if segmentCount is negative', () => {
+    expect(() => stripPrefixPathSegments(new URL('https://example.com/a/b'), -1)).toThrow(
+      'segmentCount must be greater than or equal to 0'
     )
   })
 
   it.each([
+    [0, 'https://example.com/path', '/path'],
+    [0, 'https://example.com/a/b/c', '/a/b/c'],
+    [0, 'https://example.com', '/'],
+    [0, 'https://example.com/', '/'],
     [1, 'https://example.com/prefix/path', '/path'],
     [1, 'https://example.com/prefix', '/'],
     [1, 'https://example.com/prefix/', '/'],

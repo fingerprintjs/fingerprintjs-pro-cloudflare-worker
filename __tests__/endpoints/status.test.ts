@@ -77,9 +77,21 @@ describe('status page content', () => {
       PROXY_SECRET: 'proxy_secret',
       GET_RESULT_PATH: 'get_result',
       AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
-      INTEGRATION_PATH_DEPTH: '0',
+      INTEGRATION_PATH_DEPTH: 'abc',
     }
     const req = new Request('http://localhost/worker_path/status')
+    const response = await worker.fetch(req, workerEnv)
+    expect(await response.text()).toMatchSnapshot()
+  })
+  test('when integration path depth is zero', async () => {
+    const workerEnv: WorkerEnv = {
+      FPJS_INGRESS_BASE_HOST: config.ingressApi,
+      PROXY_SECRET: 'proxy_secret',
+      GET_RESULT_PATH: 'get_result',
+      AGENT_SCRIPT_DOWNLOAD_PATH: 'agent',
+      INTEGRATION_PATH_DEPTH: '0',
+    }
+    const req = new Request('http://localhost/status')
     const response = await worker.fetch(req, workerEnv)
     expect(await response.text()).toMatchSnapshot()
   })
