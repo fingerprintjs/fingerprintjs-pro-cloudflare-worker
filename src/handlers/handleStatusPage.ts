@@ -6,7 +6,7 @@ import {
   agentScriptDownloadPathVarName,
   getResultPathVarName,
   proxySecretVarName,
-  isIntegrationPathDepthValid,
+  envHasValidIntegrationPathDepth,
   integrationPathDepthVarName,
 } from '../env'
 
@@ -50,7 +50,7 @@ function createEnvVarsInformationElement(env: WorkerEnv): string {
   const isScriptDownloadPathAvailable = isScriptDownloadPathSet(env)
   const isGetResultPathAvailable = isGetResultPathSet(env)
   const isProxySecretAvailable = isProxySecretSet(env)
-  const isIntegrationPathDepthAvailable = isIntegrationPathDepthValid(env)
+  const isIntegrationPathDepthAvailable = envHasValidIntegrationPathDepth(env)
 
   const isAllRequiredVarsAvailable = isProxySecretAvailable && isIntegrationPathDepthAvailable
   const isAllV3VarsAvailable = isScriptDownloadPathAvailable && isGetResultPathAvailable

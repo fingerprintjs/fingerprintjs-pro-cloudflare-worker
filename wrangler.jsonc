@@ -10,6 +10,6 @@
     "GET_RESULT_PATH": "",
     "PROXY_SECRET": "",
     "FPJS_INGRESS_BASE_HOST": "",
-    "INTEGRATION_PATH_DEPTH": 1
+    "INTEGRATION_PATH_DEPTH": "1",
   },
 }

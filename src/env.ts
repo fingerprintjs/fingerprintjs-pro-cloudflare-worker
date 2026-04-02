@@ -5,7 +5,7 @@ export type WorkerEnv = {
   GET_RESULT_PATH: string | null
   PROXY_SECRET: string | null
   FPJS_INGRESS_BASE_HOST: string | null
-  INTEGRATION_PATH_DEPTH: number | null
+  INTEGRATION_PATH_DEPTH: number | string | null
 }
 
 export const Defaults = {
@@ -64,23 +64,33 @@ export function getStatusPagePath(): string {
 }
 
 export const integrationPathDepthVarName = 'INTEGRATION_PATH_DEPTH'
-export function isIntegrationPathDepthValid(env: WorkerEnv) {
+function normalizeIntegrationPathDepth(env: WorkerEnv): number | null {
   const integrationPathDepth = env[integrationPathDepthVarName]
-  if (integrationPathDepth !== null && integrationPathDepth !== undefined) {
-    return Number.isInteger(integrationPathDepth) && integrationPathDepth > 0
+  if (integrationPathDepth === null || integrationPathDepth === undefined) {
+    return null
   }
+  return typeof integrationPathDepth === 'string' ? Number(integrationPathDepth) : integrationPathDepth
+}
 
-  // The default value is valid
-  return true
+function isPositiveInteger(value: number): boolean {
+  return Number.isInteger(value) && value > 0
+}
+
+export function envHasValidIntegrationPathDepth(env: WorkerEnv) {
+  const integrationPathDepth = normalizeIntegrationPathDepth(env)
+  if (integrationPathDepth == null) {
+    return true
+  }
+  return isPositiveInteger(integrationPathDepth)
 }
 
 export function getIntegrationPathDepth(env: WorkerEnv): number {
-  const integrationPathDepth = env[integrationPathDepthVarName]
-  if (integrationPathDepth === null || integrationPathDepth === undefined) {
+  const integrationPathDepth = normalizeIntegrationPathDepth(env)
+  if (integrationPathDepth === null) {
     return Defaults.INTEGRATION_PATH_DEPTH
   }
 
-  if (!Number.isInteger(integrationPathDepth) || integrationPathDepth <= 0) {
+  if (!isPositiveInteger(integrationPathDepth)) {
     console.warn(
       `INTEGRATION_PATH_DEPTH must be an integer and greater than 0, defaulting to ${Defaults.INTEGRATION_PATH_DEPTH}`
     )
