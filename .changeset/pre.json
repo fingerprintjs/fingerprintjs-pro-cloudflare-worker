@@ -1,12 +1,8 @@
 {
-  "mode": "pre",
+  "mode": "exit",
   "tag": "rc",
   "initialVersions": {
     "@fingerprint/cloudflare-worker-proxy": "1.6.0"
   },
-  "changesets": [
-    "goofy-chefs-travel",
-    "large-shrimps-know",
-    "rare-years-exist"
-  ]
+  "changesets": ["large-shrimps-know"]
 }
