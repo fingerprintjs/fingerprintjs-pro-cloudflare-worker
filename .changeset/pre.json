@@ -5,7 +5,6 @@
     "@fingerprint/cloudflare-worker-proxy": "1.6.0"
   },
   "changesets": [
-    "large-shrimps-know",
-    "rare-years-exist"
+    "large-shrimps-know"
   ]
 }
