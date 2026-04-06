@@ -16,6 +16,6 @@ Added support for Fingerprint [JavaScript agent v4](https://docs.fingerprint.com
 
 + const fpPromise = Fingerprint.load({
 +   apiKey: PUBLIC_API_KEY,
-+   endpoints: "https://yourwebsite.com/WORKER_PATH?region=eu",
++   endpoints: "https://yourwebsite.com/WORKER_PATH/?region=eu",
 + });
 ```
