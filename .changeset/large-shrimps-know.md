@@ -13,7 +13,7 @@ When upgrading to the JavaScript agent v4, remove the `scriptUrlPattern` and `en
 -   endpoint: "https://yourwebsite.com/WORKER_PATH/GET_RESULT_PATH?region=eu",
 - });
 
-+ const fpPromise = Fingerprint.load({
++ const fpPromise = Fingerprint.start({
 +   apiKey: PUBLIC_API_KEY,
 +   endpoints: "https://yourwebsite.com/WORKER_PATH/?region=eu",
 + });
