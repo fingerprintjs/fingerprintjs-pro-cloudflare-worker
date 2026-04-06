@@ -1,5 +1,28 @@
 # Fingerprint Cloudflare Worker Proxy Integration
 
+## 1.7.0
+
+### Minor Changes
+
+- Added support for Fingerprint [JavaScript agent v4](https://docs.fingerprint.com/reference/js-agent-v4). Compatibility with JavaScript agent v3 is maintained, you can upgrade to the latest JavaScript agent at your convenience.
+
+  When upgrading to the JavaScript agent v4, remove the `scriptUrlPattern` and `endpoint` options. Replace them with a single `endpoints` option pointing to the worker route of your Cloudflare proxy integration:
+
+  ```diff
+  - const fpPromise = FingerprintJS.load({
+  -   apiKey: PUBLIC_API_KEY,
+  -   scriptUrlPattern: "https://yourwebsite.com/WORKER_PATH/AGENT_SCRIPT_DOWNLOAD_PATH?apiKey=<apiKey>&version=<version>&loaderVersion=<loaderVersion>",
+  -   endpoint: "https://yourwebsite.com/WORKER_PATH/GET_RESULT_PATH?region=eu",
+  - });
+
+  + const fpPromise = Fingerprint.start({
+  +   apiKey: PUBLIC_API_KEY,
+  +   endpoints: "https://yourwebsite.com/WORKER_PATH/?region=eu",
+  + });
+  ```
+
+  See [Migrating the JavaScript agent from v3 to v4](https://docs.fingerprint.com/reference/migrating-from-v3-to-v4) for more details. ([b3d8ba5](https://github.com/fingerprintjs/cloudflare-worker-proxy/commit/b3d8ba5c1a7759dea283ab86df3f592b72de4cc7))
+
 ## 1.7.0-rc.2
 
 ### Patch Changes
