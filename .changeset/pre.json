@@ -4,7 +4,5 @@
   "initialVersions": {
     "@fingerprint/cloudflare-worker-proxy": "1.6.0"
   },
-  "changesets": [
-    "large-shrimps-know"
-  ]
+  "changesets": ["large-shrimps-know"]
 }
