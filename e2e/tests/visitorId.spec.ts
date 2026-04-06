@@ -1,6 +1,5 @@
-import { test, expect, Page, request, APIRequestContext, ElementHandle } from '@playwright/test'
+import { test, expect, Page, request, APIRequestContext, Locator } from '@playwright/test'
 import { areVisitorIdAndRequestIdValid, wait } from '../utils'
-import assert from 'node:assert'
 
 const INT_VERSION = process.env.worker_version || ''
 const WORKER_PATH = process.env.worker_path || 'fpjs-worker-default'
@@ -36,6 +35,31 @@ interface V4GetResult {
 
 type Result = GetResult | V4GetResult
 
+function hasStringProperty(value: unknown, key: string): boolean {
+  return typeof value === 'object' && value !== null && key in value && typeof Reflect.get(value, key) === 'string'
+}
+
+function isResult(value: unknown): value is Result {
+  return (
+    (hasStringProperty(value, 'event_id') && hasStringProperty(value, 'visitor_id')) ||
+    (hasStringProperty(value, 'requestId') && hasStringProperty(value, 'visitorId'))
+  )
+}
+
+function getResultIds(jsonContent: Result): { visitorId: string; requestId: string } {
+  if ('event_id' in jsonContent) {
+    return {
+      visitorId: jsonContent.visitor_id,
+      requestId: jsonContent.event_id,
+    }
+  }
+
+  return {
+    visitorId: jsonContent.visitorId,
+    requestId: jsonContent.requestId,
+  }
+}
+
 test.describe('visitorId', () => {
   async function waitUntilOnline(
     reqContext: APIRequestContext,
@@ -70,29 +94,34 @@ test.describe('visitorId', () => {
     return waitUntilOnline(reqContext, expectedVersion, newRetryCounter, maxRetries)
   }
 
-  async function testForElement(el: ElementHandle<SVGElement | HTMLElement>) {
-    const textContent = await el.textContent()
-    expect(textContent != null).toStrictEqual(true)
-    assert(typeof textContent === 'string')
+  async function testForElement(locator: Locator) {
+    await expect(locator).toBeVisible()
 
-    let jsonContent: Result | undefined
-    try {
-      jsonContent = JSON.parse(textContent)
-    } catch (e) {
-      // do nothing
-    }
-    assert(jsonContent)
+    await expect
+      .poll(
+        async () => {
+          const textContent = await locator.textContent()
+          if (typeof textContent !== 'string' || textContent.trim() === '') {
+            return false
+          }
 
-    let visitorId = ''
-    let requestId = ''
-    if ('event_id' in jsonContent) {
-      visitorId = jsonContent.visitor_id
-      requestId = jsonContent.event_id
-    } else if ('requestId' in jsonContent) {
-      visitorId = jsonContent.visitorId
-      requestId = jsonContent.requestId
-    }
-    expect(areVisitorIdAndRequestIdValid(visitorId, requestId)).toStrictEqual(true)
+          try {
+            const jsonContent = JSON.parse(textContent)
+            if (!isResult(jsonContent)) {
+              return false
+            }
+            const { visitorId, requestId } = getResultIds(jsonContent)
+            return areVisitorIdAndRequestIdValid(visitorId, requestId)
+          } catch {
+            return false
+          }
+        },
+        {
+          message: `Expected ${await locator.evaluate((el) => el.outerHTML)} to contain a valid visitor result`,
+          timeout: 30000,
+        }
+      )
+      .toBe(true)
   }
 
   async function runTest(page: Page, url: string) {
@@ -101,9 +130,8 @@ test.describe('visitorId', () => {
       waitUntil: 'networkidle',
     })
 
-    await wait(5000)
-    await page.waitForSelector('#result > code').then(testForElement)
-    await page.waitForSelector('#cdn-result > code').then(testForElement)
+    await testForElement(page.locator('#result > code'))
+    await testForElement(page.locator('#cdn-result > code'))
   }
 
   for (const [name, url] of testCases) {
